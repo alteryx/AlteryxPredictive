@@ -1,5 +1,21 @@
-#########
-# John Fox's plotMeans function from the Rcmdr package
+#' Plot means by group(s)
+#'
+#'
+#' This function is taken from John Fox's plotMeans function from the Rcmdr package
+#' @param response the response variable
+#' @param factor1 the first grouping variable
+#' @param factor2 the second grouping variable
+#' @param error.bar the type of error bars to plot
+#' @param level the confidence level to use when plotting conf.int
+#' @param xlab x axis label
+#' @param ylab y axis label
+#' @param legend.lab legend label
+#' @param main main title of the plot
+#' @param pch plotting character i.e. symbol to use
+#' @param lty line type
+#' @param col color palette to use
+#' @param ... additional arguments. unused currently.
+#' @export
 plotMeans <- function (response, factor1, factor2, error.bars = c("se", "sd",
     "conf.int", "none"), level = 0.95, xlab = deparse(substitute(factor1)),
     ylab = paste("mean of", deparse(substitute(response))), legend.lab = deparse(substitute(factor2)),
