@@ -122,12 +122,15 @@ trim.blanks <- function(text){
   gsub("^\ *", "", gsub("\ *$", "", text))
 }
 
-#########
-# The function pipeDelim takes a table row that comes from capture.output and
-# turns it into a pipe delimited string for processing in Alteryx.
-#
-# Author: Dan Putler
-
+#' Convert row into a pipe delimited string
+#'
+#'
+#' The function pipeDelim takes a table row that comes from capture.output and
+#' turns it into a pipe delimited string for processing in Alteryx.
+#'
+#' @param capture.vec row vector to convert into pipe delimited string
+#' @author Dan Putler
+#' @export
 pipeDelim <- function(capture.vec) {
   pD <- function(cv) {
     print(cv)
@@ -142,13 +145,18 @@ pipeDelim <- function(capture.vec) {
   return(out.vec)
 }
 
-#########
-# The matrixPipeDelim function takes a matrix and converts it into a character
-# vector in which each element is a pipe delimited set of values for a row in
-# the original matrix
 
-# Author: Dan Putler
-
+#' Convert a matrix into a pipe delimited set of values
+#'
+#'
+#' The matrixPipeDelim function takes a matrix and converts it into a character
+#' vector in which each element is a pipe delimited set of values for a row in
+#' the original matrix
+#'
+#' @param a.matrix matrix to convert
+#' @param round.level rounding level to use
+#' @author Dan Putler
+#' @export
 matrixPipeDelim <- function (a.matrix, round.level = 5e-07)
 {
     splitFun <- function(string) {
