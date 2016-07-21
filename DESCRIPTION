@@ -21,6 +21,8 @@ Imports:
   XML
 Suggests:
   AlteryxRDataX,
-    knitr,
-    rmarkdown
+  rgeos,
+  car,
+  knitr,
+  rmarkdown
 VignetteBuilder: knitr
