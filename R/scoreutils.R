@@ -254,8 +254,8 @@ samplePct.default <- function(x, os.value, new.data) {
 }
 
 samplePct.glm <- function(x, target.value, new.data) {
-  y.name <- unlist(strsplit(as.character(mod.obj$call)[2], " ~ "))[1]
-  y.var <- eval(parse(text = paste("mod.obj$data$", y.name, sep = "")))
+  y.name <- unlist(strsplit(as.character(x$call)[2], " ~ "))[1]
+  y.var <- eval(parse(text = paste("x$data$", y.name, sep = "")))
   100*sum(as.numeric(as.character(y.var) == target.value)) / length(y.var)
 }
 
@@ -274,12 +274,12 @@ samplePct.earth <- function(x, os.value, new.data) {
 }
 
 samplePct.rpart <- function(x, os.value, new.data) {
-  AlteryxMessage("In predProb.rpart", iType = 2, iPriority = 3)
+  AlteryxRDataX::AlteryxMessage("In predProb.rpart", iType = 2, iPriority = 3)
   y.levels <- getYlevels(x, new.data)
   if (y.levels[1] == os.value) {
-    new.y <- 2 - mod.obj$y
+    new.y <- 2 - x$y
   } else {
-    new.y <- mod.obj$y - 1
+    new.y <- x$y - 1
   }
   100*sum(new.y) / length(new.y)
 }
