@@ -7,6 +7,21 @@
 graphWHR(inches = c("True", "False"), in.w, in.h, cm.w = NULL,
   cm.h = NULL, resolution = c("1x", "2x", "3x"), print.high = FALSE)
 }
+\arguments{
+\item{inches}{boolean indicating whether to measure dimensions in inches}
+
+\item{in.w}{the width of the plot to produce in inches.}
+
+\item{in.h}{the height of the plot to produce in inches.}
+
+\item{cm.w}{the width of the plot to produce in cm.}
+
+\item{cm.h}{the height of the plot to produce in cm.}
+
+\item{resolution}{the resolution of the plot to produce as a multiple of 96dpi}
+
+\item{print.high}{whether to turn 3x into 6x (high, 576 dpi) resolution}
+}
 \description{
 This takes information about the desired graph size (in
 inches or centemeters), the desired output resolution of 1x, 2x, 3x from a

@@ -17,6 +17,8 @@ plotMeans(response, factor1, factor2, error.bars = c("se", "sd", "conf.int",
 
 \item{factor2}{the second grouping variable}
 
+\item{error.bars}{the type of error bars to plot}
+
 \item{level}{the confidence level to use when plotting conf.int}
 
 \item{xlab}{x axis label}
@@ -34,8 +36,6 @@ plotMeans(response, factor1, factor2, error.bars = c("se", "sd", "conf.int",
 \item{col}{color palette to use}
 
 \item{...}{additional arguments. unused currently.}
-
-\item{error.bar}{the type of error bars to plot}
 }
 \description{
 This function is taken from John Fox's plotMeans function from the Rcmdr package
