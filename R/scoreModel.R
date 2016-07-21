@@ -21,6 +21,7 @@ scoreModel <- function(mod.obj, new.data, score.field = "Score", ...) {
 #' @rdname scoreModel
 scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
     os.value = NULL, os.pct = NULL, ...){
+  target.value <- os.value
   new.data <- matchLevels(new.data, getXlevels(mod.obj))
   y.levels <- getYlevels(mod.obj, new.data)
   if (class(mod.obj) == "earth" && is.null(mod.obj$glm.list)) {
