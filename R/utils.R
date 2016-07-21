@@ -2,7 +2,7 @@
 #'
 #' @export
 inAlteryx <- function(){
-  'package:AlteryxRDataX' %in% search()
+  exists("AlteryxDataOutput", .GlobalEnv)
 }
 
 #' Stop
