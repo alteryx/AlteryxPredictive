@@ -463,7 +463,7 @@ varImpPlot.Alteryx <- function(x, sort=TRUE, n.var=min(30, nrow(x$importance)),
   if(!inherits(x, "randomForest")) {
     stop("This function only works for objects of class `randomForest'")
   }
-  imp <- importance(x, class=class, scale=scale, type=type, ...)
+  imp <- randomForest::importance(x, class=class, scale=scale, type=type, ...)
   print(colnames(imp))
   # If there are two or more columns, just use the second to last column
   if(ncol(imp) > 1) {

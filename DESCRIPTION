@@ -25,5 +25,6 @@ Suggests:
   car,
   knitr,
   rmarkdown,
-  RevoScaleR
+  ScaleR,
+  randomForest
 VignetteBuilder: knitr
