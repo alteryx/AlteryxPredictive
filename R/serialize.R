@@ -71,7 +71,7 @@ checkModelObjects <- function(name, default){
 #' @export
 readModelObjects <- function(name, default){
   checkModelObjects(name, default)
-  models <- if (inAlteryx()) read.Alteryx(name) else default
+  models <- if (inAlteryx()) AlteryxRDataX::read.Alteryx(name) else default
   m <- lapply(models$Object, function(x){
     unserializeObject(as.character(x))
   })

@@ -3,8 +3,8 @@ scoreModel <- function(mod.obj, new.data, score.field = "Score", os.value = NULL
   UseMethod('scoreModel')
 }
 
-scoreModel.default <- function(mod.obj, new.data, score.field = "Score", os.value = NULL,
-                               os.pct = NULL, ...){
+scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
+    os.value = NULL, os.pct = NULL, ...){
   new.data <- matchLevels(new.data, getXlevels(mod.obj))
   y.levels <- getYlevels(mod.obj, new.data)
   if (class(mod.obj) == "earth" && is.null(mod.obj$glm.list)) {
@@ -24,8 +24,8 @@ scoreModel.default <- function(mod.obj, new.data, score.field = "Score", os.valu
   } else {
     if (!is.null(os.value)) {
       if (length(y.levels) != 2) {
-        AlteryxMessage("Adjusting for the oversampling of the target is only valid for a binary categorical variable, so the predicted probabilities will not be adjusted.", iType = 2, iPriority = 3)
-        scores <- data.frame(predProb(mod.obj, newdata = the.data))
+        AlteryxRDataX::AlteryxMessage("Adjusting for the oversampling of the target is only valid for a binary categorical variable, so the predicted probabilities will not be adjusted.", iType = 2, iPriority = 3)
+        scores <- data.frame(predProb(mod.obj, newdata = new.data))
       } else {
         sample.pct <- samplePct(mod.obj, os.value, new.data)
         wr <- sample.pct/os.pct
@@ -64,9 +64,9 @@ scoreModel.lm <- function(mod.obj, new.data, score.field = "Score", pred.int = F
       # would imply machine infinity when expotentiated. If this is the case
       # a warning is given, and the smearing estimator is not applied. NOTE:
       # to make this code work nicely in non-Alteryx environments, the
-      # AlteryxMessage call would need to be replaced with a message call
+      # AlteryxRDataX::AlteryxMessage call would need to be replaced with a message call
       if (max(score) > 709) {
-        AlteryxMessage("The target variable does not appear to have been natural log transformed, no correction was applied.", iType = 2, iPriority = 3)
+        AlteryxRDataX::AlteryxMessage("The target variable does not appear to have been natural log transformed, no correction was applied.", iType = 2, iPriority = 3)
       } else {
         score <- exp(score)*(sum(exp(mod.obj$residuals))/length(mod.obj$residuals))
       }
@@ -118,7 +118,7 @@ scoreModel.rxLinMod <- function(mod.obj, new.data, score.field = "Score", pred.i
     scores <- rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "score")$score
     if (log.y) {
       if (is.null(mod.obj$smearing.adj)) {
-        AlteryxMessage("The target variable does not appear to have been natrual log transformed, no correction was applied.", iType = 2, iPriority = 3)
+        AlteryxRDataX::AlteryxMessage("The target variable does not appear to have been natrual log transformed, no correction was applied.", iType = 2, iPriority = 3)
       } else {
         scores <- exp(scores)*mod.obj$smearing.adj
       }
@@ -136,7 +136,7 @@ scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL, 
       scores <- scores[, -(ncol(scores))]
     if (!is.null(os.value)) {
       if (ncol(scores) != 2) {
-        AlteryxMessage("Adjusting for the oversampling of the target is only valid for a binary categorical variable, so the predicted probabilities will not be adjusted.", iType = 2, iPriority = 3)
+        AlteryxRDataX::AlteryxMessage("Adjusting for the oversampling of the target is only valid for a binary categorical variable, so the predicted probabilities will not be adjusted.", iType = 2, iPriority = 3)
       } else {
         target.value <- os.value
         target.loc <- 2
