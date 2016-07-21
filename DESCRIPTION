@@ -24,5 +24,6 @@ Suggests:
   rgeos,
   car,
   knitr,
-  rmarkdown
+  rmarkdown,
+  RevoScaleR
 VignetteBuilder: knitr

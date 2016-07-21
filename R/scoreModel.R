@@ -108,7 +108,7 @@ scoreModel.lm <- function(mod.obj, new.data, score.field = "Score",
 scoreModel.rxLogit <- function(mod.obj, new.data, score.field = "Score",
     os.value = NULL, os.pct = NULL, ...) {
   new.data <- matchLevels(new.data, mod.obj$xlevels)
-  pred.prob <- rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "pred.prob")$pred.prob
+  pred.prob <- ScaleR::rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "pred.prob")$pred.prob
   if (!is.null(os.value)) {
     target.value <- os.value
     num.target <- mod.obj$yinfo$counts[mod.obj$yinfo$levels == target.value]
@@ -133,7 +133,7 @@ scoreModel.rxLogit <- function(mod.obj, new.data, score.field = "Score",
 #' @export
 #' @rdname scoreModel
 scoreModel.rxGlm <- function(mod.obj, new.data, score.field = "Score", ...) {
-  scores <- rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "score")$score
+  scores <- ScaleR::rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "score")$score
   names(scores) <- score.field
   scores
 }
@@ -143,14 +143,14 @@ scoreModel.rxGlm <- function(mod.obj, new.data, score.field = "Score", ...) {
 #' @rdname scoreModel
 scoreModel.rxLinMod <- function(mod.obj, new.data, score.field = "Score", pred.int = FALSE, int.vals = NULL, log.y = FALSE, ...) {
   if (pred.int) {
-    scores <- rxPredict(mod.obj, data = new.data, computeStdErrors = TRUE, interval = "prediction", confLevel = 0.01*int.vals, type = "response")
+    scores <- ScaleR::rxPredict(mod.obj, data = new.data, computeStdErrors = TRUE, interval = "prediction", confLevel = 0.01*int.vals, type = "response")
     scores <- scores[,-2]
     if (log.y)
       for (i in 1:3)
         scores[,i] <- exp(scores[[i]])*mod.obj$smearing.adj
     names(scores) <- paste(score.field, "_", c("fit", "lwr", "upr"), sep = "")
   } else {
-    scores <- rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "score")$score
+    scores <- ScaleR::rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "score")$score
     if (log.y) {
       if (is.null(mod.obj$smearing.adj)) {
         AlteryxRDataX::AlteryxMessage("The target variable does not appear to have been natrual log transformed, no correction was applied.", iType = 2, iPriority = 3)
@@ -169,7 +169,7 @@ scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL,
   new.data <- matchLevels(new.data, mod.obj$xlevels)
   # Classification trees
   if (!is.null(mod.obj$yinfo)) {
-    scores <- rxPredict(mod.obj, data = new.data, type = "prob")
+    scores <- ScaleR::rxPredict(mod.obj, data = new.data, type = "prob")
     if (class(mod.obj) == "rxDForest")
       scores <- scores[, -(ncol(scores))]
     if (!is.null(os.value)) {
@@ -198,7 +198,7 @@ scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL,
     }
     names(scores) <- paste(score.field, "_", mod.obj$yinfo$levels)
   } else { # Regression trees
-    scores <- rxPredict(mod.obj, data = new.data, predVarNames = "score")$score
+    scores <- ScaleR::rxPredict(mod.obj, data = new.data, predVarNames = "score")$score
   }
   scores
 }
