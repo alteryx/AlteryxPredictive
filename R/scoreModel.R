@@ -1,8 +1,24 @@
-## Score model ----
-scoreModel <- function(mod.obj, new.data, score.field = "Score", os.value = NULL, os.pct = NULL, pred.int = FALSE, int.vals = NULL, log.y = FALSE, ...) {
+#' Score function
+#'
+#' @param mod.obj model object
+#' @param new.data new data to score
+#' @param score.field name given to the score field
+#' @param ... additional arguments
+#' @export
+#' @author Ramnath Vaidyanathan, Dan Putler
+#' @rdname scoreModel
+scoreModel <- function(mod.obj, new.data, score.field = "Score", ...) {
   UseMethod('scoreModel')
 }
 
+
+#' @param os.value oversampling value
+#' @param os.pct oversampling percent
+#' @param pred.int whether to generate prediction intervals
+#' @param int.vals interval values
+#' @param log.y whether to report y on the log scale
+#' @export
+#' @rdname scoreModel
 scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
     os.value = NULL, os.pct = NULL, ...){
   new.data <- matchLevels(new.data, getXlevels(mod.obj))
@@ -46,9 +62,20 @@ scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
   scores
 }
 
-scoreModel.glm <- scoreModel.svyglm <- scoreModel.negbin <- scoreModel.default
+#' @export
+scoreModel.glm <- scoreModel.default
 
-scoreModel.lm <- function(mod.obj, new.data, score.field = "Score", pred.int = FALSE, int.vals = NULL, log.y = FALSE) {
+#' @export
+scoreModel.svyglm <- scoreModel.default
+
+#' @export
+scoreModel.negbin <- scoreModel.default
+
+
+#' @export
+#' @rdname scoreModel
+scoreModel.lm <- function(mod.obj, new.data, score.field = "Score",
+     pred.int = FALSE, int.vals = NULL, log.y = FALSE, ...) {
   if (pred.int) {
     score <- as.data.frame(predict(mod.obj, newdata = new.data, level = 0.01*int.vals, interval = "predict"))
     if (log.y) {
@@ -76,7 +103,10 @@ scoreModel.lm <- function(mod.obj, new.data, score.field = "Score", pred.int = F
   scores
 }
 
-scoreModel.rxLogit <- function(mod.obj, new.data, score.field = "Score", os.value = NULL, os.pct = NULL) {
+#' @export
+#' @rdname scoreModel
+scoreModel.rxLogit <- function(mod.obj, new.data, score.field = "Score",
+    os.value = NULL, os.pct = NULL, ...) {
   new.data <- matchLevels(new.data, mod.obj$xlevels)
   pred.prob <- rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "pred.prob")$pred.prob
   if (!is.null(os.value)) {
@@ -100,13 +130,18 @@ scoreModel.rxLogit <- function(mod.obj, new.data, score.field = "Score", os.valu
   scores
 }
 
-scoreModel.rxGlm <- function(mod.obj, new,data, score.field = "Score") {
+#' @export
+#' @rdname scoreModel
+scoreModel.rxGlm <- function(mod.obj, new.data, score.field = "Score", ...) {
   scores <- rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "score")$score
   names(scores) <- score.field
   scores
 }
 
-scoreModel.rxLinMod <- function(mod.obj, new.data, score.field = "Score", pred.int = FALSE, int.vals = NULL, log.y = FALSE) {
+
+#' @export
+#' @rdname scoreModel
+scoreModel.rxLinMod <- function(mod.obj, new.data, score.field = "Score", pred.int = FALSE, int.vals = NULL, log.y = FALSE, ...) {
   if (pred.int) {
     scores <- rxPredict(mod.obj, data = new.data, computeStdErrors = TRUE, interval = "prediction", confLevel = 0.01*int.vals, type = "response")
     scores <- scores[,-2]
@@ -127,7 +162,10 @@ scoreModel.rxLinMod <- function(mod.obj, new.data, score.field = "Score", pred.i
   scores
 }
 
-scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL, os.pct = NULL) {
+#' @export
+#' @rdname scoreModel
+scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL,
+    os.pct = NULL, ...) {
   new.data <- matchLevels(new.data, mod.obj$xlevels)
   # Classification trees
   if (!is.null(mod.obj$yinfo)) {
@@ -166,7 +204,3 @@ scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL, 
 }
 
 scoreModel.rxDForest <- scoreModel.rxDTree
-
-## End of the refactored Score code
-
-
