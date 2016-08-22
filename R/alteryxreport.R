@@ -19,7 +19,7 @@ Alteryx.ReportLM <- function (lm.obj){
   the.call = gsub("\\s\\s", "", the.call)
   resid.sum <- paste(format(summary(full.sum$residuals)[-4] , digits = 3), collapse = " ")
   p.stars <- pStars(full.sum$coefficients[,4])
-  coef.est <- paste(names(full.sum$coefficients[,1]), format(full.sum$coefficients[,1], digits = 4),
+  coef.est <- paste(dimnames(full.sum$coefficients)[[1]], format(full.sum$coefficients[,1], digits = 4),
                     format(full.sum$coefficients[,2], digits = 4), format(full.sum$coefficients[,3], digits = 4),
                     as.character(p.stars$p_txt), as.character(p.stars$Stars), sep = "|")
   coef.lab <- "Coefficients:"
@@ -72,7 +72,7 @@ Alteryx.ReportGLM <- function (glm.obj){
   the.call = gsub("\\s\\s", "", the.call)
   resid.sum <- paste(format(summary(full.sum$deviance.resid)[-4], digits = 3), collapse = " ")
   p.stars <- pStars(full.sum$coefficients[,4])
-  coef.est <- paste(names(full.sum$coefficients[,1]), format(full.sum$coefficients[,1], digits = 4),
+  coef.est <- paste(dimnames(full.sum$coefficients)[[1]], format(full.sum$coefficients[,1], digits = 4),
                     format(full.sum$coefficients[,2], digits = 4), format(full.sum$coefficients[,3], digits = 4),
                     as.character(p.stars$p_txt), as.character(p.stars$Stars), sep = "|")
   coef.lab <- "Coefficients:"
