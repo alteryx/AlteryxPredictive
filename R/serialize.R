@@ -39,14 +39,6 @@ unserializeObject <- function(the.string){
   }
 }
 
-stop.Alteryx <- function(msg, ...){
-  if (inAlteryx()) {
-    AlteryxRDataX::stop.Alteryx(msg, ...)
-  } else {
-    stop(msg, call. = F)
-  }
-}
-
 # Check if an object is a model object created by serializeObject
 # @author Ramnath Vaidyanathan
 checkModelObjects <- function(name, default){
