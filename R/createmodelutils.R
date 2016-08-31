@@ -49,9 +49,8 @@ doFunction <- function(f, param_list) {
 #' @return key value pair list with name and model
 #' @export
 modelOut <- function(model_name, model_obj) {
-  out_list <- vector(mode = "list", length = 2)
-  out_list[[1]] <- c(model_name)
-  out_list[[2]] <- list(model_obj)
-  names(out_list) <- c("Name", "Object")
-  out_list
+  list(
+    Name = model_name,
+    Object = list(model_obj)
+  )
 }
