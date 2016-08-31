@@ -27,5 +27,5 @@ Suggests:
   knitr,
   rmarkdown,
   ScaleR,
-  randomForest,
+  randomForest
 VignetteBuilder: knitr
