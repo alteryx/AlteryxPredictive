@@ -21,8 +21,6 @@ getXdfLevels <- function(form, xdf) {
 #' @param input_name name of incoming connection
 #' @return list with boolean is_XDF and string xdf_path representing
 #'  whether data is XDF and the path of the data
-#' @import AlteryxRDataX
-#' @import rjson
 #' @export
 getXdfProperties <- function(input_name) {
   is_XDF <- FALSE
