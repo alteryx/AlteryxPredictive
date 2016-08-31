@@ -18,7 +18,8 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 5.0.1
 Imports:
-  XML
+  XML,
+  rjson
 Suggests:
   AlteryxRDataX,
   rgeos,
@@ -26,5 +27,5 @@ Suggests:
   knitr,
   rmarkdown,
   ScaleR,
-  randomForest
+  randomForest,
 VignetteBuilder: knitr
