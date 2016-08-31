@@ -335,6 +335,8 @@ getOutputsDT <- function(config, the_model, is_XDF) {
   write.Alteryx(results$output3, nOutput = 3)
 
   renderInComposer(results$output5, nOutput = 5)
+
+  results
 }
 
 #' output results to Alteryx
