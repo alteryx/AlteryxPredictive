@@ -27,7 +27,6 @@ getXdfProperties <- function(input_name) {
   meta_data <- AlteryxRDataX::read.AlteryxMetaInfo(input_name)
   the_source <- as.character(meta_data$Source)
   if (all(substr(the_source, 3, 9) == "Context")) {
-    library(rjson)
     context_list <- rjson::fromJSON(the_source[1])
     if (context_list$Context == "XDF") {
       is_XDF <- TRUE
