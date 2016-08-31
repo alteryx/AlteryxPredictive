@@ -11,6 +11,9 @@ makeFormula(x_vars, y_var)
 
 \item{y_var}{string of y variable field name}
 }
+\value{
+formula of y_var ~ x_vars
+}
 \description{
 Create formula string
 }
