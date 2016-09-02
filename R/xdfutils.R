@@ -21,6 +21,7 @@ getXdfLevels <- function(formula, xdf) {
 #' @param input_name name of incoming connection
 #' @return list with boolean is_XDF and string xdf_path representing
 #'  whether data is XDF and the path of the data
+#' @import rjson
 #' @export
 getXdfProperties <- function(input_name) {
   is_XDF <- FALSE
@@ -33,7 +34,7 @@ getXdfProperties <- function(input_name) {
       xdf_path <- context_list$File.Loc
       list(is_XDF = is_XDF, xdf_path = xdf_path)
     } else {
-      stop.Alteryx("At this time only XDF scaling is supported.")
+      stop.Alteryx2("At this time only XDF scaling is supported.")
     }
   }
 }
