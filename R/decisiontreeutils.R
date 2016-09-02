@@ -416,7 +416,7 @@ processDT <- function(config, data) {
   # Determine if the rpart.plot package is available.
   loadPackages("rpart, rpart.plot", "AlteryxRhelper")
 
-  AlteryxPredictive::preModelCheckDT(config, the.data)
+  preModelCheckDT(config, the.data)
 
   the_lists <- AlteryxPredictive::createDTParams(config, data)
   params <- AlteryxPredictive::paramsToDTArgs(the_lists$f, the_lists)
