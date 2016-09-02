@@ -12,15 +12,15 @@ preModelCheckDT <- function(config, the.data) {
 
   the_target <- the.data[[name_y_var]]
   if (is.numeric(the_target) && length(unique(the_target)) < 5 && !is_XDF) {
-    AlteryxMessage("The target variable is numeric, however, it has 4 or fewer unique values.", iType = 2, iPriority = 3)
+    AlteryxMessage2("The target variable is numeric, however, it has 4 or fewer unique values.", iType = 2, iPriority = 3)
   }
 
   if(rpart_params$cp < 0 || rpart_params$cp > 1) {
-    stop.Alteryx("The complexity parameter must be between 0 and 1. Please try again.")
+    stop.Alteryx2("The complexity parameter must be between 0 and 1. Please try again.")
   }
 
   if(is.na(as.numeric(config$the.cp)) && !(config$the.cp == "Auto" || config$the.cp == "")) {
-    stop.Alteryx("The complexity parameter provided is not a number. Please enter a new value and try again.")
+    stop.Alteryx2("The complexity parameter provided is not a number. Please enter a new value and try again.")
   }
 }
 
@@ -156,7 +156,7 @@ adjustCP <- function(config, the_model) {
     new_cp <- pos_cp[1]
     print(cp_table)
     if (cp_table$xerror[1] == min(cp_table$xerror)) {
-      stop.Alteryx("The minimum cross validation error occurs for a CP value where there are no splits. Specify a complexity parameter and try again.")
+      stop.Alteryx2("The minimum cross validation error occurs for a CP value where there are no splits. Specify a complexity parameter and try again.")
     }
     prune(the_model, cp = new_cp)
   } else {
@@ -381,18 +381,18 @@ getOutputsDT <- function(config, the_model, is_XDF) {
 #' @param config list of config options
 #' @export
 outputDTResultsAlteryx <- function(results, config) {
-  write.Alteryx(results$output1, 1)
-  write.Alteryx(results$output2, 2)
+  write.Alteryx2(results$output1, 1)
+  write.Alteryx2(results$output2, 2)
   renderInComposer(results$output5, 5)
 
   whr <- graphWHR(inches = config$tree.inches, in.w = config$tree.in.w, in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h, resolution = config$tree.graph.resolution, print.high = TRUE)
-  AlteryxGraph(2, width = whr[1], height = whr[2], res = whr[3], pointsize = config$tree.pointsize)
+  AlteryxGraph2(2, width = whr[1], height = whr[2], res = whr[3], pointsize = config$tree.pointsize)
   par(mar = c(5, 4, 6, 2) + 0.1)
   do.call(match.fun(results$output2$f), results$output2$args)
   invisible(dev.off())
 
   whr <- graphWHR(inches = config$prune.inches, in.w = config$prune.in.w, in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h, resolution = config$prune.graph.resolution, print.high = FALSE)
-  AlteryxGraph(4, width = whr[1], height = whr[2], res = whr[3], pointsize = config$prune.pointsize)
+  AlteryxGraph2(4, width = whr[1], height = whr[2], res = whr[3], pointsize = config$prune.pointsize)
   par(mar = c(5, 4, 6, 2) + 0.1)
   do.call(match.fun(results$output4$f), results$output4$args)
   title(main="Pruning Plot", line=5)
