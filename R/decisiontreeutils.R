@@ -311,11 +311,11 @@ getDTGraphCalls <- function(config, the_model, is_XDF) {
 #'
 #' @param the_model model object
 #' @param is_XDF boolean of whether model is XDF
+#' @import AlteryxRviz
+#' @import htmltools
 getDTViz <- function(the_model, is_XDF) {
 
   ## Interactive Visualization
-  library(AlteryxRviz)
-  library(htmltools)
   if (is_XDF){
     k1 = tags$div(tags$h4(
       "Interactive Visualizations are not supported for Revolution Enterprise"
@@ -403,6 +403,9 @@ outputDTResultsAlteryx <- function(results, config) {
 #'
 #' @param config list of configuration options
 #' @param data list of datastream objects
+#' @import rpart
+#' @import rpart.plot
+#' @import AlteryxRhelper
 #' @return list of results or results
 #' @export
 processDT <- function(config, data) {
@@ -410,11 +413,6 @@ processDT <- function(config, data) {
   set.seed(1)
 
   config$model.name <- validName(config$model.name)
-
-  # Load the rpart library (it is included with base R but still needs to be
-  # loaded in the the process's R environment
-  # Determine if the rpart.plot package is available.
-  loadPackages("rpart, rpart.plot", "AlteryxRhelper")
 
   preModelCheckDT(config, the.data)
 
