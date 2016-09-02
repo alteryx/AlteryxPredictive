@@ -19,14 +19,13 @@ LazyData: true
 RoxygenNote: 5.0.1
 Imports:
   XML,
-  rjson
-Suggests:
-  AlteryxRDataX,
+  rjson,
   rgeos,
   car,
   knitr,
   rmarkdown,
   ScaleR,
-  randomForest,
-  rjson
+  randomForest
+Suggests:
+  AlteryxRDataX
 VignetteBuilder: knitr
