@@ -26,6 +26,7 @@ getNamesFromOrdered <- function(use_weights, data_names) {
 #' @param x_vars vector of strings of x variable field names
 #' @param y_var string of y variable field name
 #' @return formula of y_var ~ x_vars
+#' @export
 makeFormula <- function(x_vars, y_var) {
   x_string <- paste(x_vars, collapse = " + ")
   as.formula(paste0(y_var, " ~ ", x_string))
