@@ -24,6 +24,7 @@ preModelCheckDT <- function(config, the.data) {
   }
 }
 
+
 #' Creation of components for model object evaluation
 #'
 #' @param config list of config options
@@ -31,19 +32,18 @@ preModelCheckDT <- function(config, the.data) {
 #' @return list with components needed to create model
 createDTParams <- function(config, data) {
   # use lists to hold params for rpart and rxDTree functions
-  rpart_params <- rxDTree_params <- list()
+  param_list <- list()
 
   # Determine if a compute context is being used, and whether it is XDF
   # The mechanism for doing this depends on how the information is transfered
   xdf_properties <- getXdfProperties("#1")
-  is_XDF <- xdf_properties$is_XDF
-  xdf_path <- xdf_properties$xdf_path
+  param_list$is_XDF <- xdf_properties$is_XDF
+  param_list$xdf_path <- xdf_properties$xdf_path
 
   # get data param
   the.data <- data$data_stream1
   data_names <- names(the.data)
-  rpart_params$data <- quote(the.data)
-  rxDTree_params$data <- quote(xdf_path)
+  param_list$data <- quote(the.data)
 
   # Get the field names
   names_list <- getNamesFromOrdered(config$used.weights, data_names)
@@ -52,24 +52,23 @@ createDTParams <- function(config, data) {
   name_weight_var <- names_list$w
 
   # use field names to get formula param
-  dtree_formula <- makeFormula(names_x_vars, name_y_var)
-  rpart_params$formula <- rxDTree_params$formula <- dtree_formula
+  param_list$dtree_formula <- makeFormula(names_x_vars, name_y_var)
 
   # get weights param
-  weight_arg <- ifelse(config$used.weights, name_weight_var, NULL)
+  param_list$weight_arg <- ifelse(config$used.weights, name_weight_var, NULL)
   rpart_params$weights <- rxDTree_params$pweights <- weight_arg
 
   # get method and parms params
   if(config$select.type) {
     if(config$classification) {
-      rpart_params$method <- rxDTree_params$method <- "class"
+      param_list$method <- "class"
       if(config$use.gini) {
-        rpart_params$parms <- rxDTree_params$parms <- quote(list(split = "gini"))
+        param_list$parms <- quote(list(split = "gini"))
       } else {
-        rpart_params$parms <- rxDTree_params$parms <- quote(list(split = "information"))
+        param_list$parms <- quote(list(split = "information"))
       }
     } else {
-      rpart_params$method <- rxDTree_params$method <- "anova"
+      param_list$method <- "anova"
     }
   }
 
@@ -82,7 +81,7 @@ createDTParams <- function(config, data) {
     surrogate <- 2
   }
 
-  rpart_params$usesurrogate <- rxDTree_params$useSurrogate <- surrogate
+  param_list$usesurrogate <- surrogate
 
   # get max bins param
   if(is_XDF && !is.na(as.numeric(config$max.bins))) {
@@ -90,22 +89,59 @@ createDTParams <- function(config, data) {
     if(max_bins < 2) {
       stop("The minimum bins is 2")
     } else {
-      rxDTree_params$maxNumBins <- max_bins
+      param_list$maxNumBins <- max_bins
     }
   }
 
   # other parameters
-  rpart_params$minsplit <- rxDTree_params$minSplit <- config$min.split
-  rpart_params$minbucket <- rxDTree_params$minBucket <- config$min.bucket
-  rpart_params$xval <- rxDTree_params$xVal <- config$xval.folds
-  rpart_params$maxdepth <- rxDTree_params$maxDepth <- config$max.depth
+  param_list$minsplit <- config$min.split
+  param_list$minbucket <- config$min.bucket
+  param_list$xval <- config$xval.folds
+  param_list$maxdepth <- config$max.depth
 
-  rpart_params$cp <- rxDTree_params$cp <- ifelse(config$the.cp == "Auto" || config$the.cp == "", .00001, config$the.cp)
+  param_list$cp <- ifelse(config$the.cp == "Auto" || config$the.cp == "", .00001, config$the.cp)
 
-  f <- ifelse(is_XDF, "rxDTree", "rpart")
-  args <- ifelse(is_XDF, rxDTree_params, rpart_params)
+  param_list
+}
 
-  list(f = f, args = args, is_XDF = is_XDF)
+#' name mapping from parameters to functions
+#'
+#' @param f_string string of function
+#' @param param_list list of decision tree params
+#' @return list with named parameters for f_string
+paramsToDTArgs <- function(f_string, param_list) {
+  if (f_string == "rpart") {
+    list(
+      data = param_list$data,
+      formula = param_list$f,
+      weights = param_list$weight_arg,
+      method = param_list$method,
+      parms = param_list$parms,
+      usesurrogate = param_list$surrogate,
+      minsplit <- param_list$minsplit,
+      minbucket = param_list$minbucket,
+      xval = param_list$xval,
+      maxdepth = param_list$maxdepth,
+      cp = param_list$cp
+    )
+  } else if(f_string == "rxDTree") {
+    list(
+      data = quote(xdf_path),
+      formula = param_list$f,
+      pweights = param_list$weight_arg,
+      method = param_list$method,
+      parms = param_list$parms,
+      useSurrogate = param_list$surrogate,
+      maxNumBins = param_list$max_bins,
+      minSplit <- param_list$minsplit,
+      minBucket = param_list$minbucket,
+      xVal = param_list$xval,
+      maxDepth = param_list$maxdepth,
+      cp = param_list$cp
+    )
+  } else {
+    stop(paste("Unsupported function specified: ", f_string))
+  }
 }
 
 #' adjusts config based on results if config was initially "Auto"
@@ -343,6 +379,7 @@ getOutputsDT <- function(config, the_model, is_XDF) {
 #'
 #' @param results list of results to output
 #' @param config list of config options
+#' @export
 outputDTResultsAlteryx <- function(results, config) {
   write.Alteryx(results$output1, 1)
   write.Alteryx(results$output2, 2)
@@ -360,4 +397,35 @@ outputDTResultsAlteryx <- function(results, config) {
   do.call(match.fun(results$output4$f), results$output4$args)
   title(main="Pruning Plot", line=5)
   invisible(dev.off())
+}
+
+#' process for converting to results list from config and data
+#'
+#' @param config list of configuration options
+#' @param data list of datastream objects
+#' @return list of results or results
+#' @export
+process <- function(config, data) {
+  # To get run-over-run consistency, set the seed
+  set.seed(1)
+
+  config$model.name <- validName(config$model.name)
+
+  # Load the rpart library (it is included with base R but still needs to be
+  # loaded in the the process's R environment
+  # Determine if the rpart.plot package is available.
+  loadPackages("rpart, rpart.plot", "AlteryxRhelper")
+
+  AlteryxPredictive::preModelCheckDT(config, the.data)
+
+  the_lists <- AlteryxPredictive::createDTParams(config, data)
+  params <- AlteryxPredictive::paramsToDTArgs(the_lists$f, the_lists)
+  the_model <- AlteryxPredictive::doFunction(the_lists$f, params)
+  is_XDF <- the_lists$is_XDF
+
+  # post-model error checking & cp adjustment if specified to "Auto"
+  the_model <- adjustCP(config, the_model)
+
+  results <- getOutputsDT(config, the_model, is_XDF)
+
 }
