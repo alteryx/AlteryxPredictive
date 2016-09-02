@@ -426,6 +426,6 @@ process <- function(config, data) {
   # post-model error checking & cp adjustment if specified to "Auto"
   the_model <- adjustCP(config, the_model)
 
-  results <- getOutputsDT(config, the_model, is_XDF)
+  getOutputsDT(config, the_model, is_XDF)
 
 }
