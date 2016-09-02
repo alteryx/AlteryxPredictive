@@ -405,7 +405,7 @@ outputDTResultsAlteryx <- function(results, config) {
 #' @param data list of datastream objects
 #' @return list of results or results
 #' @export
-process <- function(config, data) {
+processDT <- function(config, data) {
   # To get run-over-run consistency, set the seed
   set.seed(1)
 
