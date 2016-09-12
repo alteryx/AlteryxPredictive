@@ -85,11 +85,11 @@ createDTParams <- function(config, data) {
 
   # get max bins param
   if(is_XDF && !is.na(as.numeric(config$max.bins))) {
-    max_bins <- config$max.bins
-    if(max_bins < 2) {
+    maxNumBins <- config$max.bins
+    if(maxNumBins < 2) {
       stop("The minimum bins is 2")
     } else {
-      param_list$maxNumBins <- max_bins
+      param_list$maxNumBins <- maxNumBins
     }
   }
 
@@ -132,7 +132,7 @@ paramsToDTArgs <- function(f_string, param_list) {
       method = param_list$method,
       parms = param_list$parms,
       useSurrogate = param_list$surrogate,
-      maxNumBins = param_list$max_bins,
+      maxNumBins = param_list$maxNumBins,
       minSplit <- param_list$minsplit,
       minBucket = param_list$minbucket,
       xVal = param_list$xval,
