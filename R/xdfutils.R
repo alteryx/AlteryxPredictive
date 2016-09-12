@@ -6,12 +6,12 @@
 #' @export
 getXdfLevels <- function(formula, xdf) {
   factors <- rxSummary(formula, data = xdf)$categorical
-  the_names <- sapply(factors, function(x) names(x)[1])
-  if (length(the_names) == 1) {
-    the_levels <- list(the_names = as.character(factors[[1]][[1]]))
+  factor_names <- sapply(factors, function(x) names(x)[1])
+  if (length(factor_names) == 1) {
+    the_levels <- list(factor_names = as.character(factors[[1]][[1]]))
   } else {
     the_levels <- sapply(factors, function(x) as.character(x[[1]]))
-    names(the_levels) <- the_names
+    names(the_levels) <- factor_names
   }
   the_levels
 }
