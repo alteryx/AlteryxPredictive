@@ -232,18 +232,18 @@ getDTGraphCalls <- function(config, model, is_XDF) {
 
   # The values in the leaf summary
   leaf_sum <- 4
-  if (config$do.counts == "True")
+  if (config$do.counts == TRUE)
     leaf_sum <- 2
   if (model$method != "class")
     leaf_sum <- 0
   print(model$method)
 
   # Uniform or proportional tree branch lengths
-  uniform <- "FALSE"
-  fallen <- "TRUE"
-  if (config$b.dist == "True") {
-    uniform <- "TRUE"
-    fallen <- "FALSE"
+  uniform <- FALSE
+  fallen <- TRUE
+  if (config$b.dist == TRUE) {
+    uniform <- TRUE
+    fallen <- FALSE
   }
 
   # assemble list of function and params to pass to AlteryxGraph
