@@ -52,11 +52,11 @@ createDTParams <- function(config, data) {
   name_weight_var <- names_list$w
 
   # use field names to get formula param
-  param_list$dtree_formula <- makeFormula(names_x_vars, name_y_var)
+  param_list$formula <- makeFormula(names_x_vars, name_y_var)
 
   # get weights param
-  param_list$weight_arg <- ifelse(config$used.weights, name_weight_var, NULL)
-  rpart_params$weights <- rxDTree_params$pweights <- weight_arg
+  param_list$weights <- ifelse(config$used.weights, name_weight_var, NULL)
+  rpart_params$weights <- rxDTree_params$pweights <- weights
 
   # get method and parms params
   if(config$select.type) {
@@ -74,11 +74,11 @@ createDTParams <- function(config, data) {
 
   # get surrogate param
   if(config$use.surrogate.0) {
-    surrogate <- 0
+    usesurrogate <- 0
   } else if(config$use.surrogate.1) {
-    surrogate <- 1
+    usesurrogate <- 1
   } else {
-    surrogate <- 2
+    usesurrogate <- 2
   }
 
   param_list$usesurrogate <- surrogate
@@ -113,11 +113,11 @@ paramsToDTArgs <- function(f_string, param_list) {
   if (f_string == "rpart") {
     list(
       data = param_list$data,
-      formula = param_list$f,
-      weights = param_list$weight_arg,
+      formula = param_list$formula,
+      weights = param_list$weights,
       method = param_list$method,
       parms = param_list$parms,
-      usesurrogate = param_list$surrogate,
+      usesurrogate = param_list$usesurrogate,
       minsplit <- param_list$minsplit,
       minbucket = param_list$minbucket,
       xval = param_list$xval,
@@ -128,7 +128,7 @@ paramsToDTArgs <- function(f_string, param_list) {
     list(
       data = quote(xdf_path),
       formula = param_list$f,
-      pweights = param_list$weight_arg,
+      pweights = param_list$weights,
       method = param_list$method,
       parms = param_list$parms,
       useSurrogate = param_list$surrogate,
