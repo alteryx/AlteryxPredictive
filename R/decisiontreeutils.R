@@ -32,13 +32,7 @@ preModelCheckDT <- function(config, the.data) {
 #' @return list with components needed to create model
 createDTParams <- function(config, data) {
   # use lists to hold params for rpart and rxDTree functions
-  param_list <- list()
-
-  # Determine if a compute context is being used, and whether it is XDF
-  # The mechanism for doing this depends on how the information is transfered
-  xdf_properties <- getXdfProperties("#1")
-  param_list$is_XDF <- xdf_properties$is_XDF
-  param_list$xdf_path <- xdf_properties$xdf_path
+  param_list <- getXdfProperties("#1")
 
   # get data param
   the.data <- data$data_stream1
