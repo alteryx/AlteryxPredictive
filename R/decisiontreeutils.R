@@ -66,16 +66,8 @@ createDTParams <- function(config, data) {
     }
   }
 
-  # get surrogate param
-  if(config$use.surrogate.0) {
-    usesurrogate <- 0
-  } else if(config$use.surrogate.1) {
-    usesurrogate <- 1
-  } else {
-    usesurrogate <- 2
-  }
-
-  params$usesurrogate <- surrogate
+  usesurrogate <- config[c('use.surrogate.0', 'use.surrogate.1', 'use.surrogate.2')]
+  param_list$usesurrogate <- which(usesurrogate) - 1
 
   # get max bins param
   if(is_XDF && !is.na(as.numeric(config$maxNumBins))) {
