@@ -7,7 +7,7 @@ preModelCheckDT <- function(config, the.data) {
   data_names <- names(the.data)
   names_list <- getNamesFromOrdered(config$used.weights, data_names)
   name_y_var <- names_list$y
-  cp <- ifelse(config$the.cp == "Auto" || config$the.cp == "", .00001, config$the.cp)
+  cp <- ifelse(config$cp == "Auto" || config$cp == "", .00001, config$cp)
 
 
   the_target <- the.data[[name_y_var]]
@@ -19,7 +19,7 @@ preModelCheckDT <- function(config, the.data) {
     stop.Alteryx2("The complexity parameter must be between 0 and 1. Please try again.")
   }
 
-  if(is.na(as.numeric(config$the.cp)) && !(config$the.cp == "Auto" || config$the.cp == "")) {
+  if(is.na(as.numeric(config$cp)) && !(config$cp == "Auto" || config$cp == "")) {
     stop.Alteryx2("The complexity parameter provided is not a number. Please enter a new value and try again.")
   }
 }
@@ -84,8 +84,8 @@ createDTParams <- function(config, data) {
   param_list$usesurrogate <- surrogate
 
   # get max bins param
-  if(is_XDF && !is.na(as.numeric(config$max.bins))) {
-    maxNumBins <- config$max.bins
+  if(is_XDF && !is.na(as.numeric(config$maxNumBins))) {
+    maxNumBins <- config$maxNumBins
     if(maxNumBins < 2) {
       stop.Alteryx2("The minimum bins is 2")
     } else {
@@ -94,12 +94,12 @@ createDTParams <- function(config, data) {
   }
 
   # other parameters
-  param_list$minsplit <- config$min.split
-  param_list$minbucket <- config$min.bucket
-  param_list$xval <- config$xval.folds
-  param_list$maxdepth <- config$max.depth
+  param_list$minsplit <- config$minsplit
+  param_list$minbucket <- config$minbucket
+  param_list$xval <- config$xval
+  param_list$maxdepth <- config$maxdepth
 
-  param_list$cp <- ifelse(config$the.cp == "Auto" || config$the.cp == "", .00001, config$the.cp)
+  param_list$cp <- ifelse(config$cp == "Auto" || config$cp == "", .00001, config$cp)
 
   param_list
 }
@@ -150,7 +150,7 @@ paramsToDTArgs <- function(f_string, param_list) {
 #' @param the_model model object
 #' @return model obj after adjusting complexity parameter
 adjustCP <- function(config, the_model) {
-  if(is.na(as.numeric(config$the.cp)) && (config$the.cp == "Auto" || config$the.cp == "")) {
+  if(is.na(as.numeric(config$cp)) && (config$cp == "Auto" || config$cp == "")) {
     cp_table <- as.data.frame(the_model$cptable)
     pos_cp <- cp_table$CP[(cp_table$xerror - 0.5*cp_table$xstd) <= min(cp_table$xerror)]
     new_cp <- pos_cp[1]
