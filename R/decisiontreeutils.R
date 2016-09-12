@@ -89,7 +89,7 @@ createDTParams <- function(config, data) {
 
   # other parameters
   params$minsplit <- config$minsplit
-params$minbucket <- config$minbucket
+  params$minbucket <- config$minbucket
   params$xval <- config$xval
   params$maxdepth <- config$maxdepth
 
