@@ -5,13 +5,13 @@
 #' @param the.data incoming data
 preModelCheckDT <- function(config, the.data) {
   data_names <- names(the.data)
-  names_list <- getNamesFromOrdered(config$used.weights, data_names)
-  name_y_var <- names_list$y
+  names <- getNamesFromOrdered(config$used.weights, data_names)
+  name_y_var <- names$y
   cp <- ifelse(config$cp == "Auto" || config$cp == "", .00001, config$cp)
 
 
-  the_target <- the.data[[name_y_var]]
-  if (is.numeric(the_target) && length(unique(the_target)) < 5 && !is_XDF) {
+  target <- the.data[[name_y_var]]
+  if (is.numeric(target) && length(unique(target)) < 5 && !is_XDF) {
     AlteryxMessage2("The target variable is numeric, however, it has 4 or fewer unique values.", iType = 2, iPriority = 3)
   }
 
@@ -32,37 +32,37 @@ preModelCheckDT <- function(config, the.data) {
 #' @return list with components needed to create model
 createDTParams <- function(config, data) {
   # use lists to hold params for rpart and rxDTree functions
-  param_list <- getXdfProperties("#1")
+  params <- getXdfProperties("#1")
 
   # get data param
   the.data <- data$data_stream1
   data_names <- names(the.data)
-  param_list$data <- quote(the.data)
+  params$data <- quote(the.data)
 
   # Get the field names
-  names_list <- getNamesFromOrdered(config$used.weights, data_names)
-  name_y_var <- names_list$y
-  names_x_vars <- names_list$x
-  name_weight_var <- names_list$w
+  names <- getNamesFromOrdered(config$used.weights, data_names)
+  name_y_var <- names$y
+  names_x_vars <- names$x
+  name_weight_var <- names$w
 
   # use field names to get formula param
-  param_list$formula <- makeFormula(names_x_vars, name_y_var)
+  params$formula <- makeFormula(names_x_vars, name_y_var)
 
   # get weights param
-  param_list$weights <- ifelse(config$used.weights, name_weight_var, NULL)
+  params$weights <- ifelse(config$used.weights, name_weight_var, NULL)
   rpart_params$weights <- rxDTree_params$pweights <- weights
 
   # get method and parms params
   if(config$select.type) {
     if(config$classification) {
-      param_list$method <- "class"
+      params$method <- "class"
       if(config$use.gini) {
-        param_list$parms <- quote(list(split = "gini"))
+        params$parms <- quote(list(split = "gini"))
       } else {
-        param_list$parms <- quote(list(split = "information"))
+        params$parms <- quote(list(split = "information"))
       }
     } else {
-      param_list$method <- "anova"
+      params$method <- "anova"
     }
   }
 
@@ -75,7 +75,7 @@ createDTParams <- function(config, data) {
     usesurrogate <- 2
   }
 
-  param_list$usesurrogate <- surrogate
+  params$usesurrogate <- surrogate
 
   # get max bins param
   if(is_XDF && !is.na(as.numeric(config$maxNumBins))) {
@@ -83,55 +83,55 @@ createDTParams <- function(config, data) {
     if(maxNumBins < 2) {
       stop.Alteryx2("The minimum bins is 2")
     } else {
-      param_list$maxNumBins <- maxNumBins
+      params$maxNumBins <- maxNumBins
     }
   }
 
   # other parameters
-  param_list$minsplit <- config$minsplit
-  param_list$minbucket <- config$minbucket
-  param_list$xval <- config$xval
-  param_list$maxdepth <- config$maxdepth
+  params$minsplit <- config$minsplit
+params$minbucket <- config$minbucket
+  params$xval <- config$xval
+  params$maxdepth <- config$maxdepth
 
-  param_list$cp <- ifelse(config$cp == "Auto" || config$cp == "", .00001, config$cp)
+  params$cp <- ifelse(config$cp == "Auto" || config$cp == "", .00001, config$cp)
 
-  param_list
+  params
 }
 
 #' name mapping from parameters to functions
 #'
 #' @param f_string string of function
-#' @param param_list list of decision tree params
+#' @param params list of decision tree params
 #' @return list with named parameters for f_string
-paramsToDTArgs <- function(f_string, param_list) {
+paramsToDTArgs <- function(f_string, params) {
   if (f_string == "rpart") {
     list(
-      data = param_list$data,
-      formula = param_list$formula,
-      weights = param_list$weights,
-      method = param_list$method,
-      parms = param_list$parms,
-      usesurrogate = param_list$usesurrogate,
-      minsplit <- param_list$minsplit,
-      minbucket = param_list$minbucket,
-      xval = param_list$xval,
-      maxdepth = param_list$maxdepth,
-      cp = param_list$cp
+      data = params$data,
+      formula = params$formula,
+      weights = params$weights,
+      method = params$method,
+      parms = params$parms,
+      usesurrogate = params$usesurrogate,
+      minsplit <- params$minsplit,
+      minbucket = params$minbucket,
+      xval = params$xval,
+      maxdepth = params$maxdepth,
+      cp = params$cp
     )
   } else if(f_string == "rxDTree") {
     list(
       data = quote(xdf_path),
-      formula = param_list$f,
-      pweights = param_list$weights,
-      method = param_list$method,
-      parms = param_list$parms,
-      useSurrogate = param_list$surrogate,
-      maxNumBins = param_list$maxNumBins,
-      minSplit <- param_list$minsplit,
-      minBucket = param_list$minbucket,
-      xVal = param_list$xval,
-      maxDepth = param_list$maxdepth,
-      cp = param_list$cp
+      formula = params$f,
+      pweights = params$weights,
+      method = params$method,
+      parms = params$parms,
+      useSurrogate = params$surrogate,
+      maxNumBins = params$maxNumBins,
+      minSplit <- params$minsplit,
+      minBucket = params$minbucket,
+      xVal = params$xval,
+      maxDepth = params$maxdepth,
+      cp = params$cp
     )
   } else {
     stop.Alteryx2(paste("Unsupported function specified: ", f_string))
@@ -141,47 +141,47 @@ paramsToDTArgs <- function(f_string, param_list) {
 #' adjusts config based on results if config was initially "Auto"
 #'
 #' @param config list of config options
-#' @param the_model model object
+#' @param model model object
 #' @return model obj after adjusting complexity parameter
-adjustCP <- function(config, the_model) {
+adjustCP <- function(config, model) {
   if(is.na(as.numeric(config$cp)) && (config$cp == "Auto" || config$cp == "")) {
-    cp_table <- as.data.frame(the_model$cptable)
+    cp_table <- as.data.frame(model$cptable)
     pos_cp <- cp_table$CP[(cp_table$xerror - 0.5*cp_table$xstd) <= min(cp_table$xerror)]
     new_cp <- pos_cp[1]
     print(cp_table)
     if (cp_table$xerror[1] == min(cp_table$xerror)) {
       stop.Alteryx2("The minimum cross validation error occurs for a CP value where there are no splits. Specify a complexity parameter and try again.")
     }
-    prune(the_model, cp = new_cp)
+    prune(model, cp = new_cp)
   } else {
-    the_model
+    model
   }
 }
 
 #' get grp|out pipes for outputting static report
 #'
 #' @param config list of config options
-#' @param the_model model object
+#' @param model model object
 #' @param is_XDF boolean of whether model is XDF
 #' @return dataframe of piped results
-getDTPipes <- function(config, the_model, is_XDF) {
+getDTPipes <- function(config, model, is_XDF) {
 
   # The output: Start with the pruning table (have rxDTree objects add rpart
   # inheritance for printing and plotting purposes).
   if (is_XDF) {
-    the_model_rpart <- rxAddInheritance(the_model)
-    printcp(the_model_rpart)
-    out <- capture.output(printcp(the_model_rpart))
-    the_model$xlevels <- do.call(match.fun("xdfLevels"), list(paste0("~ ", paste(names_x_vars, collapse = " + ")), xdf_path))
-    if (is.factor(the_target)) {
+    model_rpart <- rxAddInheritance(model)
+    printcp(model_rpart)
+    out <- capture.output(printcp(model_rpart))
+    model$xlevels <- do.call(match.fun("xdfLevels"), list(paste0("~ ", paste(names_x_vars, collapse = " + ")), xdf_path))
+    if (is.factor(target)) {
       target_info <- do.call(match.fun("rxSummary"), list(paste0("~ ", name_y_var), data = xdf.path))[["categorical"]]
       if(length(target_info) == 1) {
-        the_model$yinfo <- list(levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
+        model$yinfo <- list(levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
       }
     }
   } else {
-    printcp(the_model) # Pruning Table
-    out <- capture.output(printcp(the_model))
+    printcp(model) # Pruning Table
+    out <- capture.output(printcp(model))
   }
 
   out <- out[out != ""]
@@ -195,7 +195,7 @@ getDTPipes <- function(config, the_model, is_XDF) {
     }
   }
   call1 <- out[1:end_call]
-  the_call = gsub("\\s\\s", "", paste(call1, collapse=""))
+  call = gsub("\\s\\s", "", paste(call1, collapse=""))
   # Figure out where the summary information ends and the actual pruning table
   # starts. The header for the pruning table is removed, and will instead show-up
   # in the Alteryx reporting tool
@@ -207,7 +207,7 @@ getDTPipes <- function(config, the_model, is_XDF) {
   }
   model_sum <- length((end_call + 1):(strt_table - 2))
   prune_tbl1 <- out[strt_table:length(out)]
-  out <- c(the_call, out[(end_call + 1):(strt_table - 2)])
+  out <- c(call, out[(end_call + 1):(strt_table - 2)])
   rpart_out <- data.frame(grp = c("Call", rep("Model_Sum", model_sum)), out = out)
   rpart_out$grp <- as.character(rpart_out$grp)
   rpart_out$out <- as.character(out)
@@ -225,11 +225,11 @@ getDTPipes <- function(config, the_model, is_XDF) {
 
   # The leaf summary
   if (is_XDF) {
-    print(the_model_rpart) # Tree Leaf Summary
-    leaves <- capture.output(the_model_rpart)
+    print(model_rpart) # Tree Leaf Summary
+    leaves <- capture.output(model_rpart)
   } else {
-    print(the_model) # Tree Leaf Summary
-    leaves <- capture.output(the_model)
+    print(model) # Tree Leaf Summary
+    leaves <- capture.output(model)
   }
   leaves_num <- 1:length(leaves)
   start_leaves <- leaves_num[substr(leaves, 1, 5) == "node)"]
@@ -258,19 +258,19 @@ getDTPipes <- function(config, the_model, is_XDF) {
 #' get graphing calls
 #'
 #' @param config list of config options
-#' @param the_model model object
+#' @param model model object
 #' @param is_XDF boolean of whether model is XDF
 #' @return params to call AlteryxGraph on
-getDTGraphCalls <- function(config, the_model, is_XDF) {
+getDTGraphCalls <- function(config, model, is_XDF) {
   # Address the user plot parameters and create the plots
 
   # The values in the leaf summary
   leaf_sum <- 4
   if (config$do.counts == "True")
     leaf_sum <- 2
-  if (the_model$method != "class")
+  if (model$method != "class")
     leaf_sum <- 0
-  print(the_model$method)
+  print(model$method)
 
   # Uniform or proportional tree branch lengths
   uniform <- "FALSE"
@@ -281,12 +281,12 @@ getDTGraphCalls <- function(config, the_model, is_XDF) {
   }
 
   # assemble list of function and params to pass to AlteryxGraph
-  graph_calls <- list()
+  calls <- list()
 
-  graph_calls$tree <- list()
-  graph_calls$tree$f <- "rpart.plot"
-  graph_calls$tree$args <- list (
-    the_model_rpart,
+  calls$tree <- list()
+  calls$tree$f <- "rpart.plot"
+  calls$tree$args <- list (
+    model_rpart,
     type = 0,
     extra = leaf_sum,
     uniform = uniform,
@@ -295,19 +295,19 @@ getDTGraphCalls <- function(config, the_model, is_XDF) {
     cex = 1
   )
 
-  graph_calls$prune <- list(
+  calls$prune <- list(
     f = "plotcp",
-    args = list(the_model)
+    args = list(model)
   )
 }
 
 #' get component for interactive viz
 #'
-#' @param the_model model object
+#' @param model model object
 #' @param is_XDF boolean of whether model is XDF
 #' @import AlteryxRviz
 #' @import htmltools
-getDTViz <- function(the_model, is_XDF) {
+getDTViz <- function(model, is_XDF) {
 
   ## Interactive Visualization
   if (is_XDF){
@@ -321,17 +321,17 @@ getDTViz <- function(the_model, is_XDF) {
         tags$h4("You need AlteryxRviz >= 0.2.5")
       )
     } else {
-      #the_model = rpart(Species ~ ., data = iris)
+      #model = rpart(Species ~ ., data = iris)
       tooltipParams = list(
         width = '250px',
         top = '130px',
         left = '100px'
       )
-      dt = renderTree(the_model, tooltipParams = tooltipParams)
-      vimp = varImpPlot(the_model, height = 300)
+      dt = renderTree(model, tooltipParams = tooltipParams)
+      vimp = varImpPlot(model, height = 300)
 
-      cmat = if (!is.null(the_model$frame$yval2)){
-        iConfusionMatrix(getConfMatrix(the_model), height = 300)
+      cmat = if (!is.null(model$frame$yval2)){
+        iConfusionMatrix(getConfMatrix(model), height = 300)
       }  else {
         tags$div(h1('Confusion Matrix Not Valid'), height = 300)
       }
@@ -346,20 +346,20 @@ getDTViz <- function(the_model, is_XDF) {
 #' get results in form of output list
 #'
 #' @param config list of config options
-#' @param the_model model object
+#' @param model model object
 #' @param is_XDF boolean of whether model is XDF
-getOutputsDT <- function(config, the_model, is_XDF) {
+getOutputsDT <- function(config, model, is_XDF) {
   # Assemble list to return needed elements to output
   results <- list()
 
-  results$output1 <- getDTPipes(config, the_model, is_XDF)
-  results$output3 <- modelOut(config$model.name, the_model)
+  results$output1 <- getDTPipes(config, model, is_XDF)
+  results$output3 <- modelOut(config$model.name, model)
 
-  graph_results <- getDTgraphCalls(config, the_model, is_XDF)
+  graph_results <- getDTgraphCalls(config, model, is_XDF)
   results$output2 <- graph_results$tree
   results$output4 <- graph_results$prune
 
-  results$output5 <- getDTViz(the_model, is_XDF)
+  results$output5 <- getDTViz(model, is_XDF)
 
   write.Alteryx(results$output1, nOutput = 1)
   write.Alteryx(results$output3, nOutput = 3)
@@ -386,14 +386,14 @@ processDT <- function(config, data) {
 
   preModelCheckDT(config, the.data)
 
-  the_lists <- AlteryxPredictive::createDTParams(config, data)
-  params <- AlteryxPredictive::paramsToDTArgs(the_lists$f, the_lists)
-  the_model <- AlteryxPredictive::doFunction(the_lists$f, params)
-  is_XDF <- the_lists$is_XDF
+  params <- AlteryxPredictive::createDTargs(config, data)
+  args <- AlteryxPredictive::argsToDTArgs(params$f, params)
+  model <- AlteryxPredictive::doFunction(params$f, args)
+  is_XDF <- params$is_XDF
 
   # post-model error checking & cp adjustment if specified to "Auto"
-  the_model <- adjustCP(config, the_model)
+  model <- adjustCP(config, model)
 
-  getOutputsDT(config, the_model, is_XDF)
+  getOutputsDT(config, model, is_XDF)
 
 }
