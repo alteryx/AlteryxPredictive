@@ -3,7 +3,7 @@
 #'
 #' @param config list of config options
 #' @param the.data incoming data
-preModelCheckDT <- function(config, the.data) {
+checkValidConfig <- function(config, the.data) {
   data_names <- names(the.data)
   names <- getNamesFromOrdered(config$used.weights, data_names)
   name_y_var <- names$y
@@ -103,7 +103,7 @@ params$minbucket <- config$minbucket
 #' @param f_string string of function
 #' @param params list of decision tree params
 #' @return list with named parameters for f_string
-paramsToDTArgs <- function(f_string, params) {
+convertParamsToArgs <- function(f_string, params) {
   if (f_string == "rpart") {
     list(
       data = params$data,
@@ -384,7 +384,7 @@ processDT <- function(config, data) {
 
   config$model.name <- validName(config$model.name)
 
-  preModelCheckDT(config, the.data)
+  checkValidConfig(config, the.data)
 
   params <- AlteryxPredictive::createDTargs(config, data)
   args <- AlteryxPredictive::argsToDTArgs(params$f, params)
