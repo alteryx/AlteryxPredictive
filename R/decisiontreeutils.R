@@ -87,7 +87,7 @@ createDTParams <- function(config, data) {
   if(is_XDF && !is.na(as.numeric(config$max.bins))) {
     maxNumBins <- config$max.bins
     if(maxNumBins < 2) {
-      stop("The minimum bins is 2")
+      stop.Alteryx2("The minimum bins is 2")
     } else {
       param_list$maxNumBins <- maxNumBins
     }
@@ -140,7 +140,7 @@ paramsToDTArgs <- function(f_string, param_list) {
       cp = param_list$cp
     )
   } else {
-    stop(paste("Unsupported function specified: ", f_string))
+    stop.Alteryx2(paste("Unsupported function specified: ", f_string))
   }
 }
 
