@@ -49,7 +49,7 @@ doFunction <- function(f, param_list) {
 #' @param model_obj model object to output
 #' @return key value pair list with name and model
 #' @export
-modelOut <- function(model_name, model_obj) {
+prepModelForOutput <- function(model_name, model_obj) {
   list(
     Name = model_name,
     Object = list(model_obj)

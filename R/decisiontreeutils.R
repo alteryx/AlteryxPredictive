@@ -345,7 +345,7 @@ getOutputsDT <- function(config, model, is_XDF) {
   results <- list()
 
   results$output1 <- getDTPipes(config, model, is_XDF)
-  results$output3 <- modelOut(config$model.name, model)
+  results$output3 <- prepModelForOutput(config$model.name, model)
 
   graph_results <- getDTgraphCalls(config, model, is_XDF)
   results$output2 <- graph_results$tree
