@@ -7,7 +7,7 @@ checkValidConfig <- function(config, the.data) {
   data_names <- names(the.data)
   names <- getNamesFromOrdered(config$used.weights, data_names)
   name_y_var <- names$y
-  cp <- ifelse(config$cp == "Auto" || config$cp == "", .00001, config$cp)
+  cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
 
   target <- the.data[[name_y_var]]
@@ -41,15 +41,13 @@ createDTParams <- function(config, data) {
 
   # Get the field names
   names <- getNamesFromOrdered(config$used.weights, data_names)
-  name_y_var <- names$y
-  names_x_vars <- names$x
   name_weight_var <- names$w
 
   # use field names to get formula param
   params$formula <- makeFormula(names_x_vars, name_y_var)
 
   # get weights param
-  params$weights <- ifelse(config$used.weights, name_weight_var, NULL)
+  params$weights <- if (config$used.weights) name_weight_var else NULL
   rpart_params$weights <- rxDTree_params$pweights <- weights
 
   # get method and parms params
@@ -85,7 +83,7 @@ createDTParams <- function(config, data) {
   params$xval <- config$xval
   params$maxdepth <- config$maxdepth
 
-  params$cp <- ifelse(config$cp == "Auto" || config$cp == "", .00001, config$cp)
+  params$cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   params
 }
@@ -199,7 +197,7 @@ getDTPipes <- function(config, model, is_XDF) {
   pt_df$out <- as.character(pt_df$out)
   rpart_out <- rbind(rpart_out, pt_df)
 
-  model <- ifelse(is_XDF, model_rpart, model)
+  model <- if (is_XDF) model_rpart else model
 
   leaves <- capture.output(model) %>%
     extract(grep("^node", .):length(.)) %>%
