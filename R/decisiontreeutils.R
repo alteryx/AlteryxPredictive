@@ -176,33 +176,17 @@ getDTPipes <- function(config, model, is_XDF) {
     out <- capture.output(printcp(model))
   }
 
-  out <- out[out != ""]
-  print(out)
-  out <- out[2:length(out)]
-  # Find the index of the end of the call
-  for (i in 1:length(out)) {
-    if (grepl("Variables", out[i])) {
-      end_call <- i - 1
-      break
-    }
-  }
-  call1 <- out[1:end_call]
-  call = gsub("\\s\\s", "", paste(call1, collapse=""))
-  # Figure out where the summary information ends and the actual pruning table
-  # starts. The header for the pruning table is removed, and will instead show-up
-  # in the Alteryx reporting tool
-  for (i in 1:length(out)) {
-    if (grepl("\\sCP\\s", out[i])) {
-      strt_table <- i + 1
-      break
-    }
-  }
-  model_sum <- length((end_call + 1):(strt_table - 2))
-  prune_tbl1 <- out[strt_table:length(out)]
-  out <- c(call, out[(end_call + 1):(strt_table - 2)])
-  rpart_out <- data.frame(grp = c("Call", rep("Model_Sum", model_sum)), out = out)
-  rpart_out$grp <- as.character(rpart_out$grp)
-  rpart_out$out <- as.character(out)
+  model_sum <- out %>%
+    extract(1:grep("^n=", .)) %>%
+    .[. != ""] %>%
+    data.frame(grp = "Model_Sum", out = ., stringsAsFactors = FALSE)
+
+  call <- out %>%
+    extract(2:(grep("^Variable", .) - 1)) %>%
+    .[. != ""] %>%
+    paste(collapse = "") %>%
+    data.frame(grp = "Call", out = ., stringsAsFactors = FALSE)
+
   # Pipe delimit the pruning table and then rbind it to the output
   prune_tbl <- NULL
   for (i in 1:length(prune_tbl1)) {
@@ -215,25 +199,17 @@ getDTPipes <- function(config, model, is_XDF) {
   pt_df$out <- as.character(pt_df$out)
   rpart_out <- rbind(rpart_out, pt_df)
 
-  # The leaf summary
-  if (is_XDF) {
-    print(model_rpart) # Tree Leaf Summary
-    leaves <- capture.output(model_rpart)
-  } else {
-    print(model) # Tree Leaf Summary
-    leaves <- capture.output(model)
-  }
-  leaves_num <- 1:length(leaves)
-  start_leaves <- leaves_num[substr(leaves, 1, 5) == "node)"]
-  leaves <- leaves[start_leaves:length(leaves)]
-  leaves <- gsub(">", "&gt;", leaves)
-  leaves <- gsub("<", "&lt;", leaves)
-  leaves <- gsub("\\s", "<nbsp/>", leaves) # Order matters
-  leaves_df <- data.frame(grp = rep("Leaves", length(leaves)), out = leaves)
-  leaves_df$grp <- as.character(leaves_df$grp)
-  leaves_df$out <- as.character(leaves_df$out)
+  model <- ifelse(is_XDF, model_rpart, model)
 
-  rpart_out <- rbind(rpart_out, leaves_df)
+  leaves <- capture.output(model) %>%
+    extract(grep("^node", .):length(.)) %>%
+    gsub(">", "&gt;", .) %>%
+    gsub("<", "&lt;", .) %>%
+    gsub("\\s", "<nbsp/>", .) %>%
+    data.frame(grp = "Leaves", out = ., stringsAsFactors = FALSE)
+
+
+  rpart_out <- rbind(rpart_out, leaves)
 
   # Indicate that this is an object of class rpart or rxDTree
   if (is_XDF) {
