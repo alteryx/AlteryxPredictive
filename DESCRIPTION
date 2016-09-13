@@ -22,10 +22,10 @@ Imports:
   rjson,
   rgeos,
   car,
+  AlteryxRviz
+Suggests:
+  AlteryxRDataX,
+  ScaleR,
   knitr,
   rmarkdown,
-  ScaleR,
   randomForest
-Suggests:
-  AlteryxRDataX
-VignetteBuilder: knitr
