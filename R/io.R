@@ -58,20 +58,46 @@ write.Alteryx2 = function(data, nOutput = 1, bIncludeRowNames = FALSE, source = 
   }
 }
 
-#' Alteryx Graph Function
+#' Get list of arguments to pass to whrParams
 #'
+#' @param config list containing plot related configuration elements
+#' @param plotPrefix prefix to use for plot, defaults to NULL
+getWHRParams = function(config, plotPrefix = NULL){
+  makeName <- function(x){
+    if (is.null(plotPrefix)) x else paste0(plotPrefix, ".", x)
+  }
+  whrParams <- c(
+    'inches', 'in.w' , 'in.h', 'cm.w', 'cm.h', 'graph.resolution'
+  )
+  # TODO: ERROR CHECKING
+  # Ensure that config contains all required elements
+  list(
+    whr  = setNames(config[makeName(whrParams)], whrParams),
+    pointsize = config[[makeName('pointsize')]]
+  )
+}
+
+#' Plot output of an R expression
 #'
+#' @param expr code generating a plot
+#' @param config list containing plot configuration
+#' @param plotPrefix prefix to use for the plot
 #' @export
-#' @param expr expression to generate graph
-#' @param nOutput output connection number
-#' @param width width
-#' @param height height
-#' @param ... additional arguments
-AlteryxGraph2 = function(expr, nOutput = 1, width = 576, height = 576, ...){
-  print_ = function(expr){if (inherits(expr, 'ggplot')){print(expr)} else{expr}}
-  if ('package:AlteryxRDataX' %in% search()){
-    requireNamespace('AlteryxRDataX')
-    AlteryxRDataX::AlteryxGraph(nOutput, width = width, height = height, ...)
+AlteryxGraph2 <- function(nOutput, expr, config = NULL,
+    plotPrefix = NULL){
+  print_ = function(expr){
+    if (inherits(expr, 'ggplot')){
+      print(expr)
+    } else{
+      expr
+    }
+  }
+  if (inAlteryx()){
+    whrParams <- getWHRParams(config, plotPrefix)
+    whr <- do.call(graphWHR2, whrParams$whr)
+    AlteryxRDataX::AlteryxGraph(nOutput, width = whr[1],
+      height = whr[2], res = whr[3], pointsize = whrParams$pointsize
+    )
     print_(expr)
     invisible(dev.off())
   } else {
