@@ -32,7 +32,11 @@ checkValidConfig <- function(config, the.data) {
 #' @return list with components needed to create model
 createDTParams <- function(config, data) {
   # use lists to hold params for rpart and rxDTree functions
-  params <- getXdfProperties("#1")
+  params <- append(
+    getXdfProperties("#1"),
+    config[,c('minsplit', 'minbucket', 'xval', 'maxdepth')],
+    list(cp = if (config$cp %in% c("Auto", "")) 1e-5 else config$cp)
+  )
 
   # get data param
   the.data <- data$data_stream1
@@ -51,19 +55,15 @@ createDTParams <- function(config, data) {
   rpart_params$weights <- rxDTree_params$pweights <- weights
 
   # get method and parms params
-  if(config$select.type) {
-    if(config$classification) {
-      params$method <- "class"
-      if(config$use.gini) {
-        params$parms <- quote(list(split = "gini"))
-      } else {
-        params$parms <- quote(list(split = "information"))
-      }
-    } else {
-      params$method <- "anova"
+  with(config, {if (select.type){
+    params$method <- if (classification) "class" else "anova"
+    if (classification) {
+      params$parms <- list()
+      params$parms$split = if (use.gini) "gini" else "information"
     }
-  }
+  }})
 
+  # get usesurrogate param
   usesurrogate <- config[c('use.surrogate.0', 'use.surrogate.1', 'use.surrogate.2')]
   param_list$usesurrogate <- which(usesurrogate) - 1
 
@@ -76,15 +76,6 @@ createDTParams <- function(config, data) {
       params$maxNumBins <- maxNumBins
     }
   }
-
-  # other parameters
-  params$minsplit <- config$minsplit
-  params$minbucket <- config$minbucket
-  params$xval <- config$xval
-  params$maxdepth <- config$maxdepth
-
-  params$cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
-
   params
 }
 
