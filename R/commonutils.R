@@ -497,38 +497,20 @@ varImpPlot.Alteryx <- function(x, sort=TRUE, n.var=min(30, nrow(x$importance)),
 #' @param resolution the resolution of the plot to produce as a multiple of 96dpi
 #' @param print.high whether to turn 3x into 6x (high, 576 dpi) resolution
 #' @author Dan Putler
-graphWHR <- function(inches = c("True", "False"), in.w , in.h, cm.w = NULL,
-    cm.h = NULL, resolution = c("1x", "2x", "3x"), print.high = FALSE){
+graphWHR2 <- function(inches = TRUE, in.w = 5.5, in.h = 5.75,
+   cm.w = NULL, cm.h = NULL, graph.resolution = c("1x", "2x", "3x"),
+   print.high = FALSE){
   # Set the dpi
-  if (resolution == "")
-    resolution <- "1x"
-  else
-    resolution <- match.arg(resolution)
+  graph.resolution <- match.arg(graph.resolution)
   dpi <- 96
-  if (resolution == "2x")
-    dpi <- 192
-  if (resolution == "3x" && !print.high)
-    dpi <- 288
-  if (resolution == "3x" && print.high)
-    dpi <- 576
+  if (graph.resolution == "2x") dpi <- 192
+  if (graph.resolution == "3x" && !print.high) dpi <- 288
+  if (graph.resolution == "3x" && print.high) dpi <- 576
 
   # Set the width and height
-  if (inches == "")
-    inches <- "True"
-  else
-    inches <- match.arg(inches)
-
-  if (in.w == "")
-    in.w <- "5.50"
-  in.w <- as.numeric(in.w)
-
-  if (in.h == "")
-    in.h <- "5.75"
-  in.h <- as.numeric(in.h)
-
-  if (inches == "False") {
-    in.w <- 0.393701*as.numeric(cm.w)
-    in.h <- 0.393701*as.numeric(cm.h)
+  if (!inches) {
+    in.w <- 0.393701*cm.w
+    in.h <- 0.393701*cm.h
   }
   width = round(dpi*in.w)
   height = round(dpi*in.h)
