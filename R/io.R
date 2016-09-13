@@ -80,10 +80,11 @@ getWHRParams = function(config, plotPrefix = NULL){
 #' Plot output of an R expression
 #'
 #' @param expr code generating a plot
+#' @param nOutput output stream to plot the graph to
 #' @param config list containing plot configuration
 #' @param plotPrefix prefix to use for the plot
 #' @export
-AlteryxGraph2 <- function(nOutput, expr, config = NULL,
+AlteryxGraph2 <- function(expr, nOutput, config = NULL,
     plotPrefix = NULL){
   print_ = function(expr){
     if (inherits(expr, 'ggplot')){
