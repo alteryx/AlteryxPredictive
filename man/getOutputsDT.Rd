@@ -4,12 +4,12 @@
 \alias{getOutputsDT}
 \title{get results in form of output list}
 \usage{
-getOutputsDT(config, the_model, is_XDF)
+getOutputsDT(config, model, is_XDF)
 }
 \arguments{
 \item{config}{list of config options}
 
-\item{the_model}{model object}
+\item{model}{model object}
 
 \item{is_XDF}{boolean of whether model is XDF}
 }

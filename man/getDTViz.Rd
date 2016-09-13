@@ -4,10 +4,10 @@
 \alias{getDTViz}
 \title{get component for interactive viz}
 \usage{
-getDTViz(the_model, is_XDF)
+getDTViz(model, is_XDF)
 }
 \arguments{
-\item{the_model}{model object}
+\item{model}{model object}
 
 \item{is_XDF}{boolean of whether model is XDF}
 }

@@ -4,12 +4,12 @@
 \alias{adjustCP}
 \title{adjusts config based on results if config was initially "Auto"}
 \usage{
-adjustCP(config, the_model)
+adjustCP(config, model)
 }
 \arguments{
 \item{config}{list of config options}
 
-\item{the_model}{model object}
+\item{model}{model object}
 }
 \value{
 model obj after adjusting complexity parameter

@@ -4,12 +4,12 @@
 \alias{getXdfLevels}
 \title{extract levels from xdf data}
 \usage{
-getXdfLevels(form, xdf)
+getXdfLevels(formula, xdf)
 }
 \arguments{
-\item{form}{R formula}
-
 \item{xdf}{path to xdf file}
+
+\item{form}{R formula}
 }
 \value{
 names of levels - vector

@@ -4,12 +4,12 @@
 \alias{getDTGraphCalls}
 \title{get graphing calls}
 \usage{
-getDTGraphCalls(config, the_model, is_XDF)
+getDTGraphCalls(config, model, is_XDF)
 }
 \arguments{
 \item{config}{list of config options}
 
-\item{the_model}{model object}
+\item{model}{model object}
 
 \item{is_XDF}{boolean of whether model is XDF}
 }

@@ -2,22 +2,18 @@
 % Please edit documentation in R/io.R
 \name{AlteryxGraph2}
 \alias{AlteryxGraph2}
-\title{Alteryx Graph Function}
+\title{Plot output of an R expression}
 \usage{
-AlteryxGraph2(expr, nOutput = 1, width = 576, height = 576, ...)
+AlteryxGraph2(nOutput, expr, config = NULL, plotPrefix = NULL)
 }
 \arguments{
-\item{expr}{expression to generate graph}
+\item{expr}{code generating a plot}
 
-\item{nOutput}{output connection number}
+\item{config}{list containing plot configuration}
 
-\item{width}{width}
-
-\item{height}{height}
-
-\item{...}{additional arguments}
+\item{plotPrefix}{prefix to use for the plot}
 }
 \description{
-Alteryx Graph Function
+Plot output of an R expression
 }
 
