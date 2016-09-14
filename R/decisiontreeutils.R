@@ -3,14 +3,10 @@
 #'
 #' @param config list of config options
 #' @param the.data incoming data
-checkValidConfig <- function(config, the.data) {
-  data_names <- names(the.data)
-  names <- getNamesFromOrdered(config$used.weights, data_names)
-  name_y_var <- names$y
+checkValidConfig <- function(config, the.data, names) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
-
-  target <- the.data[[name_y_var]]
+  target <- the.data[[names$y]]
   if (is.numeric(target) && length(unique(target)) < 5 && !is_XDF) {
     AlteryxMessage2("The target variable is numeric, however, it has 4 or fewer unique values.", iType = 2, iPriority = 3)
   }
@@ -30,7 +26,7 @@ checkValidConfig <- function(config, the.data) {
 #' @param config list of config options
 #' @param data list of datastream inputs
 #' @return list with components needed to create model
-createDTParams <- function(config, data) {
+createDTParams <- function(config, names) {
   # use lists to hold params for rpart and rxDTree functions
   params <- append(
     getXdfProperties("#1"),
@@ -38,20 +34,13 @@ createDTParams <- function(config, data) {
     list(cp = if (config$cp %in% c("Auto", "")) 1e-5 else config$cp)
   )
 
-  # get data param
-  the.data <- data$data_stream1
-  data_names <- names(the.data)
   params$data <- quote(the.data)
 
-  # Get the field names
-  names <- getNamesFromOrdered(config$used.weights, data_names)
-  name_weight_var <- names$w
-
   # use field names to get formula param
-  params$formula <- makeFormula(names_x_vars, name_y_var)
+  params$formula <- makeFormula(names$x, names$y)
 
   # get weights param
-  params$weights <- if (config$used.weights) name_weight_var else NULL
+  params$weights <- if (config$used.weights) names$w else NULL
   rpart_params$weights <- rxDTree_params$pweights <- weights
 
   # get method and parms params
@@ -84,7 +73,7 @@ createDTParams <- function(config, data) {
 #' @param f_string string of function
 #' @param params list of decision tree params
 #' @return list with named parameters for f_string
-convertParamsToArgs <- function(f_string, params) {
+convertDTParamsToArgs <- function(f_string, params) {
   fmap <- list(
     rpart = c(
       data = data,
@@ -144,7 +133,7 @@ adjustCP <- function(config, model) {
 #' @param model model object
 #' @param is_XDF boolean of whether model is XDF
 #' @return dataframe of piped results
-getDTPipes <- function(config, model, is_XDF) {
+getDTPipes <- function(config, model, is_XDF, names) {
 
   # The output: Start with the pruning table (have rxDTree objects add rpart
   # inheritance for printing and plotting purposes).
@@ -152,9 +141,9 @@ getDTPipes <- function(config, model, is_XDF) {
     model_rpart <- rxAddInheritance(model)
     printcp(model_rpart)
     out <- capture.output(printcp(model_rpart))
-    model$xlevels <- do.call(match.fun("xdfLevels"), list(paste0("~ ", paste(names_x_vars, collapse = " + ")), xdf_path))
+    model$xlevels <- do.call(match.fun("xdfLevels"), list(paste0("~ ", paste(names$x, collapse = " + ")), xdf_path))
     if (is.factor(target)) {
-      target_info <- do.call(match.fun("rxSummary"), list(paste0("~ ", name_y_var), data = xdf.path))[["categorical"]]
+      target_info <- do.call(match.fun("rxSummary"), list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
       if(length(target_info) == 1) {
         model$yinfo <- list(levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
       }
@@ -304,11 +293,11 @@ getDTViz <- function(model, is_XDF) {
 #' @param config list of config options
 #' @param model model object
 #' @param is_XDF boolean of whether model is XDF
-getOutputsDT <- function(config, model, is_XDF) {
+getOutputsDT <- function(config, model, is_XDF, names) {
   # Assemble list to return needed elements to output
   results <- list()
 
-  results$output1 <- getDTPipes(config, model, is_XDF)
+  results$output1 <- getDTPipes(config, model, is_XDF, names)
   results$output3 <- prepModelForOutput(config$model.name, model)
 
   graph_results <- getDTgraphCalls(config, model, is_XDF)
@@ -340,16 +329,22 @@ processDT <- function(config, data) {
 
   config$model.name <- validName(config$model.name)
 
-  checkValidConfig(config, the.data)
+  the.data <- data$data_stream1
+  data_names <- names(the.data)
 
-  params <- AlteryxPredictive::createDTargs(config, data)
-  args <- AlteryxPredictive::argsToDTArgs(params$f, params)
+  # Get the field names
+  names <- getNamesFromOrdered(config$used.weights, data_names)
+
+  checkValidConfig(config, the.data, names)
+
+  params <- AlteryxPredictive::createDTParams(config, names)
+  args <- AlteryxPredictive::convertDTParamsToArgs(params$f, params)
   model <- AlteryxPredictive::doFunction(params$f, args)
   is_XDF <- params$is_XDF
 
   # post-model error checking & cp adjustment if specified to "Auto"
   model <- adjustCP(config, model)
 
-  getOutputsDT(config, model, is_XDF)
+  getOutputsDT(config, model, is_XDF, names)
 
 }
