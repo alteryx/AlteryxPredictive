@@ -1,3 +1,19 @@
+#' Check if a R package is installed.
+#' If installed, load the library;
+#' otherise, stop and issue warning message
+#'
+#' @param pkgNmae Package Name, a string
+#' @export
+checkPackage <- function(pkgName) {
+  hasPkg <- pkgName %in% row.names(installed.packages())
+  if (hasPkg) {
+    library(pkgName, character.only = TRUE)
+  } else {
+    warning("Unable to find the", pkgName, "package")
+  }
+}
+
+
 #' Plot means by group(s)
 #'
 #'
