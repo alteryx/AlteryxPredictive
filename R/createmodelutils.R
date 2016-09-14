@@ -27,7 +27,7 @@ getNamesFromOrdered <- function(use_weights, data_names) {
 #' @export
 makeFormula <- function(x_vars, y_var) {
   assertthat::assert_that(class(x_vars) == "character")
-  assertthat::assert_that(class(y_var) = "character")
+  assertthat::assert_that(class(y_var) == "character")
   x_string <- paste(x_vars, collapse = " + ")
   as.formula(paste0(y_var, " ~ ", x_string))
 }
