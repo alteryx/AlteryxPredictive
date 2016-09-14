@@ -4,7 +4,7 @@
 #' @param data_names vector of names for data
 #' @return list of x, y, and weights with respective names
 #' @export
-getNamesFromOrdered <- function(use_weights, names) {
+getNamesFromOrdered <- function(names, use_weights) {
   minimum_fields <- 2 + use_weights
   assertthat::assert_that(length(names) >= minimum_fields)
   assertthat::assert_that(class(names) == "character")
