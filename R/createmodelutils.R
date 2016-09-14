@@ -5,6 +5,8 @@
 #' @return list of x, y, and weights with respective names
 #' @export
 getNamesFromOrdered <- function(use_weights, data_names) {
+  minimum_fields <- 2 + use_weights
+  assertthat::assert_that(length(data_names) >= minimum_fields)
   name_y_var <- data_names[1]
   if(use_weights){
     names_x_var <- data_names[2:length(data_names)-1]
