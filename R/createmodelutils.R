@@ -13,10 +13,7 @@ getNamesFromOrdered <- function(names, use_weights) {
   x <- if (use_weights) names[2:length(names)-1] else names[2:length(names)]
   w <- if (use_weights) names[length(names)] else NULL
   # If target variable is included in the set of predictor variables remove it from the set.
-  if (y %in% x) {
-    x <- x[x != y]
-  }
-  list(x = x, y = y, w = w)
+  list(x = x[x != y], y = y, w = w)
 }
 
 #' Create formula string
