@@ -306,11 +306,6 @@ getOutputsDT <- function(config, model, is_XDF, names) {
 
   results$output5 <- getDTViz(model, is_XDF)
 
-  write.Alteryx(results$output1, nOutput = 1)
-  write.Alteryx(results$output3, nOutput = 3)
-
-  renderInComposer(results$output5, nOutput = 5)
-
   results
 }
 
