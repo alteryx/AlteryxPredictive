@@ -85,38 +85,37 @@ createDTParams <- function(config, data) {
 #' @param params list of decision tree params
 #' @return list with named parameters for f_string
 convertParamsToArgs <- function(f_string, params) {
-  if (f_string == "rpart") {
-    list(
-      data = params$data,
-      formula = params$formula,
-      weights = params$weights,
-      method = params$method,
-      parms = params$parms,
-      usesurrogate = params$usesurrogate,
-      minsplit <- params$minsplit,
-      minbucket = params$minbucket,
-      xval = params$xval,
-      maxdepth = params$maxdepth,
-      cp = params$cp
+  fmap <- list(
+    rpart = c(
+      data = data,
+      formula = formula,
+      weights = weights,
+      method = method,
+      parms = parms,
+      usesurrogate = usesurrogate,
+      minsplit <- minsplit,
+      minbucket = minbucket,
+      xval = xval,
+      maxdepth = maxdepth,
+      cp = cp
+    ),
+    rxDTree = c(
+      xdf_path = data,
+      formula = formula,
+      pweights = weights,
+      method = method,
+      parms = parms,
+      usesurrogate = useSurrogate,
+      maxNumBins = maxNumBins,
+      minsplit = minSplit,
+      minbucket = minBucket,
+      xval = xVal,
+      maxdepth = maxDepth,
+      cp = cp
     )
-  } else if(f_string == "rxDTree") {
-    list(
-      data = quote(xdf_path),
-      formula = params$f,
-      pweights = params$weights,
-      method = params$method,
-      parms = params$parms,
-      useSurrogate = params$surrogate,
-      maxNumBins = params$maxNumBins,
-      minSplit <- params$minsplit,
-      minBucket = params$minbucket,
-      xVal = params$xval,
-      maxDepth = params$maxdepth,
-      cp = params$cp
-    )
-  } else {
-    stop.Alteryx2(paste("Unsupported function specified: ", f_string))
-  }
+  )
+  # suppress warnings because they will be thrown by values not present in f_string vector
+  suppressWarnings(plyr::rename(params, fmap[[f_string]]))
 }
 
 #' adjusts config based on results if config was initially "Auto"
