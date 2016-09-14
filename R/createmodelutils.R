@@ -4,14 +4,14 @@
 #' @param data_names vector of names for data
 #' @return list of x, y, and weights with respective names
 #' @export
-getNamesFromOrdered <- function(use_weights, data_names) {
+getNamesFromOrdered <- function(use_weights, names) {
   minimum_fields <- 2 + use_weights
-  assertthat::assert_that(length(data_names) >= minimum_fields)
-  assertthat::assert_that(class(data_names) == "character")
+  assertthat::assert_that(length(names) >= minimum_fields)
+  assertthat::assert_that(class(names) == "character")
   assertthat::assert_that(class(use_weights) == "logical")
-  y <- data_names[1]
-  x <- if (use_weights) data_names[2:length(data_names)-1] else data_names[2:length(data_names)]
-  w <- if (use_weights) data_names[length(data_names)] else NULL
+  y <- names[1]
+  x <- if (use_weights) names[2:length(names)-1] else names[2:length(names)]
+  w <- if (use_weights) names[length(names)] else NULL
   # If target variable is included in the set of predictor variables remove it from the set.
   if (y %in% x) {
     x <- x[x != y]
