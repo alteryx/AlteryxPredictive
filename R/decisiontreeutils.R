@@ -337,9 +337,9 @@ processDT <- function(config, data) {
 
   checkValidConfig(config, the.data, names)
 
-  params <- AlteryxPredictive::createDTParams(config, names)
-  args <- AlteryxPredictive::convertDTParamsToArgs(params$f, params)
-  model <- AlteryxPredictive::doFunction(params$f, args)
+  params <- createDTParams(config, names)
+  args <- convertDTParamsToArgs(params$f, params)
+  model <- doFunction(params$f, args)
   is_XDF <- params$is_XDF
 
   # post-model error checking & cp adjustment if specified to "Auto"
