@@ -7,6 +7,8 @@
 getNamesFromOrdered <- function(use_weights, data_names) {
   minimum_fields <- 2 + use_weights
   assertthat::assert_that(length(data_names) >= minimum_fields)
+  assertthat::assert_that(class(data_names) == "character")
+  assertthat::assert_that(class(use_weights) == "logical")
   y <- data_names[1]
   x <- if (use_weights) data_names[2:length(data_names)-1] else data_names[2:length(data_names)]
   w <- if (use_weights) data_names[length(data_names)] else NULL
