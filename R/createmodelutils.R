@@ -5,14 +5,15 @@
 #' @return list of x, y, and weights with respective names
 #' @export
 getNamesFromOrdered <- function(names, use_weights) {
-  minimum_fields <- 2 + use_weights
+  minimum_fields <- 2 +
+    (use_weights && names[length(names)] != names[length(names) - 1])
   assertthat::assert_that(length(names) >= minimum_fields)
   assertthat::assert_that(class(names) == "character")
   assertthat::assert_that(class(use_weights) == "logical")
   y <- names[1]
   x <- if (use_weights) names[2:length(names)-1] else names[2:length(names)]
   w <- if (use_weights) names[length(names)] else NULL
-  # If target variable is included in the set of predictor variables remove it from the set.
+  # If target variable is included in predictors, remove it from predictors.
   list(x = x[x != y], y = y, w = w)
 }
 
