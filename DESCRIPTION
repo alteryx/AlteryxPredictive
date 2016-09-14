@@ -28,4 +28,5 @@ Suggests:
   ScaleR,
   knitr,
   rmarkdown,
-  randomForest
+  randomForest,
+    testthat
