@@ -7,20 +7,14 @@
 getNamesFromOrdered <- function(use_weights, data_names) {
   minimum_fields <- 2 + use_weights
   assertthat::assert_that(length(data_names) >= minimum_fields)
-  name_y_var <- data_names[1]
-  if(use_weights){
-    names_x_var <- data_names[2:length(data_names)-1]
-    name_weights_var <- data_names[length(data_names)]
-  } else {
-    names_x_var <- data_names[2:length(data_names)]
-    name_weights_var <- NULL
+  y <- data_names[1]
+  x <- if (use_weights) data_names[2:length(data_names)-1] else data_names[2:length(data_names)]
+  w <- if (use_weights) data_names[length(data_names)] else NULL
+  # If target variable is included in the set of predictor variables remove it from the set.
+  if (y %in% x) {
+    x <- x[x != y]
   }
-  # Make sure that the target variable is not included in the set of
-  # predictor variables. If it is, then remove it from the set.
-  if (name_y_var %in% names_x_var) {
-    names_x_var <- names_x_var[names_x_var != name_y_var]
-  }
-  list(x = names_x_var, y = name_y_var, w = name_weights_var)
+  list(x = x, y = y, w = w)
 }
 
 #' Create formula string
