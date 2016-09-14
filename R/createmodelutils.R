@@ -48,6 +48,7 @@ doFunction <- function(f, param_list) {
 #' @return key value pair list with name and model
 #' @export
 prepModelForOutput <- function(model_name, model_obj) {
+  assertthat::assert_that(class(model_name) == "character")
   list(
     Name = model_name,
     Object = list(model_obj)
