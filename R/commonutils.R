@@ -7,6 +7,7 @@
 #' 1: message \cr
 #' 2: warn \cr
 #' 3: stop \cr
+#' @return A boolean, if the package exists.
 #' @export
 checkPackage <- function(pkgName, level) {
   hasPkg <- pkgName %in% row.names(installed.packages())
