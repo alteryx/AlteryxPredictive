@@ -3,14 +3,21 @@
 #' otherise, stop and issue warning message
 #'
 #' @param pkgNmae Package Name, a string
+#' @param level Message levels: \cr
+#' 1: message \cr
+#' 2: warn \cr
+#' 3: stop \cr
 #' @export
-checkPackage <- function(pkgName) {
+checkPackage <- function(pkgName, level) {
   hasPkg <- pkgName %in% row.names(installed.packages())
+  commands <- c("message", "warning", "stop")
+  msgCommand <- commands[level]
   if (hasPkg) {
     library(pkgName, character.only = TRUE)
   } else {
-    warning("Unable to find the", pkgName, "package")
+    eval(parse(text = paste0(msgCommand, "('Unable to find the ", pkgName, " package')")))
   }
+  return(hasPkg)
 }
 
 
