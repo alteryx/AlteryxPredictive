@@ -328,7 +328,7 @@ processDT <- function(config, data) {
   data_names <- names(the.data)
 
   # Get the field names
-  names <- getNamesFromOrdered(config$used.weights, data_names)
+  names <- getNamesFromOrdered(data_names, config$used.weights)
 
   checkValidConfig(config, the.data, names)
 
