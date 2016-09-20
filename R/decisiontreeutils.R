@@ -6,17 +6,18 @@
 #' @param names list of x, y, w names for data
 checkValidConfig <- function(config, the.data, names) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
+  is_XDF <- getXdfProperties("#1")$is_XDF
 
   target <- the.data[[names$y]]
   if (is.numeric(target) && length(unique(target)) < 5 && !is_XDF) {
     AlteryxMessage2("The target variable is numeric, however, it has 4 or fewer unique values.", iType = 2, iPriority = 3)
   }
 
-  if(rpart_params$cp < 0 || rpart_params$cp > 1) {
+  if(cp < 0 || cp > 1) {
     stop.Alteryx2("The complexity parameter must be between 0 and 1. Please try again.")
   }
 
-  if(is.na(as.numeric(config$cp)) && !(config$cp == "Auto" || config$cp == "")) {
+  if(is.na(as.numeric(cp)) && !(cp == "Auto" || cp == "")) {
     stop.Alteryx2("The complexity parameter provided is not a number. Please enter a new value and try again.")
   }
 }
