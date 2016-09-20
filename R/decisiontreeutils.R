@@ -6,6 +6,13 @@
 #' @param names list of x, y, w names for data
 #' @param is_XDF whether data is XDF
 checkValidConfig <- function(config, the.data, names, is_XDF) {
+  assertthat::assert_that(has_name(config, "cp"))
+  assertthat::assert_that(has_name(names, "y"))
+
+  assertthat::assert_that(are_equal(class(names$y), "character"))
+  assertthat::assert_that(are_equal(class(params$cp), "numeric"))
+  assertthat::assert_that(are_equal(class(is_XDF), "logical"))
+
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   target <- the.data[[names$y]]
