@@ -3,6 +3,7 @@
 #'
 #' @param config list of config options
 #' @param the.data incoming data
+#' @param names list of x, y, w names for data
 checkValidConfig <- function(config, the.data, names) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
