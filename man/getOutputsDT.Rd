@@ -4,7 +4,7 @@
 \alias{getOutputsDT}
 \title{get results in form of output list}
 \usage{
-getOutputsDT(config, model, is_XDF)
+getOutputsDT(config, model, is_XDF, names)
 }
 \arguments{
 \item{config}{list of config options}

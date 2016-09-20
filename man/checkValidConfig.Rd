@@ -5,12 +5,14 @@
 \title{Error checking pre-model
 Does not return anything - just throws errror}
 \usage{
-checkValidConfig(config, the.data)
+checkValidConfig(config, the.data, names)
 }
 \arguments{
 \item{config}{list of config options}
 
 \item{the.data}{incoming data}
+
+\item{names}{list of x, y, w names for data}
 }
 \description{
 Error checking pre-model

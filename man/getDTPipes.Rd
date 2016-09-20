@@ -4,7 +4,7 @@
 \alias{getDTPipes}
 \title{get grp|out pipes for outputting static report}
 \usage{
-getDTPipes(config, model, is_XDF)
+getDTPipes(config, model, is_XDF, names)
 }
 \arguments{
 \item{config}{list of config options}

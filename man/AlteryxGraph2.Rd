@@ -4,10 +4,12 @@
 \alias{AlteryxGraph2}
 \title{Plot output of an R expression}
 \usage{
-AlteryxGraph2(nOutput, expr, config = NULL, plotPrefix = NULL)
+AlteryxGraph2(expr, nOutput, config = NULL, plotPrefix = NULL)
 }
 \arguments{
 \item{expr}{code generating a plot}
+
+\item{nOutput}{output stream to plot the graph to}
 
 \item{config}{list containing plot configuration}
 
