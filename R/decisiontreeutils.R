@@ -4,9 +4,9 @@
 #' @param config list of config options
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
-checkValidConfig <- function(config, the.data, names) {
+#' @param is_XDF whether data is XDF
+checkValidConfig <- function(config, the.data, names, is_XDF) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
-  is_XDF <- getXdfProperties("#1")$is_XDF
 
   target <- the.data[[names$y]]
   if (is.numeric(target) && length(unique(target)) < 5 && !is_XDF) {
@@ -332,7 +332,7 @@ processDT <- function(config, data) {
   # Get the field names
   names <- getNamesFromOrdered(data_names, config$used.weights)
 
-  checkValidConfig(config, the.data, names)
+  checkValidConfig(config, the.data, names, is_XDF)
 
   params <- createDTParams(config, names)
   args <- convertDTParamsToArgs(params$f, params)
