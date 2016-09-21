@@ -36,11 +36,50 @@ checkValidConfig <- function(config, the.data, names, is_XDF) {
 #' @param xdf_properties list of xdf details (is_XDF and xdf_path elements)
 #' @return list with components needed to create model
 createDTParams <- function(config, names, xdf_properties) {
+  assertthat::assert_that(has_name(names, "x"))
+  assertthat::assert_that(has_name(names, "y"))
+  assertthat::assert_that(has_name(names, "w"))
+  assertthat::assert_that(has_name(xdf_properties, "is_XDF"))
+  assertthat::assert_that(has_name(xdf_properties, "xdf_path"))
+  assertthat::assert_that(has_name(config, "minsplit"))
+  assertthat::assert_that(has_name(config, "minbucket"))
+  assertthat::assert_that(has_name(config, "xval"))
+  assertthat::assert_that(has_name(config, "maxdepth"))
+  assertthat::assert_that(has_name(config, "cp"))
+  assertthat::assert_that(has_name(config, "used.weights"))
+  assertthat::assert_that(has_name(config, "select.type"))
+  assertthat::assert_that(has_name(config, "classfication"))
+  assertthat::assert_that(has_name(config, "use.gini"))
+  assertthat::assert_that(has_name(config, "use.surrogate.0"))
+  assertthat::assert_that(has_name(config, "use.surrogate.1"))
+  assertthat::assert_that(has_name(config, "use.surrogate.2"))
+  assertthat::assert_that(has_name(config, "maxNumBins"))
+
+
+  assertthat::assert_that(are_equal(class(names$x), "character"))
+  assertthat::assert_that(are_equal(class(names$y), "character"))
+  assertthat::assert_that(are_equal(class(names$z), "character"))
+  assertthat::assert_that(are_equal(class(xdf_properties$is_XDF), "logical"))
+  assertthat::assert_that(are_equal(class(xdf_properties$xdf_path), "character"))
+  assertthat::assert_that(are_equal(class(config$minsplit), "numeric"))
+  assertthat::assert_that(are_equal(class(config$minbucket), "numeric"))
+  assertthat::assert_that(are_equal(class(config$xval), "numeric"))
+  assertthat::assert_that(are_equal(class(config$maxdepth), "numeric"))
+  assertthat::assert_that(are_equal(class(config$used.weights), "logical"))
+  assertthat::assert_that(are_equal(class(config$select.type), "logical"))
+  assertthat::assert_that(are_equal(class(config$classfication), "logical"))
+  assertthat::assert_that(are_equal(class(config$use.gini), "logical"))
+  assertthat::assert_that(are_equal(class(config$use.surrogate.0), "logical"))
+  assertthat::assert_that(are_equal(class(config$use.surrogate.1), "logical"))
+  assertthat::assert_that(are_equal(class(config$use.surrogate.2), "logical"))
+  assertthat::assert_that(are_equal(class(config$maxNumBins), "numeric"))
+
+
   # use lists to hold params for rpart and rxDTree functions
   params <- append(
     xdf_properties,
     config[,c('minsplit', 'minbucket', 'xval', 'maxdepth')],
-    list(cp = if (config$cp %in% c("Auto", "")) 1e-5 else config$cp)
+    list(cp = if (config$cp %in% c("Auto", "")) 1e-5 else as.numeric(config$cp))
   )
 
   params$data <- quote(the.data)
@@ -66,7 +105,7 @@ createDTParams <- function(config, names, xdf_properties) {
   param_list$usesurrogate <- which(usesurrogate) - 1
 
   # get max bins param
-  if(is_XDF && !is.na(as.numeric(config$maxNumBins))) {
+  if(xdf_properties$is_XDF && !is.na(as.numeric(config$maxNumBins))) {
     maxNumBins <- config$maxNumBins
     if(maxNumBins < 2) {
       stop.Alteryx2("The minimum bins is 2")
