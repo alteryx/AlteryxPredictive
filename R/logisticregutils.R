@@ -57,16 +57,16 @@ processXDF <- function(inputs, config){
   # 1. is the default for pweights NULL ?
   # 2. does this take a character or a vector ?
   the.model <- rxLogit(formula = the.formula, data = XDFInfo$xdf_path,
-                       pweights = var_names$w, dropFirst = TRUE
+    pweights = var_names$w, dropFirst = TRUE
   )
   null.model <- rxLogit(makeFormula("1", var_names$y), data = XDFInfo$xdf_path,
-                        pweights = var_names$w
+    pweights = var_names$w
   )
 
   # Add the level labels for the target and predictors, along with
   # the target counts to the model object
   target.info <- rxSummary(makeFormula(var_names$y, ""),
-                           data = XDFInfo$xdf_path)$categorical
+    data = XDFInfo$xdf_path)$categorical
   the.model$yinfo <- list(
     levels = as.character(target.info[[1]][,1]),
     counts = target.info[[1]][,2]
@@ -126,7 +126,7 @@ createPlotOutputsXDF <- function(){
 #' Function to create empty plot with a message
 noDiagnosticPlot <- function(msg){
   plot(x = c(0,1), y = c(0,1), type = "n", main = "Plot not available",
-       xlab = "", ylab = "", xaxt = "n", yaxt = "n"
+    xlab = "", ylab = "", xaxt = "n", yaxt = "n"
   )
   AlteryxMessage2(msg, iType = 2, iPriority = 3)
 }
