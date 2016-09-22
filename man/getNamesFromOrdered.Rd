@@ -4,7 +4,7 @@
 \alias{getNamesFromOrdered}
 \title{Get names list for x, y, and weights}
 \usage{
-getNamesFromOrdered(use_weights, data_names)
+getNamesFromOrdered(names, use_weights)
 }
 \arguments{
 \item{use_weights}{boolean for whether weights are in data}
