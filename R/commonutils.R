@@ -1,27 +1,3 @@
-#' Check if a R package is installed.
-#' If installed, load the library;
-#' otherise, stop and issue warning message
-#'
-#' @param pkgNmae Package Name, a string
-#' @param level Message levels: \cr
-#' 1: message \cr
-#' 2: warn \cr
-#' 3: stop \cr
-#' @return A boolean, if the package exists.
-#' @export
-checkPackage <- function(pkgName, level) {
-  hasPkg <- pkgName %in% row.names(installed.packages())
-  commands <- c("message", "warning", "stop")
-  msgCommand <- commands[level]
-  if (hasPkg) {
-    library(pkgName, character.only = TRUE)
-  } else {
-    eval(parse(text = paste0(msgCommand, "('Unable to find the ", pkgName, " package')")))
-  }
-  return(hasPkg)
-}
-
-
 #' Plot means by group(s)
 #'
 #'
