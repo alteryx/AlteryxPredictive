@@ -27,6 +27,6 @@ AlteryxMessage2 <- function(msg, ...){
   if (inAlteryx()) {
     AlteryxRDataX::AlteryxMessage(msg, ...)
   } else {
-    message(msg, ...)
+    message(msg)
   }
 }

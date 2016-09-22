@@ -84,7 +84,7 @@ getWHRParams = function(config, plotPrefix = NULL){
 #' @param config list containing plot configuration
 #' @param plotPrefix prefix to use for the plot
 #' @export
-AlteryxGraph2 <- function(expr, nOutput, config = NULL,
+AlteryxGraph3 <- function(expr, nOutput, config = NULL,
     plotPrefix = NULL){
   print_ = function(expr){
     if (inherits(expr, 'ggplot')){
@@ -105,3 +105,26 @@ AlteryxGraph2 <- function(expr, nOutput, config = NULL,
     print_(expr)
   }
 }
+
+
+#' Alteryx Graph Function
+#'
+#'
+#' @export
+#' @param expr expression to generate graph
+#' @param nOutput output connection number
+#' @param width width
+#' @param height height
+#' @param ... additional arguments
+AlteryxGraph2 = function(expr, nOutput = 1, width = 576, height = 576, ...){
+  print_ = function(expr){if (inherits(expr, 'ggplot')){print(expr)} else{expr}}
+  if ('package:AlteryxRDataX' %in% search()){
+    requireNamespace('AlteryxRDataX')
+    AlteryxRDataX::AlteryxGraph(nOutput, width = width, height = height, ...)
+    print_(expr)
+    invisible(dev.off())
+  } else {
+    print_(expr)
+  }
+}
+
