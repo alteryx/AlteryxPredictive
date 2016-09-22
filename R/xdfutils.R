@@ -5,7 +5,7 @@
 #' @return names of levels - vector
 #' @export
 getXdfLevels <- function(formula, xdf) {
-  factors <- rxSummary(formula, data = xdf)$categorical
+  factors <- RevoScaleR::rxSummary(formula, data = xdf)$categorical
   factor_names <- sapply(factors, function(x) names(x)[1])
   if (length(factor_names) == 1) {
     the_levels <- list(factor_names = as.character(factors[[1]][[1]]))
