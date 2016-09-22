@@ -48,7 +48,7 @@ createDTParams <- function(config, names, xdf_properties) {
   assertthat::assert_that(has_name(config, "cp"))
   assertthat::assert_that(has_name(config, "used.weights"))
   assertthat::assert_that(has_name(config, "select.type"))
-  assertthat::assert_that(has_name(config, "classfication"))
+  assertthat::assert_that(has_name(config, "classification"))
   assertthat::assert_that(has_name(config, "use.gini"))
   assertthat::assert_that(has_name(config, "use.surrogate.0"))
   assertthat::assert_that(has_name(config, "use.surrogate.1"))
@@ -58,7 +58,7 @@ createDTParams <- function(config, names, xdf_properties) {
 
   assertthat::assert_that(are_equal(class(names$x), "character"))
   assertthat::assert_that(are_equal(class(names$y), "character"))
-  assertthat::assert_that(are_equal(class(names$z), "character"))
+  assertthat::assert_that(are_equal(class(names$w), "character"))
   assertthat::assert_that(are_equal(class(xdf_properties$is_XDF), "logical"))
   assertthat::assert_that(are_equal(class(xdf_properties$xdf_path), "character"))
   assertthat::assert_that(are_equal(class(config$minsplit), "numeric"))
@@ -67,7 +67,7 @@ createDTParams <- function(config, names, xdf_properties) {
   assertthat::assert_that(are_equal(class(config$maxdepth), "numeric"))
   assertthat::assert_that(are_equal(class(config$used.weights), "logical"))
   assertthat::assert_that(are_equal(class(config$select.type), "logical"))
-  assertthat::assert_that(are_equal(class(config$classfication), "logical"))
+  assertthat::assert_that(are_equal(class(config$classification), "logical"))
   assertthat::assert_that(are_equal(class(config$use.gini), "logical"))
   assertthat::assert_that(are_equal(class(config$use.surrogate.0), "logical"))
   assertthat::assert_that(are_equal(class(config$use.surrogate.1), "logical"))
@@ -89,7 +89,7 @@ createDTParams <- function(config, names, xdf_properties) {
 
   # get weights param
   params$weights <- if (config$used.weights) names$w else NULL
-  rpart_params$weights <- rxDTree_params$pweights <- weights
+  params$weights <- weights
 
   # get method and parms params
   with(config, {if (select.type){
@@ -102,7 +102,7 @@ createDTParams <- function(config, names, xdf_properties) {
 
   # get usesurrogate param
   usesurrogate <- config[c('use.surrogate.0', 'use.surrogate.1', 'use.surrogate.2')]
-  param_list$usesurrogate <- which(usesurrogate) - 1
+  params$usesurrogate <- which(usesurrogate) - 1
 
   # get max bins param
   if(xdf_properties$is_XDF && !is.na(as.numeric(config$maxNumBins))) {
