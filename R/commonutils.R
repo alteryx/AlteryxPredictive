@@ -605,8 +605,9 @@ validName <- function(name) {
   if (name != make.names(name)) {
     old.name <- name
     name <- gsub("\\.", "\\_", make.names(name))
-    AlteryxRDataX::AlteryxMessage(
-      paste("The invalid name", old.name, "has been replaced by", name), 2, 2, 0
+    AlteryxMessage2(
+      paste("The invalid name", old.name, "has been replaced by", name),
+        2, 2, 0
     )
   }
   name
