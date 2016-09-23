@@ -122,7 +122,7 @@ createPlotOutputsLogisticOSR <- function(the.model, singular, config){
 #' Plots in XDF
 #'
 #' @export
-createPlotOutputsLogisticXDF <- function(){
+createPlotOutputsXDF <- function(){
   noDiagnosticPlot("The diagnostic plot is not available for XDF based models")
 }
 
