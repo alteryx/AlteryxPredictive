@@ -27,7 +27,7 @@ inputs <- list(
 test_that("processLogisticOSR", {
   result <- processLogisticOSR(inputs, config)
   expect_that(result$the.model, is_a("glm"))
-  expect_identical("result$model_type", "binomial")
+  expect_identical(result$model_type, "binomial")
 })
 
 
