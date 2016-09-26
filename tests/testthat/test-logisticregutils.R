@@ -12,7 +12,7 @@ config <- list(
 
 defaults <- list(
   data = transform(iris,
-                   Species = as.factor(ifelse(Species != "setosa", "other", "setosa"))
+    Species = as.factor(ifelse(Species != "setosa", "other", "setosa"))
   )[,5:1]
 )
 inputs <- list(
