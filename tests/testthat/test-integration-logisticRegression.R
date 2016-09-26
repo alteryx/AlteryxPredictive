@@ -59,9 +59,15 @@ runLogisticRegression <- function(inputs, config){
   write.Alteryx2(the.obj, nOutput = 3)
 }
 
-result <- runLogisticRegression(inputs, config)
 
 test_that("admission data with logit link", {
+  result <- runLogisticRegression(inputs, config)
   expect_eqaul(result$Object[[1]]$coefficients["gpa"], 0.7770136)
 })
 
+
+test_that("admission data with probit link", {
+  config$the.link <- "probit"
+  result <- runLogisticRegression(inputs, config)
+  expect_eqaul(result$Object[[1]]$coefficients["gpa"], 0.464360)
+})
