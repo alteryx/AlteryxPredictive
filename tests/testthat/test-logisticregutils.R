@@ -1,18 +1,14 @@
 context("Logistic Regression: helper functions testing ")
 
 config <- list(
-  `graph.resolution` = dropdownInput('%Question.graph.resolution%' , '1x'),
-  `the.link` = dropdownInput('%Question.Link%' , 'logit'),
-  `model.name` = textInput('%Question.Model Name%', 'my_model'),
-  `used.weights` = checkboxInput('%Question.Use Weights%' , FALSE),
-  `Weight Vec` = dropdownInput('%Question.Weight Vec%'),
-  `X Vars` = listInput('%Question.X Vars%', c('Sepal.Length', 'Petal.Length')),
-  `Y Var` = dropdownInput('%Question.Y Var%', 'Species')
+  `graph.resolution` = '1x',
+  `the.link` = 'logit',
+  `model.name` = 'my_model',
+  `used.weights` = FALSE,
+  `X Vars` = c('Sepal.Length', 'Petal.Length'),
+  `Y Var` = 'Species'
 )
 
-if (config$the.link == "complementary log-log"){
-  config$the.link <- "cloglog"
-}
 
 defaults <- list(
   data = transform(iris,
