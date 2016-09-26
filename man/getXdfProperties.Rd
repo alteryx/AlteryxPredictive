@@ -4,7 +4,7 @@
 \alias{getXdfProperties}
 \title{extract xdf properties from incoming xdf data}
 \usage{
-getXdfProperties(input_name)
+getXdfProperties(input_name, default = NULL)
 }
 \arguments{
 \item{input_name}{name of incoming connection}
