@@ -22,30 +22,30 @@ processLinearOSR <- function(inputs, config){
 #' @export
 processLinearXDF <- function(inputs, config){
   temp.dir <- '%Engine.TempFilePath%'
-  xdf.path = XDFInfo$xdf_path
+  xdf.path = inputs$XDFInfo$xdf_path
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
   the.formula = if (config$`Omit Constant`){
     makeFormula(c("-1", var_names$x), var_names$y)
   } else {
     makeFormula(var_names$x, var_names$y)
   }
-  the.model <- rxLinMod(the.formula, XDFInfo$xdf_path, pweights = var_names$w,
+  the.model <- RevoScaleR::rxLinMod(the.formula, xdf.path, pweights = var_names$w,
     covCoef = TRUE, dropFirst = TRUE)
 
   # Add the level labels for factor predictors to use in model scoring, and
   # determine if the smearing estimator adjustment should be calculated for
   # scoring option value.
-  the.model$xlevels <- getXdfLevels(makeFormula(var_names$x), xdf.path)
-  sum.info <- rxSummary(makeFormula(var_names$y, ""), xdf.path)
+  the.model$xlevels <- getXdfLevels(makeFormula(var_names$x, ""), xdf.path)
+  sum.info <- RevoScaleR::rxSummary(makeFormula(var_names$y, ""), xdf.path)
   # See if it is possible that the maximum target value is consistent with the
   # use of a natural log transformation, and construct the smearing adjust if
   # it is.
   if (sum.info$sDataFrame[1,5] <= 709) {
     resids.path <- file.path(temp.dir, paste0(ceiling(100000*runif(1)), '.xdf'))
-    rxPredict(the.model, data = xdf.path, outData = resids.path,
+    RevoScaleR::rxPredict(the.model, data = xdf.path, outData = resids.path,
       computeResiduals = TRUE, predVarNames = "Pred", residVarNames = "Resid")
-    resids.df <- rxReadXdf(file = resids.path)
-    smear <- rxSummary(~ Resid, data = resids.path,
+    resids.df <- RevoScaleR::rxReadXdf(file = resids.path)
+    smear <- RevoScaleR::rxSummary(~ Resid, data = resids.path,
       transforms = list(Resid = exp(Resid)))
     the.model$smearing.adj <- smear$sDataFrame[1,2]
   }

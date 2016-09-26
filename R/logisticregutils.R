@@ -39,9 +39,9 @@ processLogisticOSR <- function(inputs, config){
 #' @export
 processLogisticXDF <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
-
+  xdf_path <- inputs$XDFInfo$xdf_path
   # Make sure the target is binary
-  len.target <- rxGetVarInfo(XDFInfo$xdf_path)[[var_names$y]]$levels
+  len.target <- RevoScaleR::rxGetVarInfo(xdf_path)[[var_names$y]]$levels
   if(len.target != 2){
     stop.Alteryx2("The target variable must only have two unique values.")
   }
@@ -55,23 +55,22 @@ processLogisticXDF <- function(inputs, config){
   # CHECK:
   # 1. is the default for pweights NULL ?
   # 2. does this take a character or a vector ?
-  the.model <- RevoScaleR::rxLogit(formula = the.formula, data = XDFInfo$xdf_path,
+  the.model <- RevoScaleR::rxLogit(formula = the.formula, data = xdf_path,
     pweights = var_names$w, dropFirst = TRUE
   )
   null.model <- RevoScaleR::rxLogit(makeFormula("1", var_names$y),
-    data = XDFInfo$xdf_path, pweights = var_names$w
+    data = xdf_path, pweights = var_names$w
   )
 
   # Add the level labels for the target and predictors, along with
   # the target counts to the model object
   target.info <- RevoScaleR::rxSummary(makeFormula(var_names$y, ""),
-    data = XDFInfo$xdf_path)$categorical
+    data = xdf_path)$categorical
   the.model$yinfo <- list(
     levels = as.character(target.info[[1]][,1]),
     counts = target.info[[1]][,2]
   )
-  the.model$xlevels <- getXdfLevels(
-    makeFormula(var_names$x, ""), XDFInfo$xdf_path)
+  the.model$xlevels <- getXdfLevels(makeFormula(var_names$x, ""), xdf_path)
   list(the.model = the.model, null.model = null.model)
 }
 
@@ -93,6 +92,7 @@ createReportLogisticOSR <- function(the.model, config, model_type) {
   } else {
     AlteryxMessage2("Creation of the Analysis of Deviance table was surpressed due to singularities", iType = 2, iPriority = 3)
   }
+  glm.out
 }
 
 #' @export
@@ -101,6 +101,7 @@ createReportLogisticXDF <- function(the.model, config, null.model, nOutput = 2) 
   glm.out <- rbind(c("Model_Name", config$model.name), glm.out)
   glm.out <- rbind(glm.out, c("Model_Type", "binomial"))
   AlteryxMessage2("Creation of the Analysis of Deviance tables was surpressed due to the use of an XDF file", iType = 2, iPriority = 3)
+  glm.out
 }
 
 #' Create Plots
