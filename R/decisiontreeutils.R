@@ -6,12 +6,6 @@
 #' @param names list of x, y, w names for data
 #' @param is_XDF whether data is XDF
 checkValidConfig <- function(config, the.data, names, is_XDF) {
-  assertthat::assert_that(has_name(config, "cp"))
-  assertthat::assert_that(has_name(names, "y"))
-
-  assertthat::assert_that(are_equal(class(names$y), "character"))
-  assertthat::assert_that(are_equal(class(is_XDF), "logical"))
-
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   target <- the.data[[names$y]]
@@ -36,45 +30,6 @@ checkValidConfig <- function(config, the.data, names, is_XDF) {
 #' @param xdf_properties list of xdf details (is_XDF and xdf_path elements)
 #' @return list with components needed to create model
 createDTParams <- function(config, names, xdf_properties) {
-  assertthat::assert_that(has_name(names, "x"))
-  assertthat::assert_that(has_name(names, "y"))
-  assertthat::assert_that(has_name(names, "w"))
-  assertthat::assert_that(has_name(xdf_properties, "is_XDF"))
-  assertthat::assert_that(has_name(xdf_properties, "xdf_path"))
-  assertthat::assert_that(has_name(config, "minsplit"))
-  assertthat::assert_that(has_name(config, "minbucket"))
-  assertthat::assert_that(has_name(config, "xval"))
-  assertthat::assert_that(has_name(config, "maxdepth"))
-  assertthat::assert_that(has_name(config, "cp"))
-  assertthat::assert_that(has_name(config, "used.weights"))
-  assertthat::assert_that(has_name(config, "select.type"))
-  assertthat::assert_that(has_name(config, "classification"))
-  assertthat::assert_that(has_name(config, "use.gini"))
-  assertthat::assert_that(has_name(config, "use.surrogate.0"))
-  assertthat::assert_that(has_name(config, "use.surrogate.1"))
-  assertthat::assert_that(has_name(config, "use.surrogate.2"))
-  assertthat::assert_that(has_name(config, "maxNumBins"))
-
-
-  assertthat::assert_that(are_equal(class(names$x), "character"))
-  assertthat::assert_that(are_equal(class(names$y), "character"))
-  assertthat::assert_that(are_equal(class(names$w), "character"))
-  assertthat::assert_that(are_equal(class(xdf_properties$is_XDF), "logical"))
-  assertthat::assert_that(are_equal(class(xdf_properties$xdf_path), "character"))
-  assertthat::assert_that(are_equal(class(config$minsplit), "numeric"))
-  assertthat::assert_that(are_equal(class(config$minbucket), "numeric"))
-  assertthat::assert_that(are_equal(class(config$xval), "numeric"))
-  assertthat::assert_that(are_equal(class(config$maxdepth), "numeric"))
-  assertthat::assert_that(are_equal(class(config$used.weights), "logical"))
-  assertthat::assert_that(are_equal(class(config$select.type), "logical"))
-  assertthat::assert_that(are_equal(class(config$classification), "logical"))
-  assertthat::assert_that(are_equal(class(config$use.gini), "logical"))
-  assertthat::assert_that(are_equal(class(config$use.surrogate.0), "logical"))
-  assertthat::assert_that(are_equal(class(config$use.surrogate.1), "logical"))
-  assertthat::assert_that(are_equal(class(config$use.surrogate.2), "logical"))
-  assertthat::assert_that(are_equal(class(config$maxNumBins), "numeric"))
-
-
   # use lists to hold params for rpart and rxDTree functions
   params <- append(
     xdf_properties,
