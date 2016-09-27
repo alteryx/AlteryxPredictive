@@ -25,11 +25,13 @@ inputs <- list(
 
 
 #' ### Run and Create Outputs
-design <- survey::svydesign(id = ~1, weights = ~pw, data = apiclus1)
-exp_model <- survey::svyglm(sch.wide ~ ell + meals , design = design, family=quasibinomial(logit))
+library(survey)
+design <- svydesign(id = ~1, weights = ~pw, data = apiclus1)
+exp_model <- svyglm(sch.wide ~ ell + meals , design = design,
+  family = quasibinomial(logit)
+)
 
 test_that("admission data with probit link", {
   result <- AlteryxPredictive:::runLogisticRegression(inputs, config)
-  expect_equal(result$Object[[1]]$coefficients,
-               exp_model$coefficients)
+  expect_equal(result$Object[[1]]$coefficients, exp_model$coefficients)
 })
