@@ -24,12 +24,12 @@ processLogisticOSR <- function(inputs, config){
     the.design <- svydesign(
       ids = ~1, weights = makeFormula(var_names$w, ""), data = inputs$the.data
     )
-    the.family <- quasibinomial(config$the.link)
-    the.model <- svyglm(the.formula, family = the.family, design = the.design)
+    the.model <- svyglm(the.formula, family = quasibinomial(config$the.link),
+      design = the.design)
   } else {
     model_type <- "binomial"
-    the.family <- binomial(config$the.link)
-    the.model <- glm(the.formula, family = the.family, data = inputs$the.data)
+    the.model <- glm(the.formula, family = binomial(config$the.link),
+      data = inputs$the.data)
   }
   list(the.model = the.model, model_type = model_type)
 }
