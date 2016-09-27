@@ -1,4 +1,4 @@
-context("Logistic Regression: helper functions testing ")
+context("Logistic Regression: basic version with admission data")
 
 config <- list(
   `graph.resolution` = '1x',
