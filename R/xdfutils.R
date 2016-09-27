@@ -24,7 +24,7 @@ getXdfLevels <- function(formula, xdf) {
 #' @import rjson
 #' @export
 getXdfProperties <- function(input_name, default = NULL) {
-  if(inAlteryx()){
+  if(!inAlteryx()){
     default
   } else {
     is_XDF <- FALSE
@@ -35,10 +35,12 @@ getXdfProperties <- function(input_name, default = NULL) {
       if (context_list$Context == "XDF") {
         is_XDF <- TRUE
         xdf_path <- context_list$File.Loc
-        list(is_XDF = is_XDF, xdf_path = xdf_path)
       } else {
         stop.Alteryx2("At this time only XDF scaling is supported.")
       }
+    } else {
+      xdf_path = ""
     }
+    list(is_XDF = is_XDF, xdf_path = xdf_path)
   }
 }
