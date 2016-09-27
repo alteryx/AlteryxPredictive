@@ -310,8 +310,7 @@ AlteryxReportRx <- function (rx.obj, null.deviance = NULL) {
     summary.df$out <- as.character(summary.df$out)
   } else {
     resid.se <- paste("Residual standard error:", format(rx.obj$sigma, digits = 5), "on", rx.obj$df[2], "degrees of freedom")
-    r.sq <- paste("Multiple R-squared: ", format(rx.obj$r.squared, digits = 4), ", Adjusted R-Squared: ", format(rx.obj$adj.r.squared,
-                                                                                                                 digits = 4), sep = "")
+    r.sq <- paste("Multiple R-squared: ", format(rx.obj$r.squared, digits = 4), ", Adjusted R-Squared: ", format(rx.obj$adj.r.squared, digits = 4), sep = "")
     p.f <- format(rx.obj$f.pvalue, digits = 4)
     p.f[rx.obj$f.pvalue < 2.2e-16] <- "< 2.2e-16"
     f.stat <- paste("F-statistic: ", format(rx.obj$fstatistic$value, digits = 4), " on ", as.integer(rx.obj$fstatistic$numdf), " and ", as.integer(rx.obj$fstatistic$dendf), " DF, p-value: ", p.f, sep = "")
@@ -322,51 +321,6 @@ AlteryxReportRx <- function (rx.obj, null.deviance = NULL) {
     summary.df$out <- as.character(summary.df$out)
   }
   json.str <- paste("\"", names(rx.obj$coefficients), "\":\"", rx.obj$coefficients, "\"", sep = "", collapse = ", ")
-  json.str <- paste("{", json.str, "}")
-  coef.str <- c("Coef_JSON", json.str)
-  summary.df <- rbind(summary.df, coef.str)
-  summary.df
-}
-
-AlteryxReportMadLib <- function (ml.obj, null.deviance = NULL) {
-  if (!(class(ml.obj) %in% c("logregr.madlib")))
-    stop("The object provided is not an appropriate MADlib class object")
-  the.call <- paste(capture.output(ml.obj$call), collapse = "")
-  the.call = gsub("\\s\\s", "", the.call)
-  # The coefficients and related estimates need to be done by class
-  if (class(ml.obj) == "logregr.madlib") {
-    param.names <- names(ml.obj$coef)
-    the.coefs <- format(ml.obj$coef, digits = 4)
-    the.se <- format(ml.obj$std_err, digits = 4)
-    the.t <- format(ml.obj$z_stats, digits = 4)
-    p.stars <- pStars(ml.obj$p_values)
-    p.stars$p_txt <- as.character(p.stars$p_txt)
-    p.stars$Stars <- as.character(p.stars$Stars)
-    p.stars$Stars[is.na(ml.obj$coef)] <- " "
-  } else {
-  }
-  coef.est <- paste(param.names, the.coefs, the.se, the.t, p.stars$p_txt, p.stars$Stars, sep = "|")
-  coef.lab <- "Coefficients:"
-  # Model summary
-  if (class(ml.obj) == "logregr.madlib") {
-    dispersion <- "(Dispersion parameter for binomial taken to be 1)"
-    #df.null <- rx.obj$nValidObs - 1
-    #df.mod <- rx.obj$nValidObs - length(param.names)
-    #null.dev <- paste("Null deviance:", format(null.deviance, digits = 5), "on", df.null, "degrees of freedom")
-    #mod.dev <- paste("Residual deviance:", format(rx.obj$deviance, digits = 5), "on", df.mod, "degrees of freedom")
-    #McF.R2 <- 1 - (rx.obj$deviance/null.deviance)
-    #mod.fit <- paste("McFadden R-Squared: ", format(McF.R2, digits = 4), ", AIC: ", format(rx.obj$aic, digits = 4), sep = "")
-    aic <- 2*length(the.coefs) - 2*ml.obj$log_likelihood
-    mod.fit <- paste("AIC: ", format(aic, digits = 4), "  Log Likelihood: ", format(ml.obj$log_likelihood, digits = 4), sep = "")
-    fisher.it <- paste("Number of IRLS iterations:", ml.obj$num_iterations)
-    sum.grps <- c("Call", "Coef_Label", rep("Coef_Est", length(coef.est)), "Dispersion", "Fit_Stats", "Fisher")
-    sum.out <- c(the.call, coef.lab, coef.est, dispersion, mod.fit, fisher.it)
-    summary.df <- data.frame(grp = sum.grps, out = sum.out)
-    summary.df$grp <- as.character(summary.df$grp)
-    summary.df$out <- as.character(summary.df$out)
-  } else {
-  }
-  json.str <- paste("\"", names(ml.obj$coef), "\":\"", ml.obj$coef, "\"", sep = "", collapse = ", ")
   json.str <- paste("{", json.str, "}")
   coef.str <- c("Coef_JSON", json.str)
   summary.df <- rbind(summary.df, coef.str)

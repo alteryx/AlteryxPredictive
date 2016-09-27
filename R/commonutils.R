@@ -497,6 +497,7 @@ varImpPlot.Alteryx <- function(x, sort=TRUE, n.var=min(30, nrow(x$importance)),
 #' @param resolution the resolution of the plot to produce as a multiple of 96dpi
 #' @param print.high whether to turn 3x into 6x (high, 576 dpi) resolution
 #' @author Dan Putler
+#' @export
 graphWHR2 <- function(inches = TRUE, in.w = 5.5, in.h = 5.75,
    cm.w = NULL, cm.h = NULL, graph.resolution = c("1x", "2x", "3x"),
    print.high = FALSE){
@@ -605,8 +606,9 @@ validName <- function(name) {
   if (name != make.names(name)) {
     old.name <- name
     name <- gsub("\\.", "\\_", make.names(name))
-    AlteryxRDataX::AlteryxMessage(
-      paste("The invalid name", old.name, "has been replaced by", name), 2, 2, 0
+    AlteryxMessage2(
+      paste("The invalid name", old.name, "has been replaced by", name),
+        2, 2, 0
     )
   }
   name

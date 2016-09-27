@@ -12,7 +12,7 @@ Authors@R: c(
 Description: This package contains utility functions used by the
     predictive tools in Alteryx.
 Depends:
-    R (>= 3.2.3)
+    R (>= 3.2.2)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -25,8 +25,8 @@ Imports:
   AlteryxRviz
 Suggests:
   AlteryxRDataX,
-  ScaleR,
+  RevoScaleR,
   knitr,
   rmarkdown,
   randomForest,
-    testthat
+  testthat
