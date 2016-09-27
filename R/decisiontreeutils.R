@@ -3,7 +3,9 @@
 #'
 #' @param config list of config options
 #' @param the.data incoming data
-checkValidConfig <- function(config, the.data, names) {
+#' @param names list of x, y, w names for data
+#' @param is_XDF whether data is XDF
+checkValidConfig <- function(config, the.data, names, is_XDF) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   target <- the.data[[names$y]]
@@ -11,11 +13,11 @@ checkValidConfig <- function(config, the.data, names) {
     AlteryxMessage2("The target variable is numeric, however, it has 4 or fewer unique values.", iType = 2, iPriority = 3)
   }
 
-  if(rpart_params$cp < 0 || rpart_params$cp > 1) {
+  if(cp < 0 || cp > 1) {
     stop.Alteryx2("The complexity parameter must be between 0 and 1. Please try again.")
   }
 
-  if(is.na(as.numeric(config$cp)) && !(config$cp == "Auto" || config$cp == "")) {
+  if(is.na(as.numeric(cp)) && !(cp == "Auto" || cp == "")) {
     stop.Alteryx2("The complexity parameter provided is not a number. Please enter a new value and try again.")
   }
 }
@@ -25,13 +27,14 @@ checkValidConfig <- function(config, the.data, names) {
 #'
 #' @param config list of config options
 #' @param data list of datastream inputs
+#' @param xdf_properties list of xdf details (is_XDF and xdf_path elements)
 #' @return list with components needed to create model
-createDTParams <- function(config, names) {
+createDTParams <- function(config, names, xdf_properties) {
   # use lists to hold params for rpart and rxDTree functions
   params <- append(
-    getXdfProperties("#1"),
+    xdf_properties,
     config[,c('minsplit', 'minbucket', 'xval', 'maxdepth')],
-    list(cp = if (config$cp %in% c("Auto", "")) 1e-5 else config$cp)
+    list(cp = if (config$cp %in% c("Auto", "")) 1e-5 else as.numeric(config$cp))
   )
 
   params$data <- quote(the.data)
@@ -41,7 +44,7 @@ createDTParams <- function(config, names) {
 
   # get weights param
   params$weights <- if (config$used.weights) names$w else NULL
-  rpart_params$weights <- rxDTree_params$pweights <- weights
+  params$weights <- weights
 
   # get method and parms params
   with(config, {if (select.type){
@@ -54,10 +57,10 @@ createDTParams <- function(config, names) {
 
   # get usesurrogate param
   usesurrogate <- config[c('use.surrogate.0', 'use.surrogate.1', 'use.surrogate.2')]
-  param_list$usesurrogate <- which(usesurrogate) - 1
+  params$usesurrogate <- which(usesurrogate) - 1
 
   # get max bins param
-  if(is_XDF && !is.na(as.numeric(config$maxNumBins))) {
+  if(xdf_properties$is_XDF && !is.na(as.numeric(config$maxNumBins))) {
     maxNumBins <- config$maxNumBins
     if(maxNumBins < 2) {
       stop.Alteryx2("The minimum bins is 2")
@@ -329,10 +332,10 @@ processDT <- function(config, data) {
 
   # Get the field names
   names <- getNamesFromOrdered(data_names, config$used.weights)
+  xdf_properties <- getXdfProperties("#1")
+  checkValidConfig(config, the.data, names, xdf_properties$is_XDF)
 
-  checkValidConfig(config, the.data, names)
-
-  params <- createDTParams(config, names)
+  params <- createDTParams(config, names, xdf_properties)
   args <- convertDTParamsToArgs(params$f, params)
   model <- doFunction(params$f, args)
   is_XDF <- params$is_XDF
