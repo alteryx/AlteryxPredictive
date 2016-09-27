@@ -15,14 +15,10 @@ config <- list(
 #'
 #' This is a named list of all inputs that stream into the R tool.
 #' We also specify defaults for use when R code is run outside Alteryx.
-defaults <- list(
-  data = admission[, c(config$`Y Var`, config$`X Vars`)]
-)
 inputs <- list(
-  the.data = read.Alteryx2("#1", default = defaults$data),
-  XDFInfo = getXdfProperties("#1", default = list(is_XDF = FALSE, xdf_path = NULL))
+  the.data = admission[, c(config$`Y Var`, config$`X Vars`)],
+  XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
 )
-
 
 
 #' ### Run and Create Outputs
@@ -62,12 +58,12 @@ runLogisticRegression <- function(inputs, config){
 
 test_that("admission data with logit link", {
   result <- runLogisticRegression(inputs, config)
-  expect_eqaul(result$Object[[1]]$coefficients["gpa"], 0.7770136)
+  expect_lt(abs(result$Object[[1]]$coefficients["gpa"] - 0.7770136), 10e-6)
 })
 
 
 test_that("admission data with probit link", {
   config$the.link <- "probit"
   result <- runLogisticRegression(inputs, config)
-  expect_eqaul(result$Object[[1]]$coefficients["gpa"], 0.464360)
+  expect_lt(abs(result$Object[[1]]$coefficients["gpa"] - 0.464360), 10e-6)
 })
