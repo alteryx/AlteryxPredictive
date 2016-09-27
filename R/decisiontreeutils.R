@@ -346,3 +346,29 @@ processDT <- function(config, data) {
   getOutputsDT(config, model, is_XDF, names)
 
 }
+
+#' output results to Alteryx
+#'
+#' @param results list of results to output
+#' @param config list of config options
+#' @export
+outputDTResultsAlteryx <- function(results, config) {
+  write.Alteryx2(results$output1, 1)
+  write.Alteryx2(results$output2, 2)
+  renderInComposer(results$output5, 5)
+
+  whr <- graphWHR(inches = config$tree.inches, in.w = config$tree.in.w, in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h, resolution = config$tree.graph.resolution, print.high = TRUE)
+  AlteryxGraph2(2, width = whr[1], height = whr[2], res = whr[3], pointsize = config$tree.pointsize)
+  par(mar = c(5, 4, 6, 2) + 0.1)
+  do.call(match.fun(results$output2$f), results$output2$args)
+  invisible(dev.off())
+
+  whr <- graphWHR(inches = config$prune.inches, in.w = config$prune.in.w, in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h, resolution = config$prune.graph.resolution, print.high = FALSE)
+  AlteryxGraph2(4, width = whr[1], height = whr[2], res = whr[3], pointsize = config$prune.pointsize)
+  par(mar = c(5, 4, 6, 2) + 0.1)
+  do.call(match.fun(results$output4$f), results$output4$args)
+  title(main="Pruning Plot", line=5)
+  invisible(dev.off())
+}
+
+outputDTResultsAlteryx(results, config)
