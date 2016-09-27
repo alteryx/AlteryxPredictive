@@ -1,8 +1,8 @@
 runLogisticRegression <- function(inputs, config){
   library(car)
   #' Modify the link so that it can be passed on to R.
-  if (config$the.link == "complementary log-log"){
-    config$the.link <- "cloglog"
+  if (config$Link == "complementary log-log"){
+    config$Link <- "cloglog"
   }
 
   if (inputs$XDFInfo$is_XDF){
@@ -26,7 +26,7 @@ runLogisticRegression <- function(inputs, config){
     res = whr[3], pointsize = 9)
 
   # Model Output
-  the.obj <- prepModelForOutput(config$model.name, d$the.model)
+  the.obj <- prepModelForOutput(config[['Model Name']], d$the.model)
   write.Alteryx2(the.obj, nOutput = 3)
   return(the.obj)
 }

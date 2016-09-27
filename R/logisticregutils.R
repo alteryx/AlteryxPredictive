@@ -5,7 +5,7 @@
 #'
 #' @export
 processLogisticOSR <- function(inputs, config){
-  var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
+  var_names <- getNamesFromOrdered(names(inputs$the.data), config[['Use Weights']])
 
   # Make sure the target is binary
   ylevels <- levels(inputs$the.data[[1]])
@@ -16,7 +16,7 @@ processLogisticOSR <- function(inputs, config){
 
   the.formula <- makeFormula(var_names$x, var_names$y)
   # If sample weights are used
-  if (config$used.weights) {
+  if (config[['Use Weights']]) {
     # Adjust the set of field names to remove the weight field
     # if weights are used
     library(survey)
@@ -24,11 +24,11 @@ processLogisticOSR <- function(inputs, config){
     the.design <- svydesign(
       ids = ~1, weights = makeFormula(var_names$w, ""), data = inputs$the.data
     )
-    the.model <- svyglm(the.formula, family = quasibinomial(config$the.link),
+    the.model <- svyglm(the.formula, family = quasibinomial(config$Link),
       design = the.design)
   } else {
     model_type <- "binomial"
-    the.model <- glm(the.formula, family = binomial(config$the.link),
+    the.model <- glm(the.formula, family = binomial(config$Link),
       data = inputs$the.data)
   }
   list(the.model = the.model, model_type = model_type)
@@ -38,7 +38,7 @@ processLogisticOSR <- function(inputs, config){
 #'
 #' @export
 processLogisticXDF <- function(inputs, config){
-  var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
+  var_names <- getNamesFromOrdered(names(inputs$the.data), config[['Use Weights']])
   xdf_path <- inputs$XDFInfo$xdf_path
   # Make sure the target is binary
   len.target <- RevoScaleR::rxGetVarInfo(xdf_path)[[var_names$y]]$levels
@@ -48,7 +48,7 @@ processLogisticXDF <- function(inputs, config){
 
   the.formula <- makeFormula(var_names$x, var_names$y)
 
-  if (config$the.link != "logit"){
+  if (config$Link != "logit"){
     AlteryxMessage2("Only the logit link function is available for XDF files, and will be used.", iType = 2, iPriority = 3)
   }
 
@@ -85,7 +85,7 @@ createReportLogisticOSR <- function(the.model, config, model_type) {
   glm.out1 <- Alteryx.ReportGLM(the.model)
   glm.out <- glm.out1$summary.df
   singular <- glm.out1$singular
-  glm.out <- rbind(c("Model_Name", config$model.name), glm.out)
+  glm.out <- rbind(c("Model_Name", config[['Model Name']]), glm.out)
   glm.out <- rbind(glm.out, c("Model_Type", model_type))
   if (!singular) {
     glm.out <- rbind(glm.out, Alteryx.ReportAnova(the.model))
@@ -98,7 +98,7 @@ createReportLogisticOSR <- function(the.model, config, model_type) {
 #' @export
 createReportLogisticXDF <- function(the.model, config, null.model, nOutput = 2) {
   glm.out <- AlteryxReportRx(the.model, null.model$deviance)
-  glm.out <- rbind(c("Model_Name", config$model.name), glm.out)
+  glm.out <- rbind(c("Model_Name", config[['Model Name']]), glm.out)
   glm.out <- rbind(glm.out, c("Model_Type", "binomial"))
   AlteryxMessage2("Creation of the Analysis of Deviance tables was surpressed due to the use of an XDF file", iType = 2, iPriority = 3)
   glm.out
@@ -112,7 +112,7 @@ createReportLogisticXDF <- function(the.model, config, null.model, nOutput = 2) 
 #'
 #' @export
 createPlotOutputsLogisticOSR <- function(the.model, singular, config){
-  if (!(singular && config$used.weights)) {
+  if (!(singular && config[['Use Weights']])) {
     par(mfrow=c(2, 2), mar=c(5, 4, 2, 2) + 0.1)
     plot(the.model)
   } else {
