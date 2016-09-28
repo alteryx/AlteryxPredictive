@@ -2,9 +2,9 @@ context("Logistic Regression: basic version with admission data")
 
 config <- list(
   `graph.resolution` = '1x',
-  `the.link` = 'logit',
-  `model.name` = 'Basic_Logistic_Regression',
-  `used.weights` = FALSE,
+  `Link` = 'logit',
+  `Model Name` = 'Basic_Logistic_Regression',
+  `Use Weights` = FALSE,
   `X Vars` = c('gre', 'gpa', 'rank'),
   `Y Var` = 'admit'
 )
@@ -36,7 +36,7 @@ test_that("admission data with logit link returns correct coefficients", {
 })
 
 test_that("admission data with probit link returns correct coefficients", {
-  config$the.link <- "probit"
+  config$Link <- "probit"
   exp_probit_model <- update(exp_logistic_model, family = binomial(probit))
   result <- AlteryxPredictive:::runLogisticRegression(inputs, config)
   expect_equal(

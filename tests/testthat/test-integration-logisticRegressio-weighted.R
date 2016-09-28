@@ -2,9 +2,9 @@ context("Logistic Regression: weighted version with api data")
 
 config <- list(
   `graph.resolution` = '1x',
-  `the.link` = 'logit',
-  `model.name` = 'Basic_Logistic_Regression',
-  `used.weights` = TRUE,
+  `Link` = 'logit',
+  `Model Name` = 'Basic_Logistic_Regression',
+  `Use Weights` = TRUE,
   `X Vars` = c('ell', 'meals'),
   `W Var` = 'pw',
   `Y Var` = 'sch.wide'
