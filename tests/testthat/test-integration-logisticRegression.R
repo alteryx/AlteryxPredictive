@@ -9,16 +9,19 @@ config <- list(
   `Y Var` = 'admit'
 )
 
-##----
-
-#' #### Read Inputs
-#'
-#' This is a named list of all inputs that stream into the R tool.
-#' We also specify defaults for use when R code is run outside Alteryx.
 inputs <- list(
-  the.data = admission[, c(config$`Y Var`, config$`X Vars`)],
+  the.data = AlteryxPredictive::admission[, c(config$`Y Var`, config$`X Vars`)],
   XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
 )
+
+# AlteryxRhelper::makeWorkflow(
+#   template = "~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests/SampleTest.yxmd",
+#   data = inputs$the.data,
+#   config = config,
+#   inputs_id = 2,
+#   config_id = 8,
+#   outFile = "~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests/LogisticTest1.yxmd"
+# )
 
 
 #' ### Run and Create Outputs
