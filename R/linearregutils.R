@@ -5,14 +5,14 @@
 #'
 #' @export
 processLinearOSR <- function(inputs, config){
-  var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
+  var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
   the.formula <- if (config$`Omit Constant`){
     makeFormula(c("-1", var_names$x), var_names$y)
   } else {
     makeFormula(var_names$x, var_names$y)
   }
   # FIXME: Revisit what we pass to the weights argument.
-  if (config$used.weight){
+  if (config$`Use Weight`){
     lm(the.formula, inputs$the.data, weights = inputs$the.data[[var_names$w]])
   } else {
     lm(the.formula, inputs$the.data)
@@ -23,7 +23,7 @@ processLinearOSR <- function(inputs, config){
 processLinearXDF <- function(inputs, config){
   temp.dir <- '%Engine.TempFilePath%'
   xdf.path = inputs$XDFInfo$xdf_path
-  var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
+  var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
   the.formula = if (config$`Omit Constant`){
     makeFormula(c("-1", var_names$x), var_names$y)
   } else {
@@ -60,7 +60,7 @@ processLinearXDF <- function(inputs, config){
 #' @export
 createReportLinearOSR <- function(the.model, config){
   lm.out <- Alteryx.ReportLM(the.model)
-  lm.out <- rbind(c("Model_Name", config$model.name), lm.out)
+  lm.out <- rbind(c("Model_Name", config$`Model Name`), lm.out)
   lm.out <- rbind(lm.out, Alteryx.ReportAnova(the.model))
   lm.out
 }
@@ -69,7 +69,7 @@ createReportLinearOSR <- function(the.model, config){
 createReportLinearXDF <- function(the.model, config){
   AlteryxMessage2("Creation of the Analysis of Variance table was surpressed due to the use of an XDF file", iType = 2, iPriority = 3)
   lm.out <- AlteryxReportRx(the.model)
-  lm.out <- rbind(c("Model_Name", config$model.name), lm.out)
+  lm.out <- rbind(c("Model_Name", config$`Model Name`), lm.out)
   lm.out
 }
 
