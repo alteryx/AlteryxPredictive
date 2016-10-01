@@ -11,17 +11,19 @@
 ## Helper Functions ----
 # Extract predictor variables from an R model call object
 #' @export
-getXVars <- function(x){
-  UseMethod('getXVars')
+getXVars2 <- function(x){
+  UseMethod('getXVars2')
+}
+
+getXVarsFromCall <- function(x){
+  strsplit(as.character(formula(x))[3], "\\s*\\+\\s*")[[1]]
 }
 
 #' @export
-getXVars.default <- function(x) {
+getXVars2.default <- function(x) {
   the.call <- x$call
   if(class(the.call) != "call") stop("The argument was not a call object.")
-  the.formula <- as.character(the.call)[2]
-  form.split <- unlist(strsplit(the.formula, " ~ "))
-  xvars <- unlist(strsplit(form.split[2], " \\+ "))
+  xvars <- getXVarsFromCall(x)
   xvars <- xvars[xvars != "-1"]
   chkNewLine <- function(string) {
     if (substr(string, 1, 1) == "\n")
@@ -34,12 +36,12 @@ getXVars.default <- function(x) {
 }
 
 #' @export
-getXVars.naiveBayes <- function(x) {
+getXVars2.naiveBayes <- function(x) {
   x$xvars
 }
 
 #' @export
-getXVars.svm.formula <- getXVars.naiveBayes
+getXVars2.svm.formula <- getXVars2.naiveBayes
 
 noZeroLevels <- function(ll){Filter(Negate(is.numeric), ll)}
 noNullLevels <- function(ll){Filter(Negate(is.null), ll)}
