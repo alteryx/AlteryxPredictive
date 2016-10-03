@@ -21,7 +21,7 @@ processLinearOSR <- function(inputs, config){
 
 #' @export
 processLinearXDF <- function(inputs, config){
-  temp.dir <- '%Engine.TempFilePath%'
+  temp.dir <- textInput('%Engine.TempFilePath%', tempdir())
   xdf.path = inputs$XDFInfo$xdf_path
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
   the.formula = if (config$`Omit Constant`){
