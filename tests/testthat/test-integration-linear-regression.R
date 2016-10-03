@@ -2,9 +2,10 @@ context("integration-linear-regression")
 
 config <- list(
   `graph.resolution` = '1x',
-  `Model Name` = 'My Regression',
+  `Model Name` = 'Linear_Regression_No_Weights',
   `Omit Constant` = FALSE,
   `Use Weights` = FALSE,
+  `Weight Vec` = NULL,
   `X Vars` = names(mtcars)[-1],
   `Y Var` = 'mpg'
 )
