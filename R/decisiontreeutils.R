@@ -33,9 +33,9 @@ createDTParams <- function(config, names, xdf_properties) {
   # use lists to hold params for rpart and rxDTree functions
   params <- append(
     xdf_properties,
-    config[,c('minsplit', 'minbucket', 'xval', 'maxdepth')],
-    list(cp = if (config$cp %in% c("Auto", "")) 1e-5 else as.numeric(config$cp))
+    config[c('minsplit', 'minbucket', 'xval', 'maxdepth', 'method')],
   )
+  params$cp <- if (config$cp %in% c("Auto", "")) 1e-5 else as.numeric(config$cp)
 
   params$data <- quote(the.data)
 
@@ -44,7 +44,7 @@ createDTParams <- function(config, names, xdf_properties) {
 
   # get weights param
   params$weights <- if (config$used.weights) names$w else NULL
-  params$weights <- weights
+  #params$weights <- weights
 
   # get method and parms params
   with(config, {if (select.type){
@@ -56,8 +56,8 @@ createDTParams <- function(config, names, xdf_properties) {
   }})
 
   # get usesurrogate param
-  usesurrogate <- config[c('use.surrogate.0', 'use.surrogate.1', 'use.surrogate.2')]
-  params$usesurrogate <- which(usesurrogate) - 1
+  usesurrogate <- config[c('usesurrogate.0', 'usesurrogate.1', 'usesurrogate.2')]
+  params$usesurrogate <- which(unlist(usesurrogate, use.names = F)) - 1
 
   # get max bins param
   if(xdf_properties$is_XDF && !is.na(as.numeric(config$maxNumBins))) {
@@ -79,35 +79,36 @@ createDTParams <- function(config, names, xdf_properties) {
 convertDTParamsToArgs <- function(f_string, params) {
   fmap <- list(
     rpart = c(
-      data = data,
-      formula = formula,
-      weights = weights,
-      method = method,
-      parms = parms,
-      usesurrogate = usesurrogate,
-      minsplit <- minsplit,
-      minbucket = minbucket,
-      xval = xval,
-      maxdepth = maxdepth,
-      cp = cp
+      data = "data",
+      formula = "formula",
+      weights = "weights",
+      method = "method",
+      parms = "parms",
+      usesurrogate = "usesurrogate",
+      minsplit = "minsplit",
+      minbucket = "minbucket",
+      xval = "xval",
+      maxdepth = "maxdepth",
+      cp = "cp"
     ),
     rxDTree = c(
-      xdf_path = data,
-      formula = formula,
-      pweights = weights,
-      method = method,
-      parms = parms,
-      usesurrogate = useSurrogate,
-      maxNumBins = maxNumBins,
-      minsplit = minSplit,
-      minbucket = minBucket,
-      xval = xVal,
-      maxdepth = maxDepth,
-      cp = cp
+      xdf_path = "data",
+      formula = "formula",
+      pweights = "weights",
+      method = "method",
+      parms = "parms",
+      usesurrogate = "useSurrogate",
+      maxNumBins = "maxNumBins",
+      minsplit = "minSplit",
+      minbucket = "minBucket",
+      xval = "xVal",
+      maxdepth = "maxDepth",
+      cp = "cp"
     )
   )
   # suppress warnings because they will be thrown by values not present in f_string vector
-  suppressWarnings(plyr::rename(params, fmap[[f_string]]))
+  params <- suppressWarnings(plyr::rename(params, fmap[[f_string]]))
+  params[names(fmap[[f_string]])]
 }
 
 #' adjusts config based on results if config was initially "Auto"
@@ -253,8 +254,7 @@ getDTGraphCalls <- function(config, model, is_XDF) {
 #'
 #' @param model model object
 #' @param is_XDF boolean of whether model is XDF
-#' @import AlteryxRviz
-#' @import htmltools
+#' @import AlteryxRviz htmltools
 getDTViz <- function(model, is_XDF) {
 
   ## Interactive Visualization
@@ -316,9 +316,7 @@ getOutputsDT <- function(config, model, is_XDF, names) {
 #'
 #' @param config list of configuration options
 #' @param data list of datastream objects
-#' @import rpart
-#' @import rpart.plot
-#' @import AlteryxRhelper
+#' @import rpart rpart.plot
 #' @return list of results or results
 #' @export
 processDT <- function(config, data) {
@@ -332,12 +330,13 @@ processDT <- function(config, data) {
 
   # Get the field names
   names <- getNamesFromOrdered(data_names, config$used.weights)
-  xdf_properties <- getXdfProperties("#1")
+  xdf_properties <- data$XDFinfo
   checkValidConfig(config, the.data, names, xdf_properties$is_XDF)
 
   params <- createDTParams(config, names, xdf_properties)
-  args <- convertDTParamsToArgs(params$f, params)
-  model <- doFunction(params$f, args)
+  params$f_string <- 'rpart'
+  args <- convertDTParamsToArgs(params$f_string, params)
+  model <- doFunction(params$f_string, args)
   is_XDF <- params$is_XDF
 
   # post-model error checking & cp adjustment if specified to "Auto"
@@ -370,5 +369,3 @@ outputDTResultsAlteryx <- function(results, config) {
   title(main="Pruning Plot", line=5)
   invisible(dev.off())
 }
-
-outputDTResultsAlteryx(results, config)
