@@ -12,13 +12,13 @@ mrsLevels <- function(data, loc_tmp, rem_tmp = NULL, rem_R = NULL) {
     if(is.null(rem_tmp) || is.null(rem_R)) {
       stop.Alteryx("Not all of the information about the Teradata platform has not be provided.")
     }
-    cc <- RxInTeradata(connectionString = con_string, shareDir = loc_tmp, remoteShareDir = rem_tmp, revoPath = rem_R, wait = TRUE)
+    cc <- RevoScaleR::RxInTeradata(connectionString = con_string, shareDir = loc_tmp, remoteShareDir = rem_tmp, revoPath = rem_R, wait = TRUE)
   } else {
-    cc <- RxInSqlServer(connectionString = con_string, shareDir = loc_tmp, wait = TRUE)
+    cc <-  RevoScaleR::RxInSqlServer(connectionString = con_string, shareDir = loc_tmp, wait = TRUE)
   }
-  rxSetComputeContext(cc)
-  all_info <- rxGetVarInfo(data = data, computeInfo = TRUE)
-  rxSetComputeContext("local")
+  RevoScaleR::rxSetComputeContext(cc)
+  all_info <-  RevoScaleR::rxGetVarInfo(data = data, computeInfo = TRUE)
+  RevoScaleR::rxSetComputeContext("local")
   the_levels <- noNullLevels(lapply(all_info, function(x) x$levels))
   class(the_levels) <- "mrsLevels"
   the_levels
@@ -54,15 +54,15 @@ mrsReorderFactors <- function(data, loc_tmp, rem_tmp, rem_R) {
 mrsDataObj <- function(con_string, table, fields, loc_tmp, rem_tmp, rem_R) {
   context <- unlist(strsplit(unlist(strsplit(con_string, ";"))[1], "DRIVER="))[2]
   if (context == "Teradata") {
-    data_obj <- RxTeradata(table = table, connectionString = con_string, stringsAsFactors = TRUE)
+    data_obj <-  RevoScaleR::RxTeradata(table = table, connectionString = con_string, stringsAsFactors = TRUE)
     col_info <- mrsReorderFactors(data_obj, loc_tmp, rem_tmp, rem_R)
     col_info <- col_info[names(col_info) %in% fields]
-    data_obj <- RxTeradata(table = table, connectionString = con_string, colInfo = col_info)
+    data_obj <-  RevoScaleR::RxTeradata(table = table, connectionString = con_string, colInfo = col_info)
   } else { # SQL Server for now
-    data_obj <- RxSqlServerData(table = table, connectionString = con_string, stringsAsFactors = TRUE)
+    data_obj <-  RevoScaleR::RxSqlServerData(table = table, connectionString = con_string, stringsAsFactors = TRUE)
     col_info <- mrsReorderFactors(data_obj, loc_tmp, rem_tmp, rem_R)
     col_info <- col_info[names(col_info) %in% fields]
-    data_obj <- RxSqlServerData(table = table, connectionString = con_string, colInfo = col_info)
+    data_obj <-  RevoScaleR::RxSqlServerData(table = table, connectionString = con_string, colInfo = col_info)
   }
   data_obj
 }
