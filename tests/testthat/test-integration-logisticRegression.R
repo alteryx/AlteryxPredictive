@@ -5,6 +5,7 @@ config <- list(
   `Link` = 'logit',
   `Model Name` = 'Basic_Logistic_Regression',
   `Use Weights` = FALSE,
+  `Weight Vec` = NULL,
   `X Vars` = c('gre', 'gpa', 'rank'),
   `Y Var` = 'admit'
 )
@@ -14,13 +15,14 @@ inputs <- list(
   XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
 )
 
+testDir = '~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests'
 # AlteryxRhelper::makeWorkflow(
-#   template = "~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests/SampleTest.yxmd",
+#   template = file.path(testDir, "SampleTest.yxmd"),
 #   data = inputs$the.data,
 #   config = config,
 #   inputs_id = 2,
 #   config_id = 8,
-#   outFile = "~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests/LogisticTest1.yxmd"
+#   outFile = file.path(testDir, "LogisticTest1.yxmd")
 # )
 
 

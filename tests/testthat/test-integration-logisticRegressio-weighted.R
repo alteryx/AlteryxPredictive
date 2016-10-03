@@ -3,7 +3,7 @@ context("Logistic Regression: weighted version with api data")
 config <- list(
   `graph.resolution` = '1x',
   `Link` = 'logit',
-  `Model Name` = 'Basic_Logistic_Regression',
+  `Model Name` = 'Logistic_Regression_With_Weights',
   `Use Weights` = TRUE,
   `X Vars` = c('ell', 'meals'),
   `Weight Vec` = 'pw',
@@ -16,13 +16,14 @@ inputs <- list(
   XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
 )
 
+testDir = '~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests'
 # AlteryxRhelper::makeWorkflow(
-#   template = "~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests/SampleTest.yxmd",
+#   template = file.path(testDir, "SampleTest.yxmd"),
 #   data = inputs$the.data,
 #   config = config,
 #   inputs_id = 2,
 #   config_id = 8,
-#   outFile = "~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests/LogisticTest2.yxmd"
+#   outFile = file.path(testDir, "LogisticTest2.yxmd")
 # )
 
 
