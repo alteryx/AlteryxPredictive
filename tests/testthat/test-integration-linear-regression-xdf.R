@@ -13,8 +13,7 @@ inputs <- list(
   the.data = mtcars,
   XDFInfo = list(
     is_XDF = TRUE,
-    xdf_path = system.file('xdfdata/mtcars.xdf',
-      package = 'AlteryxPredictive')
+    xdf_path = system.file('xdfdata/mtcars.xdf', package = 'AlteryxPredictive')
   )
 )
 
