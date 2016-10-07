@@ -47,13 +47,12 @@ createDTParams <- function(config, names, xdf_properties) {
   #params$weights <- weights
 
   # get method and parms params
-  with(config, {if (select.type){
-    params$method <- if (classification) "class" else "anova"
-    if (classification) {
-      params$parms <- list()
-      params$parms$split <- if (use.gini) "gini" else "information"
+  if(config$select.type) {
+    params$method <- if (config$classification) "class" else "anova"
+    if (config$classification) {
+      params$parms <- list(split = c(if (config$use.gini) "gini" else "information"))
     }
-  }})
+  }
 
   # get usesurrogate param
   usesurrogate <- config[c('usesurrogate.0', 'usesurrogate.1', 'usesurrogate.2')]
