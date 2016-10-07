@@ -51,7 +51,7 @@ createDTParams <- function(config, names, xdf_properties) {
     params$method <- if (classification) "class" else "anova"
     if (classification) {
       params$parms <- list()
-      params$parms$split = if (use.gini) "gini" else "information"
+      params$parms$split <- if (use.gini) "gini" else "information"
     }
   }})
 
