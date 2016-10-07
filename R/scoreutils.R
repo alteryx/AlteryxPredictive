@@ -43,11 +43,15 @@ getXVars2.naiveBayes <- function(x) {
 #' @export
 getXVars2.svm.formula <- getXVars2.naiveBayes
 
+#' @export
 noZeroLevels <- function(ll){Filter(Negate(is.numeric), ll)}
+
+#' @export
 noNullLevels <- function(ll){Filter(Negate(is.null), ll)}
 
 # matchLevels coerces the levels in new data factors to exactly match the levels
 # of factors in the original data, and is needed for Revo ScaleR models
+#' @export
 matchLevels <- function(nd, ol) {
   # Address the non-standard way randomForest returns xlevel values
   check.ol <- sapply(ol, is.numeric)
@@ -85,30 +89,37 @@ matchLevels <- function(nd, ol) {
 }
 
 ## Get X Levels ----
+#' @export
 getXlevels <- function(x){
   UseMethod('getXlevels')
 }
 
+#' @export
 getXlevels.default <- function(x){
   x$xlevels
 }
 
+#' @export
 getXlevels.svm.formula <- function(x){
   noZeroLevels(x$xlevels)
 }
 
+#' @export
 getXlevels.naiveBayes <- function(x){
   noZeroLevels(x$xlevels)
 }
 
+#' @export
 getXlevels.rpart <- function(x){
   attr(x, "xlevels")
 }
 
+#' @export
 getXlevels.randomForest.formula <- function(x){
   noZeroLevels(x$forest$xlevels)
 }
 
+#' @export
 getXlevels.gbm <- function(x){
   xlevels <- x$var.levels[x$var.type != 0]
   names(xlevels) <- x$var.names[x$var.type != 0]
@@ -117,22 +128,27 @@ getXlevels.gbm <- function(x){
 
 
 ## Get Y levels ----
+#' @export
 getYlevels <- function(x, ...){
   UseMethod("getYlevels")
 }
 
+#' @export
 getYlevels.default <- function(x, ...){
   x$levels
 }
 
+#' @export
 getYlevels.randomForest.formula <- function(x, ...){
   levels(x$y)
 }
 
+#' @export
 getYlevels.rpart <- function(x, new.data){
   attributes(predict(x, newdata = new.data[1, , drop = FALSE]))$dimnames[[2]]
 }
 
+#' @export
 getYlevels.glm <- function(x, ...) {
   if (family(x)$family != "binomial") {
     return(NULL)
@@ -142,6 +158,7 @@ getYlevels.glm <- function(x, ...) {
   levels(y_var)
 }
 
+#' @export
 getYlevels.svyglm <- function(x, ...) {
   if (family(x)$family != "quasibinomial") {
     return(NULL)
@@ -151,6 +168,7 @@ getYlevels.svyglm <- function(x, ...) {
   levels(y_var)
 }
 
+#' @export
 getYlevels.gbm <- function(x, ...) {
   if(is.null(x$classes) && !is.null(x$target.levels)) {
     x$target.levels
@@ -159,10 +177,12 @@ getYlevels.gbm <- function(x, ...) {
   }
 }
 
+#' @export
 getYlevels.nnet.formula <- function(x, ...) {
   x$lev
 }
 
+#' @export
 getYlevels.earth <- function(x, ...) {
   x$y.levels
 }
