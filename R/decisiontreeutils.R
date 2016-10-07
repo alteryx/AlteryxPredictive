@@ -33,7 +33,7 @@ createDTParams <- function(config, names, xdf_properties) {
   # use lists to hold params for rpart and rxDTree functions
   params <- append(
     xdf_properties,
-    config[c('minsplit', 'minbucket', 'xval', 'maxdepth', 'method')],
+    config[c('minsplit', 'minbucket', 'xval', 'maxdepth', 'method')]
   )
   params$cp <- if (config$cp %in% c("Auto", "")) 1e-5 else as.numeric(config$cp)
 
