@@ -28,6 +28,8 @@ testDir = '~/Desktop/SNIPPETS/dev/Predictive_Refresh/Linear_Regression/Extras/Te
 #   config = config,
 #   inputs_id = 1,
 #   config_id = 5,
+#   comment_id = 7,
+#   comment = "This workflow is a basic test for the refreshed Linear Regression plugin.",
 #   outFile = file.path(testDir, 'LinearRegressionTest1.yxmd')
 # )
 
@@ -51,5 +53,7 @@ test_that('linear regression works correctly on diamonds', {
 #   config = config,
 #   inputs_id = 1,
 #   config_id = 5,
+#   comment_id = 7,
+#   comment = 'This workflow tests the refreshed Linear Regression plugin on the diamonds dataset.',
 #   outFile = file.path(testDir, 'LinearRegressionTest2.yxmd')
 # )
