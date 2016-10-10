@@ -3,13 +3,12 @@
 #' @param template template
 #' @param input input
 #' @export
-#' @import XML
 makeInput <- function(template, input){
-  xml <- xmlInternalTreeParse(template)
-  r <- xmlRoot(xml)
+  xml <- XML::xmlInternalTreeParse(template)
+  r <- XML::xmlRoot(xml)
   #g <- getNodeSet(r, '//Question[not(Questions)]')
-  g <- getNodeSet(r, '//Question')
-  l <- lapply(g, xmlToList)
+  g <- XML::getNodeSet(r, '//Question')
+  l <- lapply(g, XML::xmlToList)
   l <- l[sort(sapply(l, function(x){x$Name}), index.return = TRUE)$ix]
   x = paste(Filter(Negate(is.null), lapply(l, makeCall)), collapse = ',\n')
   x2 = paste0('## DO NOT MODIFY: Auto Inserted by AlteryxRhelper ----\nlibrary(AlteryxRhelper)\n', input, ' <- list(\n', x, "\n)", "\noptions(alteryx.wd = '%Engine.WorkflowDirectory%')\noptions(alteryx.debug = ", input, "$debug)\n##----")
