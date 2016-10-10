@@ -41,7 +41,8 @@ processLogisticXDF <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config[['Use Weights']])
   xdf_path <- inputs$XDFInfo$xdf_path
   # Make sure the target is binary
-  len.target <- RevoScaleR::rxGetVarInfo(xdf_path)[[var_names$y]]$levels
+  len.target <- length(
+    RevoScaleR::rxGetVarInfo(xdf_path)[[var_names$y]]$levels)
   if(len.target != 2){
     stop.Alteryx2("The target variable must only have two unique values.")
   }
@@ -123,7 +124,7 @@ createPlotOutputsLogisticOSR <- function(the.model, singular, config){
 #' Plots in XDF
 #'
 #' @export
-createPlotOutputsXDF <- function(){
+createPlotOutputsLogisticXDF <- function(){
   noDiagnosticPlot("The diagnostic plot is not available for XDF based models")
 }
 
