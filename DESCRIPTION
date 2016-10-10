@@ -7,6 +7,7 @@ Authors@R: c(
     person("Dylan", "Blanchard", role = "aut"),
     person("Chris", "Freeman", role = "aut"),
     person("Dan", "Putler", role = "aut"),
+    person("Bridget", "Toomey", role = "aut"),
     person(family = "Alteryx", role = "cph")
   )
 Description: This package contains utility functions used by the
