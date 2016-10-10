@@ -2,19 +2,19 @@
 % Please edit documentation in R/decisiontreeutils.R
 \name{adjustCP}
 \alias{adjustCP}
-\title{adjusts config based on results if config was initially "Auto"}
+\title{Adjusts config based on results if config was initially "Auto"}
 \usage{
-adjustCP(config, model)
+adjustCP(model, config)
 }
 \arguments{
-\item{config}{list of config options}
-
 \item{model}{model object}
+
+\item{config}{list of config options}
 }
 \value{
 model obj after adjusting complexity parameter
 }
 \description{
-adjusts config based on results if config was initially "Auto"
+Adjusts config based on results if config was initially "Auto"
 }
 
