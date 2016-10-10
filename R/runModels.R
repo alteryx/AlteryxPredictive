@@ -58,3 +58,49 @@ runLinearRegression <- function(inputs, config){
   the.obj <- prepModelForOutput(config$`Model Name`, the.model)
   write.Alteryx2(the.obj, nOutput = 3)
 }
+
+runDecisionTree <- function(inputs, config){
+  # Set the seed to get run-over-run consistency
+  set.seed(1)
+
+  # Rename arguments to be consistent with rpart.
+  config <- plyr::rename(config, c(
+    use.weights = 'used.weights', `Model Name` = 'model.name',
+    max.bins = 'maxNumBins', min.split = "minsplit", min.bucket = 'minbucket',
+    xval.folds = 'xval', max.depth = 'maxdepth', Counts = 'do.counts',
+    `Branch Dist` = 'b.dist'
+  ))
+
+  config$model.name <- validName(config$model.name)
+  var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
+
+  the.model <- processDT(inputs, config)
+  the.report <- createReportDT(the.model, config, var_names, inputs$XDFinfo$is_XDF)
+  makeTreePlot <- function(){createTreePlotDT(the.model, config)}
+  makePrunePlot <- function(){createPrunePlotDT(the.model)}
+
+  # Report Output
+  write.Alteryx2(the.report, nOutput = 1)
+
+  # Tree Plot
+  whr <- graphWHR2(inches = config$tree.inches, in.w = config$tree.in.w,
+    in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h,
+    graph.resolution = config$tree.graph.resolution, print.high = TRUE)
+  AlteryxGraph2(makeTreePlot(), nOutput = 2, width = whr[1], height = whr[2], res = whr[3],
+    pointsize = config$tree.pointsize)
+
+  # Model Object
+  the.obj <- prepModelForOutput(config$model.name, the.model)
+  write.Alteryx2(the.obj, nOutput = 3)
+
+  # Prune Plot
+  whr <- graphWHR2(inches = config$prune.inches, in.w = config$prune.in.w,
+    in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h,
+    graph.resolution = config$prune.graph.resolution, print.high = FALSE)
+  AlteryxGraph2(makePrunePlot(), nOutput = 4, width = whr[1], height = whr[2], res = whr[3],
+    pointsize = config$prune.pointsize)
+
+  # Interactive Dashboard
+  dashboard <- createDashboardDT(the.model, inputs$XDFinfo$is_XDF)
+  AlteryxRviz::renderInComposer(dashboard, nOutput = 5)
+}
