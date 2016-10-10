@@ -2,19 +2,19 @@
 % Please edit documentation in R/decisiontreeutils.R
 \name{convertDTParamsToArgs}
 \alias{convertDTParamsToArgs}
-\title{name mapping from parameters to functions}
+\title{Map parameter names for OSR and XDF}
 \usage{
-convertDTParamsToArgs(f_string, params)
+convertDTParamsToArgs(params, f_string)
 }
 \arguments{
-\item{f_string}{string of function}
-
 \item{params}{list of decision tree params}
+
+\item{f_string}{string of function}
 }
 \value{
 list with named parameters for f_string
 }
 \description{
-name mapping from parameters to functions
+Map parameter names for OSR and XDF
 }
 

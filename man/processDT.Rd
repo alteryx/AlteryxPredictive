@@ -2,9 +2,9 @@
 % Please edit documentation in R/decisiontreeutils.R
 \name{processDT}
 \alias{processDT}
-\title{process for converting to results list from config and data}
+\title{Process DT model}
 \usage{
-processDT(config, data)
+processDT(inputs, config)
 }
 \arguments{
 \item{config}{list of configuration options}
@@ -15,6 +15,6 @@ processDT(config, data)
 list of results or results
 }
 \description{
-process for converting to results list from config and data
+Process DT model
 }
 

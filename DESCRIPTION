@@ -1,12 +1,13 @@
 Package: AlteryxPredictive
 Title: Utility functions used by the predictive tools in Alteryx
-Version: 0.2.2
+Version: 0.3
 Authors@R: c(
     person("Ramnath", "Vaidyanathan", role = c("aut", "cre"), email = "ramnath@alteryx.com"),
     person("Kuo", "Liu", role = "aut"),
     person("Dylan", "Blanchard", role = "aut"),
     person("Chris", "Freeman", role = "aut"),
     person("Dan", "Putler", role = "aut"),
+    person("Bridget", "Toomey", role = "aut"),
     person(family = "Alteryx", role = "cph")
   )
 Description: This package contains utility functions used by the
@@ -18,18 +19,18 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 5.0.1
 Imports:
-  XML,
+  magrittr,
   rjson,
   rgeos,
   car,
   rpart,
   rpart.plot,
-  htmltools,
-  AlteryxRviz
+  htmltools
 Suggests:
   AlteryxRDataX,
   RevoScaleR,
   knitr,
   rmarkdown,
   randomForest,
-  testthat
+  testthat,
+  XML

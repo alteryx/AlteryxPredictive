@@ -10,15 +10,16 @@ checkValidConfig <- function(config, the.data, names, is_XDF) {
 
   target <- the.data[[names$y]]
   if (is.numeric(target) && length(unique(target)) < 5 && !is_XDF) {
-    AlteryxMessage2("The target variable is numeric, however, it has 4 or fewer unique values.", iType = 2, iPriority = 3)
+    AlteryxMessage2(
+      "The target variable is numeric, however, it has 4 or fewer unique values.",
+      iType = 2, iPriority = 3)
   }
-
   if(cp < 0 || cp > 1) {
     stop.Alteryx2("The complexity parameter must be between 0 and 1. Please try again.")
   }
-
   if(is.na(as.numeric(cp)) && !(cp == "Auto" || cp == "")) {
-    stop.Alteryx2("The complexity parameter provided is not a number. Please enter a new value and try again.")
+    stop.Alteryx2(
+      "The complexity parameter provided is not a number. Please enter a new value and try again.")
   }
 }
 
@@ -31,27 +32,18 @@ checkValidConfig <- function(config, the.data, names, is_XDF) {
 #' @return list with components needed to create model
 createDTParams <- function(config, names, xdf_properties) {
   # use lists to hold params for rpart and rxDTree functions
-  params <- append(
-    xdf_properties,
-    config[c('minsplit', 'minbucket', 'xval', 'maxdepth', 'method')]
-  )
-  params$cp <- if (config$cp %in% c("Auto", "")) 1e-5 else as.numeric(config$cp)
-
-  params$data <- quote(the.data)
-
-  # use field names to get formula param
-  params$formula <- makeFormula(names$x, names$y)
-
-  # get weights param
-  params$weights <- if (config$used.weights) names$w else NULL
-  #params$weights <- weights
+  params <- config[c('minsplit', 'minbucket', 'xval', 'maxdepth')]
+  params <- modifyList(params, list(
+    cp = if (config$cp %in% c("Auto", "")) 1e-5 else as.numeric(config$cp),
+    data = quote(the.data),
+    formula = makeFormula(names$x, names$y),
+    weights = names$w
+  ))
 
   # get method and parms params
-  if(config$select.type) {
-    params$method <- if (config$classification) "class" else "anova"
-    if (config$classification) {
-      params$parms <- list(split = c(if (config$use.gini) "gini" else "information"))
-    }
+  params$method <- if (config$classification) "class" else "anova"
+  if (config$classification) {
+    params$parms <- list(split = if (config$use.gini) "gini" else "information")
   }
 
   # get usesurrogate param
@@ -70,57 +62,38 @@ createDTParams <- function(config, names, xdf_properties) {
   params
 }
 
-#' name mapping from parameters to functions
+#' Map parameter names for OSR and XDF
 #'
 #' @param f_string string of function
 #' @param params list of decision tree params
 #' @return list with named parameters for f_string
-convertDTParamsToArgs <- function(f_string, params) {
+convertDTParamsToArgs <- function(params, f_string) {
   fmap <- list(
-    rpart = c(
-      data = "data",
-      formula = "formula",
-      weights = "weights",
-      method = "method",
-      parms = "parms",
-      usesurrogate = "usesurrogate",
-      minsplit = "minsplit",
-      minbucket = "minbucket",
-      xval = "xval",
-      maxdepth = "maxdepth",
-      cp = "cp"
+    rpart = c(data = "data", formula = "formula", weights = "weights", method = "method",
+      parms = "parms", usesurrogate = "usesurrogate", minsplit = "minsplit",
+      minbucket = "minbucket", xval = "xval", maxdepth = "maxdepth", cp = "cp"
     ),
-    rxDTree = c(
-      xdf_path = "data",
-      formula = "formula",
-      pweights = "weights",
-      method = "method",
-      parms = "parms",
-      usesurrogate = "useSurrogate",
-      maxNumBins = "maxNumBins",
-      minsplit = "minSplit",
-      minbucket = "minBucket",
-      xval = "xVal",
-      maxdepth = "maxDepth",
-      cp = "cp"
+    rxDTree = c(xdf_path = "data", formula = "formula", weights = "pweights", method = "method",
+      parms = "parms", usesurrogate = "useSurrogate", maxNumBins = "maxNumBins",
+      minsplit = "minSplit", minbucket = "minBucket", xval = "xVal",
+      maxdepth = "maxDepth", cp = "cp"
     )
   )
-  # suppress warnings because they will be thrown by values not present in f_string vector
-  params <- suppressWarnings(plyr::rename(params, fmap[[f_string]]))
-  params[names(fmap[[f_string]])]
+  to_rename <- intersect(names(fmap$rpart), names(params))
+  plyr::rename(params[to_rename], fmap[[f_string]], warn_missing = F)
 }
 
-#' adjusts config based on results if config was initially "Auto"
+#' Adjusts config based on results if config was initially "Auto"
 #'
-#' @param config list of config options
 #' @param model model object
+#' @param config list of config options
 #' @return model obj after adjusting complexity parameter
-adjustCP <- function(config, model) {
+adjustCP <- function(model, config) {
   if(is.na(as.numeric(config$cp)) && (config$cp == "Auto" || config$cp == "")) {
     cp_table <- as.data.frame(model$cptable)
     pos_cp <- cp_table$CP[(cp_table$xerror - 0.5*cp_table$xstd) <= min(cp_table$xerror)]
     new_cp <- pos_cp[1]
-    print(cp_table)
+    #print(cp_table)
     if (cp_table$xerror[1] == min(cp_table$xerror)) {
       stop.Alteryx2("The minimum cross validation error occurs for a CP value where there are no splits. Specify a complexity parameter and try again.")
     }
@@ -130,54 +103,72 @@ adjustCP <- function(config, model) {
   }
 }
 
-#' get grp|out pipes for outputting static report
+#' Process DT model
 #'
-#' @param config list of config options
+#' @param config list of configuration options
+#' @param data list of datastream objects
+#' @import rpart rpart.plot
+#' @return list of results or results
+#' @export
+processDT <- function(inputs, config) {
+  var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
+  the.data <- inputs$the.data
+  checkValidConfig(config, the.data, var_names, inputs$XDFinfo$is_XDF)
+
+  params <- createDTParams(config, var_names, inputs$XDFinfo)
+  f_string <- if (inputs$XDFinfo$is_XDF) 'rxDTree' else 'rpart'
+
+  args <- convertDTParamsToArgs(params, f_string)
+  model <- do.call(f_string, args)
+
+  # Post-model Error checking & cp adjustment if specified to "Auto"
+  adjustCP(model, config)
+}
+
+
+#' Get data for static report (grp|out pipes)
+#'
 #' @param model model object
+#' @param config list of config options
 #' @param is_XDF boolean of whether model is XDF
 #' @return dataframe of piped results
-getDTPipes <- function(config, model, is_XDF, names) {
-
+#' @importFrom magrittr %>% extract
+createReportDT <- function(model, config, names, is_XDF) {
   # The output: Start with the pruning table (have rxDTree objects add rpart
   # inheritance for printing and plotting purposes).
   if (is_XDF) {
     model_rpart <- rxAddInheritance(model)
     printcp(model_rpart)
     out <- capture.output(printcp(model_rpart))
-    model$xlevels <- do.call(match.fun("xdfLevels"), list(paste0("~ ", paste(names$x, collapse = " + ")), xdf_path))
+    model$xlevels <- do.call(match.fun("xdfLevels"),
+      list(paste0("~ ", paste(names$x, collapse = " + ")), xdf_path))
     if (is.factor(target)) {
-      target_info <- do.call(match.fun("rxSummary"), list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
+      target_info <- do.call(match.fun("rxSummary"),
+        list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
       if(length(target_info) == 1) {
-        model$yinfo <- list(levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
+        model$yinfo <- list(
+          levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
       }
     }
   } else {
-    printcp(model) # Pruning Table
     out <- capture.output(printcp(model))
   }
 
   model_sum <- out %>%
-    extract(1:grep("^n=", .)) %>%
+    extract(grep("^Variable", .):grep("^n=", .)) %>%
     .[. != ""] %>%
     data.frame(grp = "Model_Sum", out = ., stringsAsFactors = FALSE)
 
-  call <- out %>%
-    extract(2:(grep("^Variable", .) - 1)) %>%
+  model_call <- out %>%
+    extract(grep("^r", .):(grep("^Variable", .) - 1)) %>%
     .[. != ""] %>%
     paste(collapse = "") %>%
     data.frame(grp = "Call", out = ., stringsAsFactors = FALSE)
 
-  # Pipe delimit the pruning table and then rbind it to the output
-  prune_tbl <- NULL
-  for (i in 1:length(prune_tbl1)) {
-    a_row <- unlist(strsplit(prune_tbl1[i], "\\s"))
-    a_row <- a_row[a_row != ""]
-    prune_tbl <- c(prune_tbl, paste(a_row[1], a_row[2], a_row[3], a_row[4], a_row[5], a_row[6], sep="|"))
-  }
-  pt_df <- data.frame(grp = rep("Prune", length(prune_tbl)), out = prune_tbl)
-  pt_df$grp <- as.character(pt_df$grp)
-  pt_df$out <- as.character(pt_df$out)
-  rpart_out <- rbind(rpart_out, pt_df)
+  prune_tbl <- out %>%
+    extract((grep("^\\s*CP", .) + 1):length(.)) %>%
+    gsub("\\s+", "|", .) %>%
+    data.frame(grp = "Prune", out = ., stringsAsFactors = FALSE)
 
   model <- if (is_XDF) model_rpart else model
 
@@ -188,73 +179,46 @@ getDTPipes <- function(config, model, is_XDF, names) {
     gsub("\\s", "<nbsp/>", .) %>%
     data.frame(grp = "Leaves", out = ., stringsAsFactors = FALSE)
 
-
-  rpart_out <- rbind(rpart_out, leaves)
-
   # Indicate that this is an object of class rpart or rxDTree
-  if (is_XDF) {
-    rpart_out <- rbind(c("Model_Name", config$model.name), rpart_out, c("Model_Class", "rxDTree"))
-  } else {
-    rpart_out <- rbind(c("Model_Name", config$model.name), rpart_out, c("Model_Class", "rpart"))
-  }
-
-  # Write out the grp-out table for reporting
-  # results$out1 <- rpart_out
+  rpart_out <- rbind(
+    c("Model_Name", config$model.name),
+    model_call, model_sum, prune_tbl, leaves,
+    c("Model_Class", if (is_XDF) 'rxDTree' else 'rpart')
+  )
   rpart_out
 }
 
-#' get graphing calls
+#' Create Tree Plot
 #'
-#' @param config list of config options
 #' @param model model object
-#' @param is_XDF boolean of whether model is XDF
-#' @return params to call AlteryxGraph on
-getDTGraphCalls <- function(config, model, is_XDF) {
-  # Address the user plot parameters and create the plots
-
-  # The values in the leaf summary
-  leaf_sum <- 4
-  if (config$do.counts == TRUE)
-    leaf_sum <- 2
-  if (model$method != "class")
-    leaf_sum <- 0
-  print(model$method)
-
-  # Uniform or proportional tree branch lengths
-  uniform <- FALSE
-  fallen <- TRUE
-  if (config$b.dist == TRUE) {
-    uniform <- TRUE
-    fallen <- FALSE
-  }
-
-  # assemble list of function and params to pass to AlteryxGraph
-  calls <- list()
-
-  calls$tree <- list()
-  calls$tree$f <- "rpart.plot"
-  calls$tree$args <- list (
-    model_rpart,
-    type = 0,
-    extra = leaf_sum,
-    uniform = uniform,
-    fallen.leaves = fallen,
-    main = "Tree Plot",
-    cex = 1
-  )
-
-  calls$prune <- list(
-    f = "plotcp",
-    args = list(model)
+#' @param config configuration object
+#' @export
+createTreePlotDT <- function(model, config){
+  leaf_sum <- if (model$method != "class") 0 else if (config$do.counts == TRUE) 2 else 4
+  uniform <- config$b.dist
+  fallen <- !uniform
+  par(mar = c(5, 4, 6, 2) + 0.1)
+  rpart.plot::rpart.plot(
+    model, type = 0, extra = leaf_sum, uniform = uniform, fallen.leaves = fallen,
+    main = "Tree Plot", cex = 1
   )
 }
 
-#' get component for interactive viz
+#' Create Prune Plot
+#'
+#' @param model model object
+createPrunePlotDT <- function(model){
+  par(mar = c(5, 4, 6, 2) + 0.1)
+  rpart::plotcp(model, main = NULL)
+  title(main = "Pruning Plot", line=5)
+}
+
+#' Create Interactive Dashboard
 #'
 #' @param model model object
 #' @param is_XDF boolean of whether model is XDF
-#' @import AlteryxRviz htmltools
-getDTViz <- function(model, is_XDF) {
+#' @import htmltools
+createDashboardDT <- function(model, is_XDF) {
 
   ## Interactive Visualization
   if (is_XDF){
@@ -274,97 +238,17 @@ getDTViz <- function(model, is_XDF) {
         top = '130px',
         left = '100px'
       )
-      dt = renderTree(model, tooltipParams = tooltipParams)
-      vimp = varImpPlot(model, height = 300)
+      dt = AlteryxRviz::renderTree(model, tooltipParams = tooltipParams)
+      vimp = AlteryxRviz::varImpPlot(model, height = 300)
 
       cmat = if (!is.null(model$frame$yval2)){
-        iConfusionMatrix(getConfMatrix(model), height = 300)
+        AlteryxRviz::iConfusionMatrix(AlteryxRviz::getConfMatrix(model), height = 300)
       }  else {
         tags$div(h1('Confusion Matrix Not Valid'), height = 300)
       }
 
-      k1 = dtDashboard(dt, vimp, cmat)
+      k1 = AlteryxRviz::dtDashboard(dt, vimp, cmat)
     }
-    # renderInComposer(k1, nOutput = 5)
   }
   k1
-}
-
-#' get results in form of output list
-#'
-#' @param config list of config options
-#' @param model model object
-#' @param is_XDF boolean of whether model is XDF
-getOutputsDT <- function(config, model, is_XDF, names) {
-  # Assemble list to return needed elements to output
-  results <- list()
-
-  results$output1 <- getDTPipes(config, model, is_XDF, names)
-  results$output3 <- prepModelForOutput(config$model.name, model)
-
-  graph_results <- getDTgraphCalls(config, model, is_XDF)
-  results$output2 <- graph_results$tree
-  results$output4 <- graph_results$prune
-
-  results$output5 <- getDTViz(model, is_XDF)
-
-  results
-}
-
-#' process for converting to results list from config and data
-#'
-#' @param config list of configuration options
-#' @param data list of datastream objects
-#' @import rpart rpart.plot
-#' @return list of results or results
-#' @export
-processDT <- function(config, data) {
-  # To get run-over-run consistency, set the seed
-  set.seed(1)
-
-  config$model.name <- validName(config$model.name)
-
-  the.data <- data$data_stream1
-  data_names <- names(the.data)
-
-  # Get the field names
-  names <- getNamesFromOrdered(data_names, config$used.weights)
-  xdf_properties <- data$XDFinfo
-  checkValidConfig(config, the.data, names, xdf_properties$is_XDF)
-
-  params <- createDTParams(config, names, xdf_properties)
-  params$f_string <- 'rpart'
-  args <- convertDTParamsToArgs(params$f_string, params)
-  model <- doFunction(params$f_string, args)
-  is_XDF <- params$is_XDF
-
-  # post-model error checking & cp adjustment if specified to "Auto"
-  model <- adjustCP(config, model)
-
-  getOutputsDT(config, model, is_XDF, names)
-
-}
-
-#' output results to Alteryx
-#'
-#' @param results list of results to output
-#' @param config list of config options
-#' @export
-outputDTResultsAlteryx <- function(results, config) {
-  write.Alteryx2(results$output1, 1)
-  write.Alteryx2(results$output2, 2)
-  renderInComposer(results$output5, 5)
-
-  whr <- graphWHR(inches = config$tree.inches, in.w = config$tree.in.w, in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h, resolution = config$tree.graph.resolution, print.high = TRUE)
-  AlteryxGraph2(2, width = whr[1], height = whr[2], res = whr[3], pointsize = config$tree.pointsize)
-  par(mar = c(5, 4, 6, 2) + 0.1)
-  do.call(match.fun(results$output2$f), results$output2$args)
-  invisible(dev.off())
-
-  whr <- graphWHR(inches = config$prune.inches, in.w = config$prune.in.w, in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h, resolution = config$prune.graph.resolution, print.high = FALSE)
-  AlteryxGraph2(4, width = whr[1], height = whr[2], res = whr[3], pointsize = config$prune.pointsize)
-  par(mar = c(5, 4, 6, 2) + 0.1)
-  do.call(match.fun(results$output4$f), results$output4$args)
-  title(main="Pruning Plot", line=5)
-  invisible(dev.off())
 }
