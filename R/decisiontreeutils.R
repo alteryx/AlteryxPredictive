@@ -41,9 +41,13 @@ createDTParams <- function(config, names, xdf_properties) {
   ))
 
   # get method and parms params
-  params$method <- if (config$classification) "class" else "anova"
-  if (config$classification) {
-    params$parms <- list(split = if (config$use.gini) "gini" else "information")
+  if (config$select.type){
+    params$method <- if (config$classification) "class" else "anova"
+    if (config$classification) {
+      params$parms <- list(split = if (config$use.gini) "gini" else "information")
+    }
+  } else {
+    params$method <- ""
   }
 
   # get usesurrogate param
