@@ -21,12 +21,14 @@ exp_logistic_model <- glm(
   admit ~ gre + gpa + rank, data = admission,
   family = binomial(logit)
 )
-coefs <- coef(exp_logistic_model)
-coef_dframe <- data.frame(
-  Variable = names(coefs),
-  Coefficient = format(coefs, digits = 5)
-)
-
+coefs2dframe <- function(mod){
+  coefs <- coef(mod)
+  data.frame(
+    Variable = names(coefs),
+    Coefficient = format(coefs, digits = 5)
+  )
+}
+coefs_dframe = coefs2dframe(exp_logistic_model)
 
 test_that("admission data with logit link returns correct coefficients", {
   result <- AlteryxPredictive:::runLogisticRegression(inputs, config)
