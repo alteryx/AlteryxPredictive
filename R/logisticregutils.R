@@ -15,6 +15,7 @@ processLogisticOSR <- function(inputs, config){
   }
 
   the.formula <- makeFormula(var_names$x, var_names$y)
+  the.data <- inputs$the.data
   # If sample weights are used
   if (config[['Use Weights']]) {
     # Adjust the set of field names to remove the weight field
@@ -22,14 +23,13 @@ processLogisticOSR <- function(inputs, config){
     library(survey)
     model_type <- "quasibinomial"
     the.design <- svydesign(
-      ids = ~1, weights = makeFormula(var_names$w, ""), data = inputs$the.data
+      ids = ~1, weights = makeFormula(var_names$w, ""), data = the.data
     )
     the.model <- svyglm(the.formula, family = quasibinomial(config$Link),
       design = the.design)
   } else {
     model_type <- "binomial"
-    the.model <- glm(the.formula, family = binomial(config$Link),
-      data = inputs$the.data)
+    the.model <- glm(the.formula, family = binomial(config$Link), data = the.data)
   }
   list(the.model = the.model, model_type = model_type)
 }
