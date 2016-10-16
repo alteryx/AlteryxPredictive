@@ -18,7 +18,7 @@ inputs <- list(
 
 #' ### Run and Create Outputs
 exp_logistic_model <- glm(
-  admit ~ gre + gpa + rank, data = admission,
+  admit ~ gre + gpa + rank, data = AlteryxPredictive::admission,
   family = binomial(logit)
 )
 coefs2dframe <- function(mod){
