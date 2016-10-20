@@ -6,9 +6,9 @@
 #' @param ... additional arguments
 #' @export
 #' @author Ramnath Vaidyanathan, Dan Putler
-#' @rdname scoreModel
-scoreModel <- function(mod.obj, new.data, score.field = "Score", ...) {
-  UseMethod('scoreModel')
+#' @rdname scoreModel2
+scoreModel2 <- function(mod.obj, new.data, score.field = "Score", ...) {
+  UseMethod('scoreModel2')
 }
 
 
@@ -18,8 +18,8 @@ scoreModel <- function(mod.obj, new.data, score.field = "Score", ...) {
 #' @param int.vals interval values
 #' @param log.y whether to report y on the log scale
 #' @export
-#' @rdname scoreModel
-scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
+#' @rdname scoreModel2
+scoreModel2.default <- function(mod.obj, new.data, score.field = "Score",
     os.value = NULL, os.pct = NULL, ...){
   target.value <- os.value
   new.data <- matchLevels(new.data, getXlevels(mod.obj))
@@ -28,7 +28,7 @@ scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
     stop.Alteryx("Spline Models that did not use a GLM family cannot be scored")
   }
   if (is.null(y.levels)) {
-    if(class(mod.obj)[1] %in% c("nnet.formula", "rpart")){
+    if(inherits(mod.obj, c("nnet.formula", "rpart", "svm"))){
       scores <- data.frame(score = as.vector(predict(mod.obj, newdata = new.data)))
     } else {
       if (class(mod.obj)[1] == "gbm") {
@@ -64,18 +64,18 @@ scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
 }
 
 #' @export
-scoreModel.glm <- scoreModel.default
+scoreModel2.glm <- scoreModel2.default
 
 #' @export
-scoreModel.svyglm <- scoreModel.default
+scoreModel2.svyglm <- scoreModel2.default
 
 #' @export
-scoreModel.negbin <- scoreModel.default
+scoreModel2.negbin <- scoreModel2.default
 
 
 #' @export
-#' @rdname scoreModel
-scoreModel.lm <- function(mod.obj, new.data, score.field = "Score",
+#' @rdname scoreModel2
+scoreModel2.lm <- function(mod.obj, new.data, score.field = "Score",
      pred.int = FALSE, int.vals = NULL, log.y = FALSE, ...) {
   if (pred.int) {
     score <- as.data.frame(predict(mod.obj, newdata = new.data, level = 0.01*int.vals, interval = "predict"))
@@ -105,8 +105,8 @@ scoreModel.lm <- function(mod.obj, new.data, score.field = "Score",
 }
 
 #' @export
-#' @rdname scoreModel
-scoreModel.rxLogit <- function(mod.obj, new.data, score.field = "Score",
+#' @rdname scoreModel2
+scoreModel2.rxLogit <- function(mod.obj, new.data, score.field = "Score",
     os.value = NULL, os.pct = NULL, ...) {
   new.data <- matchLevels(new.data, mod.obj$xlevels)
   pred.prob <- RevoScaleR::rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "pred.prob")$pred.prob
@@ -132,8 +132,8 @@ scoreModel.rxLogit <- function(mod.obj, new.data, score.field = "Score",
 }
 
 #' @export
-#' @rdname scoreModel
-scoreModel.rxGlm <- function(mod.obj, new.data, score.field = "Score", ...) {
+#' @rdname scoreModel2
+scoreModel2.rxGlm <- function(mod.obj, new.data, score.field = "Score", ...) {
   scores <- RevoScaleR::rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "score")$score
   names(scores) <- score.field
   scores
@@ -141,7 +141,7 @@ scoreModel.rxGlm <- function(mod.obj, new.data, score.field = "Score", ...) {
 
 
 #' @export
-#' @rdname scoreModel
+#' @rdname scoreModel2
 scoreModel.rxLinMod <- function(mod.obj, new.data, score.field = "Score", pred.int = FALSE, int.vals = NULL, log.y = FALSE, ...) {
   if (pred.int) {
     scores <- RevoScaleR::rxPredict(mod.obj, data = new.data, computeStdErrors = TRUE, interval = "prediction", confLevel = 0.01*int.vals, type = "response")
@@ -164,8 +164,8 @@ scoreModel.rxLinMod <- function(mod.obj, new.data, score.field = "Score", pred.i
 }
 
 #' @export
-#' @rdname scoreModel
-scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL,
+#' @rdname scoreModel2
+scoreModel2.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL,
     os.pct = NULL, ...) {
   new.data <- matchLevels(new.data, mod.obj$xlevels)
   # Classification trees
@@ -204,4 +204,4 @@ scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL,
   scores
 }
 
-scoreModel.rxDForest <- scoreModel.rxDTree
+scoreModel2.rxDForest <- scoreModel2.rxDTree
