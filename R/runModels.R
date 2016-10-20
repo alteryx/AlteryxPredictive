@@ -45,7 +45,7 @@ getResultsLinearRegression <- function(inputs, config){
   if (inputs$XDFInfo$is_XDF){
     the.model <- processLinearXDF(inputs, config)
     lm.out <- createReportLinearXDF(the.model, config)
-    plot.out <- function(){createPlotOutputsXDF()}
+    plot.out <- function(){createPlotOutputsLinearXDF()}
   } else {
     the.model <- processLinearOSR(inputs, config)
     lm.out <- createReportLinearOSR(the.model, config)
