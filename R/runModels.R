@@ -112,9 +112,7 @@ getResultsDecisionTree <- function(inputs, config) {
        dashboard = dashboard)
 }
 
-
 runDecisionTree <- function(inputs, config){
-
-
-
+  results <- getResultsDecisionTree(inputs, config)
+  writeOutputs.decisionTree(results)
 }
