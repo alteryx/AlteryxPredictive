@@ -72,7 +72,7 @@ writeOutputs.decisionTree <- function(results) {
                 pointsize = config$tree.pointsize)
 
   # Model Object
-  the.obj <- prepModelForOutput(config$model.name, results$model)
+  the.obj <- prepModelForOutput(config$`Model Name`, results$model)
   write.Alteryx2(the.obj, nOutput = 3)
 
   # Prune Plot
