@@ -75,7 +75,7 @@ runDecisionTree <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
 
   the.model <- processDT(inputs, config)
-  the.report <- createReportDT(the.model, config, var_names, inputs$XDFinfo$is_XDF)
+  the.report <- createReportDT(the.model, config, var_names, inputs$XDFInfo$is_XDF)
   makeTreePlot <- function(){createTreePlotDT(the.model, config)}
   makePrunePlot <- function(){createPrunePlotDT(the.model)}
 
@@ -101,6 +101,6 @@ runDecisionTree <- function(inputs, config){
     pointsize = config$prune.pointsize)
 
   # Interactive Dashboard
-  dashboard <- createDashboardDT(the.model, inputs$XDFinfo$is_XDF)
+  dashboard <- createDashboardDT(the.model, inputs$XDFInfo$is_XDF)
   AlteryxRviz::renderInComposer(dashboard, nOutput = 5)
 }
