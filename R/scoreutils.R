@@ -187,6 +187,15 @@ getYlevels.earth <- function(x, ...) {
   x$y.levels
 }
 
+#' @export
+getYlevels.svm <- function(x, ...){
+  if (x$type <= 2){
+    x$levels
+  } else {
+    NULL
+  }
+}
+
 ## Predict probabilities ----
 predProb <- function(x, new.data, ...){
   UseMethod('predProb')
