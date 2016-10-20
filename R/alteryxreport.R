@@ -73,6 +73,9 @@ Alteryx.ReportGLM <- function (glm.obj){
   full.sum <- summary(glm.obj)
   the.call <- paste(capture.output(full.sum$call), collapse = "")
   the.call = gsub("\\s\\s", "", the.call)
+  f <- formula(glm.obj)
+  the.call <- sub("formula = ([^\\,]+)",
+    paste("formula =", paste(f[2], "~", f[3])), the.call)
   resid.sum <- paste(format(summary(full.sum$deviance.resid)[-4], digits = 3), collapse = " ")
   p.stars <- pStars(full.sum$coefficients[,4])
   coef.est <- paste(dimnames(full.sum$coefficients)[[1]], format(full.sum$coefficients[,1], digits = 4),

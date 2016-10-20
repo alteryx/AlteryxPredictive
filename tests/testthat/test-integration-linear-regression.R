@@ -15,22 +15,31 @@ inputs <- list(
   XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
 )
 
+exp_model <- lm(mpg ~ ., data = mtcars)
 test_that('linear regression works correctly on mtcars', {
   results <- AlteryxPredictive:::runLinearRegression(inputs, config)
-  exp_model <- lm(mpg ~ ., data = mtcars)
   expect_equal(results$Object[[1]]$coefficients, exp_model$coefficients)
 })
 
+coefs <- coef(exp_model)
+coef_dframe <- data.frame(
+  Variable = names(coefs),
+  Coefficient = format(coefs, digits = 5)
+)
+
+
 testDir = '~/Desktop/SNIPPETS/dev/Predictive_Refresh/Linear_Regression/Extras/Tests/'
-# AlteryxRhelper::makeWorkflow(
-#   template = file.path(testDir, 'SampleTest.yxmd'),
-#   data = inputs$the.data,
-#   config = config,
-#   inputs_id = 1,
-#   config_id = 5,
-#   comment_id = 7,
-#   comment = "This workflow is a basic test for the refreshed Linear Regression plugin.",
-#   outFile = file.path(testDir, 'LinearRegressionTest1.yxmd')
+comment = 'This workflow tests that mtcars data returns correct coefficients'
+# AlteryxRhelper::makeWorkflow2(
+#   template = file.path(testDir, "SampleTest.yxmd"),
+#   repl = list(
+#     list(node = 26, data = inputs$the.data, type = 'input'),
+#     list(node = 3, data = config, type = 'config'),
+#     list(node = 14, data = coef_dframe, type = 'input'),
+#     list(node = 23, data = comment, type = 'text'),
+#     list(node = 19, data = 'Linear Regression Test', type = 'text')
+#   ),
+#   outFile = file.path(testDir, "LinearTest1.yxmd")
 # )
 
 
@@ -40,20 +49,33 @@ config <- modifyList(config, list(
 ))
 
 inputs$the.data = head(ggplot2::diamonds[,c(config$`Y Var`, config$`X Vars`)], 200)
+#inputs$the.data = as.data.frame(inputs$the.data, stringsAsFactors = F)
+inputs$the.data[,c('cut', 'color')] = lapply(
+  inputs$the.data[,c('cut', 'color')], as.character
+)
 
+exp_model <- lm(carat ~ cut + color + price, data = inputs$the.data)
 test_that('linear regression works correctly on diamonds', {
   results <- AlteryxPredictive:::runLinearRegression(inputs, config)
-  exp_model <- lm(carat ~ cut + color + price, data = head(ggplot2::diamonds, 200))
   expect_equal(results$Object[[1]]$coefficients, exp_model$coefficients)
 })
 
-# AlteryxRhelper::makeWorkflow(
-#   template = file.path(testDir, 'SampleTest.yxmd'),
-#   data = inputs$the.data,
-#   config = config,
-#   inputs_id = 1,
-#   config_id = 5,
-#   comment_id = 7,
-#   comment = 'This workflow tests the refreshed Linear Regression plugin on the diamonds dataset.',
-#   outFile = file.path(testDir, 'LinearRegressionTest2.yxmd')
+
+coefs <- coef(exp_model)
+coef_dframe <- data.frame(
+  Variable = names(coefs),
+  Coefficient = format(coefs, digits = 5)
+)
+
+comment = 'This workflow tests that diamonds data returns correct coefficients'
+# AlteryxRhelper::makeWorkflow2(
+#   template = file.path(testDir, "SampleTest.yxmd"),
+#   repl = list(
+#     list(node = 26, data = inputs$the.data, type = 'input'),
+#     list(node = 3, data = config, type = 'config'),
+#     list(node = 14, data = coef_dframe, type = 'input'),
+#     list(node = 23, data = comment, type = 'text'),
+#     list(node = 19, data = 'Linear Regression Test', type = 'text')
+#   ),
+#   outFile = file.path(testDir, "LinearTest2.yxmd")
 # )

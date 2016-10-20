@@ -85,3 +85,10 @@ createPlotOutputsLinearOSR <- function(the.model){
   par(mfrow=c(2, 2), mar=c(5, 4, 2, 2) + 0.1)
   plot(the.model)
 }
+
+#' Plots in XDF
+#'
+#' @export
+createPlotOutputsLinearXDF <- function(){
+  noDiagnosticPlot("The diagnostic plot is not available for XDF based models")
+}

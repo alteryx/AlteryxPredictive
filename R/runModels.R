@@ -1,6 +1,22 @@
-runLogisticRegression <- function(inputs, config){
+writeOutputs <- function(results){
+  # Report
+  write.Alteryx2(results$report, nOutput = 1)
+
+  # Plot Output
+  # whr <- graphWHR(inches = "True", in.w = 6, in.h = 6, config$resolution)
+  whr <- graphWHR2(inches = TRUE, in.w = 6, in.h = 6,
+    graph.resolution = config$graph.resolution)
+  AlteryxGraph2(results$plot(), 2, width = whr[1], height = whr[2],
+    res = whr[3], pointsize = 9)
+
+  # Model Object
+  the.obj <- prepModelForOutput(config$`Model Name`, results$model)
+  write.Alteryx2(the.obj, nOutput = 3)
+}
+
+getResultsLogisticRegression <- function(inputs, config){
   library(car)
-  #' Modify the link so that it can be passed on to R.
+  # Modify the link so that it can be passed on to R.
   if (config$Link == "complementary log-log"){
     config$Link <- "cloglog"
   }
@@ -16,47 +32,31 @@ runLogisticRegression <- function(inputs, config){
       createPlotOutputsLogisticOSR(d$the.model, FALSE, config)
     }
   }
-
-  # Report Output
-  write.Alteryx2(glm.out, nOutput = 1)
-
-  # Plot Output
-  whr <- graphWHR2(inches = TRUE, in.w = 6, in.h = 6, config$graph.resolution)
-  AlteryxGraph2(plot.out(), 2, width = whr[1], height = whr[2],
-    res = whr[3], pointsize = 9)
-
-  # Model Output
-  the.obj <- prepModelForOutput(config[['Model Name']], d$the.model)
-  write.Alteryx2(the.obj, nOutput = 3)
-  return(the.obj)
+  list(model = d$the.model, report = glm.out, plot = plot.out)
+}
+runLogisticRegression <- function(inputs, config){
+  results <- getResultsLogisticRegression(inputs, config)
+  writeOutputs(results)
 }
 
-runLinearRegression <- function(inputs, config){
+getResultsLinearRegression <- function(inputs, config){
   library(car)
   config$`Model Name`= validName(config$`Model Name`)
   if (inputs$XDFInfo$is_XDF){
     the.model <- processLinearXDF(inputs, config)
     lm.out <- createReportLinearXDF(the.model, config)
-    plot.out <- function(){createPlotOutputsXDF()}
+    plot.out <- function(){createPlotOutputsLinearXDF()}
   } else {
     the.model <- processLinearOSR(inputs, config)
     lm.out <- createReportLinearOSR(the.model, config)
     plot.out <- function(){createPlotOutputsLinearOSR(the.model)}
   }
+  list(model = the.model, report = lm.out, plot = plot.out)
+}
 
-  # Report
-  write.Alteryx2(lm.out, nOutput = 1)
-
-  # Plot Output
-  # whr <- graphWHR(inches = "True", in.w = 6, in.h = 6, config$resolution)
-  whr <- AlteryxPredictive:::graphWHR2(inches = TRUE, in.w = 6, in.h = 6,
-    config$graph.resolution)
-  AlteryxGraph2(plot.out(), 2, width = whr[1], height = whr[2],
-    res = whr[3], pointsize = 9)
-
-  # Model Object
-  the.obj <- prepModelForOutput(config$`Model Name`, the.model)
-  write.Alteryx2(the.obj, nOutput = 3)
+runLinearRegression <- function(inputs, config){
+  results <- getResultsLinearRegression(inputs, config)
+  writeOutputs(results)
 }
 
 runDecisionTree <- function(inputs, config){
