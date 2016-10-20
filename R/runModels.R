@@ -59,7 +59,34 @@ runLinearRegression <- function(inputs, config){
   writeOutputs(results)
 }
 
-runDecisionTree <- function(inputs, config){
+
+writeOutputs.decisionTree <- function(results) {
+  # Report Output
+  write.Alteryx2(results$report, nOutput = 1)
+
+  # Tree Plot
+  whr <- graphWHR2(inches = config$tree.inches, in.w = config$tree.in.w,
+                   in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h,
+                   graph.resolution = config$tree.graph.resolution, print.high = TRUE)
+  AlteryxGraph2(results$treePlot(), nOutput = 2, width = whr[1], height = whr[2], res = whr[3],
+                pointsize = config$tree.pointsize)
+
+  # Model Object
+  the.obj <- prepModelForOutput(config$model.name, results$model)
+  write.Alteryx2(the.obj, nOutput = 3)
+
+  # Prune Plot
+  whr <- graphWHR2(inches = config$prune.inches, in.w = config$prune.in.w,
+                   in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h,
+                   graph.resolution = config$prune.graph.resolution, print.high = FALSE)
+  AlteryxGraph2(results$prunePlot(), nOutput = 4, width = whr[1], height = whr[2], res = whr[3],
+                pointsize = config$prune.pointsize)
+
+  # Interactive Dashboard
+  AlteryxRviz::renderInComposer(results$dashboard, nOutput = 5)
+}
+
+getResultsDecisionTree <- function(inputs, config) {
   # Set the seed to get run-over-run consistency
   set.seed(1)
 
@@ -78,29 +105,16 @@ runDecisionTree <- function(inputs, config){
   the.report <- createReportDT(the.model, config, var_names, inputs$XDFInfo$is_XDF)
   makeTreePlot <- function(){createTreePlotDT(the.model, config)}
   makePrunePlot <- function(){createPrunePlotDT(the.model)}
-
-  # Report Output
-  write.Alteryx2(the.report, nOutput = 1)
-
-  # Tree Plot
-  whr <- graphWHR2(inches = config$tree.inches, in.w = config$tree.in.w,
-    in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h,
-    graph.resolution = config$tree.graph.resolution, print.high = TRUE)
-  AlteryxGraph2(makeTreePlot(), nOutput = 2, width = whr[1], height = whr[2], res = whr[3],
-    pointsize = config$tree.pointsize)
-
-  # Model Object
-  the.obj <- prepModelForOutput(config$model.name, the.model)
-  write.Alteryx2(the.obj, nOutput = 3)
-
-  # Prune Plot
-  whr <- graphWHR2(inches = config$prune.inches, in.w = config$prune.in.w,
-    in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h,
-    graph.resolution = config$prune.graph.resolution, print.high = FALSE)
-  AlteryxGraph2(makePrunePlot(), nOutput = 4, width = whr[1], height = whr[2], res = whr[3],
-    pointsize = config$prune.pointsize)
-
-  # Interactive Dashboard
   dashboard <- createDashboardDT(the.model, inputs$XDFInfo$is_XDF)
-  AlteryxRviz::renderInComposer(dashboard, nOutput = 5)
+
+  list(model = the.model, report = the.report,
+       treePlot = makeTreePlot, prunePlot = makePrunePlot,
+       dashboard = dashboard)
+}
+
+
+runDecisionTree <- function(inputs, config){
+
+
+
 }
