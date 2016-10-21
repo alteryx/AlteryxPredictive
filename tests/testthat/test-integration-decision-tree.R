@@ -65,12 +65,11 @@ exp_tree_model <- rpart(
   maxdepth = 20
 )
 
+
 test_that("Iris data with vanilla decision tree model", {
   result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
-  expect_equal(
-    result$model$frame,
-    exp_tree_model$frame
-  )
+  expect_equal(getCall(result$model)[[2]], getCall(exp_tree_model)[[2]])
+  expect_equal(result$model$frame,exp_tree_model$frame)
 })
 
 
