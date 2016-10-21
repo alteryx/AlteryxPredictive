@@ -18,7 +18,7 @@ inputs <- list(
 exp_model <- lm(mpg ~ ., data = mtcars)
 test_that('linear regression works correctly on mtcars', {
   results <- AlteryxPredictive:::runLinearRegression(inputs, config)
-  expect_equal(results$Object[[1]]$coefficients, exp_model$coefficients)
+  expect_equal(results$model$coefficients, exp_model$coefficients)
 })
 
 coefs <- coef(exp_model)
@@ -57,7 +57,7 @@ inputs$the.data[,c('cut', 'color')] = lapply(
 exp_model <- lm(carat ~ cut + color + price, data = inputs$the.data)
 test_that('linear regression works correctly on diamonds', {
   results <- AlteryxPredictive:::runLinearRegression(inputs, config)
-  expect_equal(results$Object[[1]]$coefficients, exp_model$coefficients)
+  expect_equal(results$model$coefficients, exp_model$coefficients)
 })
 
 
