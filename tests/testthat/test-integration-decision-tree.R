@@ -4,7 +4,7 @@ config <- list(
   `Branch Dist` = checkboxInput('%Question.Branch Dist%' , TRUE),
   `classification` = radioInput('%Question.classification%' , TRUE),
   `Counts` = radioInput('%Question.Counts%' , FALSE),
-  `cp` = numericInput('%Question.cp%' , 'Auto'),
+  `cp` = numericInput('%Question.cp%' , 0.01),
   `max.bins` = textInput('%Question.max.bins%' , 'Default'),
   `max.depth` = numericInput('%Question.max.depth%' , 20),
   `min.bucket` = numericInput('%Question.min.bucket%' , 7),
@@ -61,13 +61,14 @@ inputs <- list(
 #' ### Run and Create Outputs
 exp_tree_model <- rpart(
   formula = Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width,
-  data = iris
+  data = iris,
+  maxdepth = 20
 )
 
 test_that("Iris data with vanilla decision tree model", {
-  result <- AlteryxPredictive:::runDecisionTree(inputs, config)
+  result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
   expect_equal(
-    result$frame,
+    result$model$frame,
     exp_tree_model$frame
   )
 })
