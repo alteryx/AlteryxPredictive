@@ -2,7 +2,7 @@ writeOutputs <- function(results, ...) {
   UseMethod('writeOutputs')
 }
 
-writeOutputs.GLM <- function(results){
+writeOutputs.GLM <- function(results, config){
   # Report
   write.Alteryx2(results$report, nOutput = 1)
 
@@ -18,16 +18,18 @@ writeOutputs.GLM <- function(results){
   write.Alteryx2(the.obj, nOutput = 3)
 }
 
-writeOutputs.DecisionTree <- function(results) {
+writeOutputs.DecisionTree <- function(results, config) {
   # Report Output
   write.Alteryx2(results$report, nOutput = 1)
 
   # Tree Plot
   whr <- graphWHR2(inches = config$tree.inches, in.w = config$tree.in.w,
-                   in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h,
-                   graph.resolution = config$tree.graph.resolution, print.high = TRUE)
-  AlteryxGraph2(results$treePlot(), nOutput = 2, width = whr[1], height = whr[2], res = whr[3],
-                pointsize = config$tree.pointsize)
+    in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h,
+    graph.resolution = config$tree.graph.resolution, print.high = TRUE
+  )
+  AlteryxGraph2(results$treePlot(), nOutput = 2, width = whr[1], height = whr[2],
+    res = whr[3], pointsize = config$tree.pointsize
+  )
 
   # Model Object
   the.obj <- prepModelForOutput(config$`Model Name`, results$model)
@@ -35,10 +37,12 @@ writeOutputs.DecisionTree <- function(results) {
 
   # Prune Plot
   whr <- graphWHR2(inches = config$prune.inches, in.w = config$prune.in.w,
-                   in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h,
-                   graph.resolution = config$prune.graph.resolution, print.high = FALSE)
-  AlteryxGraph2(results$prunePlot(), nOutput = 4, width = whr[1], height = whr[2], res = whr[3],
-                pointsize = config$prune.pointsize)
+    in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h,
+    graph.resolution = config$prune.graph.resolution, print.high = FALSE
+  )
+  AlteryxGraph2(results$prunePlot(), nOutput = 4, width = whr[1], height = whr[2],
+    res = whr[3], pointsize = config$prune.pointsize
+  )
 
   # Interactive Dashboard
   AlteryxRviz::renderInComposer(results$dashboard, nOutput = 5)
@@ -67,9 +71,10 @@ getResultsLogisticRegression <- function(inputs, config){
   class(results) <- "GLM"
   results
 }
+
 runLogisticRegression <- function(inputs, config){
   results <- getResultsLogisticRegression(inputs, config)
-  writeOutputs(results)
+  writeOutputs(results, config)
 }
 
 # Linear Regression ----
@@ -93,7 +98,7 @@ getResultsLinearRegression <- function(inputs, config){
 
 runLinearRegression <- function(inputs, config){
   results <- getResultsLinearRegression(inputs, config)
-  writeOutputs(results)
+  # writeOutputs(results, config)
 }
 
 
@@ -120,8 +125,9 @@ getResultsDecisionTree <- function(inputs, config) {
   dashboard <- createDashboardDT(the.model, inputs$XDFInfo$is_XDF)
 
   results <- list(model = the.model, report = the.report,
-                  treePlot = makeTreePlot, prunePlot = makePrunePlot,
-                  dashboard = dashboard)
+    treePlot = makeTreePlot, prunePlot = makePrunePlot,
+    dashboard = dashboard
+  )
   class(results) <- "DecisionTree"
   results
 }
