@@ -215,12 +215,15 @@ matrixPipeDelim <- function (a.matrix, round.level = 5e-07){
 	out.vec
 }
 
-# The function pStars takes a vector of p-values and (1) converts them to text
-# and formats the "top-end" to be consistent with standard R reporting of
-# p-values and (2) creates a text column of "stars" to signify significance
-# levels
-# Author: Dan Putler
-
+#' Convert p-values to text.
+#'
+#' The function pStars takes a vector of p-values and (1) converts them to text
+#' and formats the "top-end" to be consistent with standard R reporting of
+#' p-values and (2) creates a text column of "stars" to signify significance
+#' levels.
+#' @param p.val vector of pvalues.
+#' @author Dan Putler
+#' @export
 pStars <- function (p.val){
   splitFun <- function(string) {
     the.split <- unlist(strsplit(string, "e"))
@@ -328,6 +331,8 @@ unitScale <- function(x) {
 #'   length two.
 #' @param xlabs	A vector of character strings to label the first set of points:
 #'   the default is to use the row dimname of x, or 1:n is the dimname is NULL.
+#' @author Dan Putler
+#' @export
 bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
   choices = 1:2, scale = 1, pc.biplot=FALSE, var.axes = TRUE, col=palette()[1:2],
   cex = rep(par("cex"), 2), xlabs = NULL, ylabs = NULL, expand=1, xlim = NULL,
@@ -421,10 +426,16 @@ bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
 }
 
 
-# The function takes a matrix and two standardization vectors and standardizes
-# the variables based on substracting the first standardization vector from the
-# appropriate columns and then dividing by the second standarization parameter.
-# Author: Dan Putler
+#' Standardize a matrix
+#'
+#' The function takes a matrix and two standardization vectors and standardizes
+#' the variables based on subtracting the first standardization vector from the
+#' appropriate columns and then dividing by the second standarization parameter.
+#' @param x matrix to standardize
+#' @param std.vec1 vector to subtract from columns
+#' @param std.vec2 vector to divide the columns
+#' @author Dan Putler
+#' @export
 standardize <- function(x, std.vec1, std.vec2) {
   # Input checking
   if (!all(names(std.vec1) == names(std.vec2)))
@@ -439,13 +450,29 @@ standardize <- function(x, std.vec1, std.vec2) {
 
 
 
-# This function calculates the Calinski-Harabas index for all solutions
-# contained in a bootFlexclust object. It does it for each Rand test paired
-# comparison, so 100 bootstrap replicates of the Rand index will result in 200
-# Calinski-Harabase index values. This code borrows from the function index.G1
-# of Marek Walesiak and Andrzej Dudek's clusterSim package in terms of
-# implementing the sum of squares components
-# Author: Dan Putler
+#' Bootstrap Replicates of the Calinski-Harabas index for Cluster Validation
+#'
+#' This function calculates the Calinski-Harabas index for all solutions
+#' contained in a bootFlexclust object. It does it for each Rand test paired
+#' comparison, so 100 bootstrap replicates of the Rand index will result in 200
+#' Calinski-Harabase index values. This code borrows from the function index.G1
+#' of Marek Walesiak and Andrzej Dudek's clusterSim package in terms of
+#' implementing the sum of squares components
+#' @param xdat A numeric matrix of the data to be clustered.
+#' @param k_vals An integer vector giving the set of clustering solutions to be
+#'   examined.
+#' @param clstr1 The cluster assignments from a bootFlexclust object for one
+#'   side of the Rand index paired comparisons.
+#' @param clstr2 The cluster assignments from a bootFlexclust object for the
+#'   other side of the Rand index paired comparisons
+#' @param cntrs1 The cluster centers from a bootFlexclust object for one side of
+#'   the bootFlexclust Rand index paired comparisons.
+#' @param cntrs2 The cluster centers from a bootFlexclust object for the other
+#'   side of the bootFlexclust Rand index paired comparisons.
+#' @param method The clustering method, one of "kmn" (K-Means), "kmd"
+#'   (K-Medians), and "neuralgas" (neural gas).
+#' @author Dan Putler
+#' @export
 bootCH <- function(xdat, k_vals, clstr1, clstr2, cntrs1, cntrs2,
   method = c("kmn", "kmd", "neuralgas")) {
   method = match.arg(method)
