@@ -98,7 +98,7 @@ getResultsLinearRegression <- function(inputs, config){
 
 runLinearRegression <- function(inputs, config){
   results <- getResultsLinearRegression(inputs, config)
-  # writeOutputs(results, config)
+  writeOutputs(results, config)
 }
 
 
