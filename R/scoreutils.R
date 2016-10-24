@@ -11,8 +11,8 @@
 ## Helper Functions ----
 # Extract predictor variables from an R model call object
 #' @export
-getXVars2 <- function(x){
-  UseMethod('getXVars2')
+getXVars <- function(x){
+  UseMethod('getXVars')
 }
 
 getXVarsFromCall <- function(x){
@@ -20,7 +20,7 @@ getXVarsFromCall <- function(x){
 }
 
 #' @export
-getXVars2.default <- function(x) {
+getXVars.default <- function(x) {
   the.call <- x$call
   if(class(the.call) != "call") stop("The argument was not a call object.")
   xvars <- getXVarsFromCall(x)
@@ -36,12 +36,12 @@ getXVars2.default <- function(x) {
 }
 
 #' @export
-getXVars2.naiveBayes <- function(x) {
+getXVars.naiveBayes <- function(x) {
   x$xvars
 }
 
 #' @export
-getXVars2.svm.formula <- getXVars2.naiveBayes
+getXVars.svm.formula <- getXVars.naiveBayes
 
 #' @export
 noZeroLevels <- function(ll){Filter(Negate(is.numeric), ll)}
