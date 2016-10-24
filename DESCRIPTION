@@ -21,7 +21,6 @@ RoxygenNote: 5.0.1
 Imports:
   magrittr,
   rjson,
-  rgeos,
   car,
   rpart,
   rpart.plot,
