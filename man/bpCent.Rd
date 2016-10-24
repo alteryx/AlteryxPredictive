@@ -57,4 +57,7 @@ The bpCent function is from Dan Putler's BCA package, and is included here to av
 the need of loading the Rcmdr package (with its GUI). The function creates a biplot
 of a cluster analysis solution.
 }
+\author{
+Dan Putler
+}
 
