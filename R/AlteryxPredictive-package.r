@@ -9,3 +9,5 @@
 #' @importFrom utils capture.output head install.packages installed.packages
 #'   modifyList packageVersion
 NULL
+
+utils::globalVariables(c(".", "setInternet2"))

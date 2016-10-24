@@ -1,8 +1,11 @@
-#' #### Process Inputs
+#' Process Linear Regression Inputs
 #'
 #' These two function take `inputs` and `config` and return the model object
 #' along with other elements essential to create the reports and plots
 #'
+#' @param inputs input data streams to the tool
+#' @param config configuration passed to the tool
+#' @rdname processLinear
 #' @export
 processLinearOSR <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
@@ -19,6 +22,8 @@ processLinearOSR <- function(inputs, config){
   }
 }
 
+#' @inheritParams processLinearOSR
+#' @rdname processLinear
 #' @export
 processLinearXDF <- function(inputs, config){
   temp.dir <- textInput('%Engine.TempFilePath%', tempdir())
@@ -57,7 +62,11 @@ processLinearXDF <- function(inputs, config){
 #' If the ANOVA table is requested then create it and add its results to the
 #' key-value table. Its creation will be surpressed if the car package isn't
 #' present, or if the input is an XDF file.
+#'
+#' @param the.model model object
+#' @param config configuration passed to the tool
 #' @export
+#' @rdname createReportLinear
 createReportLinearOSR <- function(the.model, config){
   lm.out <- Alteryx.ReportLM(the.model)
   lm.out <- rbind(c("Model_Name", config$`Model Name`), lm.out)
@@ -65,7 +74,9 @@ createReportLinearOSR <- function(the.model, config){
   lm.out
 }
 
+#' @inheritParams createReportLinearOSR
 #' @export
+#' @rdname createReportLinear
 createReportLinearXDF <- function(the.model, config){
   AlteryxMessage2("Creation of the Analysis of Variance table was surpressed due to the use of an XDF file", iType = 2, iPriority = 3)
   lm.out <- AlteryxReportRx(the.model)
@@ -80,6 +91,7 @@ createReportLinearXDF <- function(the.model, config){
 #' and their isn't the combination of singularities and the use of
 #' sampling weights.
 #'
+#' @param the.model model object
 #' @export
 createPlotOutputsLinearOSR <- function(the.model){
   par(mfrow=c(2, 2), mar=c(5, 4, 2, 2) + 0.1)

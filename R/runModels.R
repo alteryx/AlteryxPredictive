@@ -50,7 +50,7 @@ writeOutputs.DecisionTree <- function(results, config) {
 
 # Logistic Regression ----
 getResultsLogisticRegression <- function(inputs, config){
-  library(car)
+  requireNamespace("car")
   # Modify the link so that it can be passed on to R.
   if (config$Link == "complementary log-log"){
     config$Link <- "cloglog"
@@ -79,7 +79,7 @@ runLogisticRegression <- function(inputs, config){
 
 # Linear Regression ----
 getResultsLinearRegression <- function(inputs, config){
-  library(car)
+  requireNamespace("car")
   config$`Model Name`= validName(config$`Model Name`)
   if (inputs$XDFInfo$is_XDF){
     the.model <- processLinearXDF(inputs, config)

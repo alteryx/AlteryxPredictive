@@ -10,7 +10,7 @@ mrsLevels <- function(data, loc_tmp, rem_tmp = NULL, rem_R = NULL) {
   context <- unlist(strsplit(unlist(strsplit(con_string, ";"))[1], "DRIVER="))[2]
   if (context == "Teradata") {
     if(is.null(rem_tmp) || is.null(rem_R)) {
-      stop.Alteryx("Not all of the information about the Teradata platform has not be provided.")
+      stop.Alteryx2("Not all of the information about the Teradata platform has not be provided.")
     }
     cc <- RevoScaleR::RxInTeradata(connectionString = con_string, shareDir = loc_tmp, remoteShareDir = rem_tmp, revoPath = rem_R, wait = TRUE)
   } else {

@@ -25,7 +25,7 @@ scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
   new.data <- matchLevels(new.data, getXlevels(mod.obj))
   y.levels <- getYlevels(mod.obj, new.data)
   if (class(mod.obj) == "earth" && is.null(mod.obj$glm.list)) {
-    stop.Alteryx("Spline Models that did not use a GLM family cannot be scored")
+    stop.Alteryx2("Spline Models that did not use a GLM family cannot be scored")
   }
   if (is.null(y.levels)) {
     if(inherits(mod.obj, c("nnet.formula", "rpart", "svm"))){

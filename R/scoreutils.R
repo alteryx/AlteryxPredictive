@@ -9,7 +9,9 @@
 # Authors: Ramnath Vaidyanthan and Dan Putler                                  #
 ################################################################################
 ## Helper Functions ----
-# Extract predictor variables from an R model call object
+#' Extract predictor variables from an R model call object
+#'
+#' @param x model object
 #' @export
 getXVars <- function(x){
   UseMethod('getXVars')
@@ -43,14 +45,25 @@ getXVars.naiveBayes <- function(x) {
 #' @export
 getXVars.svm.formula <- getXVars.naiveBayes
 
+#' Remove non numeric elements from a list
+#'
+#' @param ll list
 #' @export
 noZeroLevels <- function(ll){Filter(Negate(is.numeric), ll)}
 
+
+#' Remove factors with null levels from a list
+#'
+#' @param ll list of factor levels.
 #' @export
 noNullLevels <- function(ll){Filter(Negate(is.null), ll)}
 
-# matchLevels coerces the levels in new data factors to exactly match the levels
-# of factors in the original data, and is needed for Revo ScaleR models
+#' Match levels of factors in original data with new data
+#'
+#' Coerce the levels in new data factors to exactly match the levels
+#' of factors in the original data, and is needed for Revo ScaleR models
+#' @param nd new data
+#' @param ol old factor levels
 #' @export
 matchLevels <- function(nd, ol) {
   # Address the non-standard way randomForest returns xlevel values
@@ -88,7 +101,9 @@ matchLevels <- function(nd, ol) {
   nd
 }
 
-## Get X Levels ----
+#' Get X Levels from model object
+#'
+#' @param x model object
 #' @export
 getXlevels <- function(x){
   UseMethod('getXlevels')
@@ -127,7 +142,10 @@ getXlevels.gbm <- function(x){
 }
 
 
-## Get Y levels ----
+#' Get Y levels from model object
+#'
+#' @param x model object.
+#' @param ... other parameters to pass to the function.
 #' @export
 getYlevels <- function(x, ...){
   UseMethod("getYlevels")
@@ -144,7 +162,7 @@ getYlevels.randomForest.formula <- function(x, ...){
 }
 
 #' @export
-getYlevels.rpart <- function(x, new.data){
+getYlevels.rpart <- function(x, new.data, ...){
   attributes(predict(x, newdata = new.data[1, , drop = FALSE]))$dimnames[[2]]
 }
 

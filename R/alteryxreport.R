@@ -256,6 +256,10 @@ Alteryx.ParseAnova <- function(the_anova, obj.class) {
   return(parsed_rows)
 }
 
+#' Create report for rx model objects.
+#'
+#' @param rx.obj model object of class rxLinMod, rxLogit or rxGlm
+#' @param null.deviance null deviance
 #' @export
 AlteryxReportRx <- function (rx.obj, null.deviance = NULL) {
   if (!(class(rx.obj) %in% c("rxLinMod","rxLogit","rxGlm")))

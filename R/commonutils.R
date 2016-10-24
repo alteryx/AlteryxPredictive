@@ -301,6 +301,8 @@ unitScale <- function(x) {
 
 
 #' Biplot of a Cluster Analysis Function
+#'
+#'
 #' The bpCent function is from Dan Putler's BCA package, and is included here to avoid
 #' the need of loading the Rcmdr package (with its GUI). The function creates a biplot
 #' of a cluster analysis solution.
@@ -331,6 +333,16 @@ unitScale <- function(x) {
 #'   length two.
 #' @param xlabs	A vector of character strings to label the first set of points:
 #'   the default is to use the row dimname of x, or 1:n is the dimname is NULL.
+#' @param ylabs A vector of character strings to label the second set of points: the default is to use the row dimname of y, or 1:n is the dimname is NULL.
+#' @param expand An expansion factor to apply when plotting the second set of points relative to the first. This can be used to tweak the scaling of the two sets to a physically comparable scale.
+#' @param xlim Limits for the x axis in the units of the first set of variables.
+#' @param ylim Limits for the y axis in the units of the first set of variables.
+#' @param arrow.len The length of the arrow heads on the axes plotted in var.axes is true. The arrow head can be suppressed by arrow.len = 0.
+#' @param main graphical parameter
+#' @param sub graphical parameter
+#' @param xlab graphical parameter
+#' @param ylab graphical parameter
+#' @param ... graphical parameters
 #' @author Dan Putler
 #' @export
 bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
@@ -557,7 +569,8 @@ varImpPlot.Alteryx <- function(x, sort=TRUE, n.var=min(30, nrow(x$importance)),
 #' @param in.h the height of the plot to produce in inches.
 #' @param cm.w the width of the plot to produce in cm.
 #' @param cm.h the height of the plot to produce in cm.
-#' @param resolution the resolution of the plot to produce as a multiple of 96dpi
+#' @param graph.resolution the resolution of the plot to produce as a multiple
+#'   of 96dpi
 #' @param print.high whether to turn 3x into 6x (high, 576 dpi) resolution
 #' @author Dan Putler
 #' @export
@@ -663,6 +676,13 @@ wrapTable <- function(dframe, width = 6, first.rnames = TRUE, round.level = 0.00
 #' base of 96 dpi, and and (in the case of 3x) whether high (576 dpi) resolution
 #' should be used to determine the appropriate width, height, and res values to
 #' provide the AlteryxGraph device.
+#' @param inches A flag whether the to measure dimensions using inches (as opposed to centimeters).
+#' @param in.w The width of the plot to produce in inches.
+#' @param in.h The height of the plot to produce in inches.
+#' @param cm.w The width of the plot to produce in centimeters.
+#' @param cm.h The height of the plot to produce in centimeters.
+#' @param resolution The resolution of the plot to produce expressed as multiple of 96 ppi.
+#' @param print.high Whether to actually turn 3x into 6x (high, 576 ppi) resolution.
 #' @export
 #' @author Dan Putler
 graphWHR <- function(inches = c("True", "False"), in.w , in.h, cm.w = NULL,
@@ -713,7 +733,7 @@ graphWHR <- function(inches = c("True", "False"), in.w , in.h, cm.w = NULL,
 #' @export
 validName <- function(name) {
   if (!is.character(name) || length(name) > 1)
-    stop.Alteryx("The name provided needs to be a character string")
+    stop.Alteryx2("The name provided needs to be a character string")
   if (name != make.names(name)) {
     old.name <- name
     name <- gsub("\\.", "\\_", make.names(name))
