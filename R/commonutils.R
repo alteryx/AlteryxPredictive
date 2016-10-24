@@ -115,9 +115,12 @@ plotMeans <- function (response, factor1, factor2, error.bars = c("se", "sd",
 }
 
 
-#########
-# Trim Blanks function
 
+#' Trim Blanks Function
+#'
+#' This function trims blanks from text input
+#' @param text input text that may contain blanks
+#' @export
 trim.blanks <- function(text){
   gsub("^\ *", "", gsub("\ *$", "", text))
 }
@@ -256,12 +259,17 @@ pStars <- function (p.val){
 }
 
 
-# The unitScale function standardizes variables so that their values fall in
-# the inclusive unit interval. The argument (x) must be an object that is, or
-# can be coerced to be, a numeric matrix. The function returns a matrix of values
-# whose columns have been standardized to have values that fall in the inclusive
-# unit interval.
-# Author: Dan Putler
+#' Unit Scale Function
+#'
+#' The unitScale function standardizes variables so that their values fall in the
+#' inclusive unit interval. The argument (x) must be an object that is, or can be
+#' coerced to be, a numeric matrix. The function returns a matrix of values whose
+#' columns have been standardized to have values that fall in the inclusive unit
+#' interval.
+#'
+#' @param x a numeric matrix object
+#' @export
+#' @author Dan Putler
 unitScale <- function(x) {
   if (!(class(x) %in% c("matrix", "data.frame", "numeric", "integer"))) {
     stop("The function argument cannot be coerced to be a matrix")
@@ -289,9 +297,37 @@ unitScale <- function(x) {
 }
 
 
-# The bpCent function is from Dan Putler's BCA package, and is included here to
-# avoid the need of loading the Rcmdr package (with its GUI). The function
-# creates a biplot of a cluster analysis solution.
+#' Biplot of a Cluster Analysis Function
+#' The bpCent function is from Dan Putler's BCA package, and is included here to avoid
+#' the need of loading the Rcmdr package (with its GUI). The function creates a biplot
+#' of a cluster analysis solution.
+#'
+#' @param pc The prcomp object of the data used in clustering.
+#' @param clsAsgn A vector containing the cluster assignment for each record in
+#'   the clustering data.
+#' @param data.pts If TRUE the point for each record is plotted.
+#' @param centroids If TRUE the centroid for each cluster is plotted.
+#' @param choices	length 2 vector specifying the components to plot.
+#' @param scale	The variables scaled by lambda ^ scale and the observations are
+#'   scaled by lambda ^ (1-scale), where lambda are the eigen values of the
+#'   principal components solution. scale should be between 0 and 1.
+#' @param pc.biplot	If true, then lambda = 1 and the observations are are scaled
+#'   up the sqrt(n) and the variables scaled down by sqrt(n). In this case the
+#'   inner product between variables approximate covariances, and the distances
+#'   between observations approximate Mahalanobis distance. Gabriel refers to
+#'   this as a "principal component biplot".
+#' @param var.axes	If TRUE the second set of points have arrows representing
+#'   them as (unscaled) axes.
+#' @param col	A vector of length 2 giving the colours for the first and second
+#'   set of points respectively (and the corresponding axes). If a single colour
+#'   is specified it will be used for both sets. If missing the default colour
+#'   is looked for in the palette: if there it and the next colour as used,
+#'   otherwise the first two colours of the paletter are used.
+#' @param cex	The character expansion factor used for labelling the points. The
+#'   labels can be of different sizes for the two sets by supplying a vector of
+#'   length two.
+#' @param xlabs	A vector of character strings to label the first set of points:
+#'   the default is to use the row dimname of x, or 1:n is the dimname is NULL.
 bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
   choices = 1:2, scale = 1, pc.biplot=FALSE, var.axes = TRUE, col=palette()[1:2],
   cex = rep(par("cex"), 2), xlabs = NULL, ylabs = NULL, expand=1, xlim = NULL,
@@ -592,6 +628,54 @@ wrapTable <- function(dframe, width = 6, first.rnames = TRUE, round.level = 0.00
   names(out.vec) <- NULL
   out.vec
 }
+
+#' GraphWHR Function
+#'
+#' The function graphWH takes information about the desired graph size (in
+#' inches or centemeters), the desired output resolution of 1x, 2x, 3x from a
+#' base of 96 dpi, and and (in the case of 3x) whether high (576 dpi) resolution
+#' should be used to determine the appropriate width, height, and res values to
+#' provide the AlteryxGraph device.
+#' @export
+#' @author Dan Putler
+graphWHR <- function(inches = c("True", "False"), in.w , in.h, cm.w = NULL,
+    cm.h = NULL, resolution = c("1x", "2x", "3x"), print.high = FALSE) {
+  # Set the dpi
+  if (resolution == "")
+    resolution <- "1x"
+  else
+    resolution <- match.arg(resolution)
+  dpi <- 96
+  if (resolution == "2x")
+    dpi <- 192
+  if (resolution == "3x" && !print.high)
+    dpi <- 288
+  if (resolution == "3x" && print.high)
+    dpi <- 576
+
+  # Set the width and height
+  if (inches == "")
+    inches <- "True"
+  else
+    inches <- match.arg(inches)
+
+  if (in.w == "")
+    in.w <- "5.50"
+  in.w <- as.numeric(in.w)
+
+  if (in.h == "")
+    in.h <- "5.75"
+  in.h <- as.numeric(in.h)
+
+  if (inches == "False") {
+    in.w <- 0.393701*as.numeric(cm.w)
+    in.h <- 0.393701*as.numeric(cm.h)
+  }
+  width = round(dpi*in.w)
+  height = round(dpi*in.h)
+  c(width, height, dpi)
+}
+
 
 #' Create a valid name for an R object
 #'
