@@ -25,12 +25,17 @@ Imports:
   car,
   rpart,
   rpart.plot,
-  htmltools
+  htmltools,
+  assertthat,
+  plyr
 Suggests:
-  AlteryxRDataX,
-  RevoScaleR,
   knitr,
   rmarkdown,
   randomForest,
   testthat,
-  XML
+  XML,
+  survey,
+  AlteryxRviz
+Enhances:
+  AlteryxRDataX,
+  RevoScaleR
