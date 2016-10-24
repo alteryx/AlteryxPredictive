@@ -5,7 +5,6 @@
 #'
 #' @param the.object object to serialize
 #' @author Rob Bryan
-#' @export
 serializeObject <- function(the.object){
   if (inherits(the.object,"Spatial")){
     return(rgeos::writeWKT(the.object))
@@ -25,7 +24,6 @@ serializeObject <- function(the.object){
 #'
 #' @param the.string string to unserialize
 #' @author Rob Bryan
-#' @export
 unserializeObject <- function(the.string){
   if (identical(substr(the.string,1,2),"A\n"))
     return(unserialize(charToRaw(as.character(the.string))) )
