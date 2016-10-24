@@ -7,9 +7,9 @@
 processDT(inputs, config)
 }
 \arguments{
-\item{config}{list of configuration options}
+\item{inputs}{input data streams to the tool}
 
-\item{data}{list of datastream objects}
+\item{config}{configuration passed to the tool}
 }
 \value{
 list of results or results

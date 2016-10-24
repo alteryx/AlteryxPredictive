@@ -2,9 +2,17 @@
 % Please edit documentation in R/linearregutils.R
 \name{processLinearOSR}
 \alias{processLinearOSR}
-\title{#### Process Inputs}
+\alias{processLinearXDF}
+\title{Process Linear Regression Inputs}
 \usage{
 processLinearOSR(inputs, config)
+
+processLinearXDF(inputs, config)
+}
+\arguments{
+\item{inputs}{input data streams to the tool}
+
+\item{config}{configuration passed to the tool}
 }
 \description{
 These two function take `inputs` and `config` and return the model object

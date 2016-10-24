@@ -18,9 +18,10 @@ graphWHR2(inches = TRUE, in.w = 5.5, in.h = 5.75, cm.w = NULL,
 
 \item{cm.h}{the height of the plot to produce in cm.}
 
-\item{print.high}{whether to turn 3x into 6x (high, 576 dpi) resolution}
+\item{graph.resolution}{the resolution of the plot to produce as a multiple
+of 96dpi}
 
-\item{resolution}{the resolution of the plot to produce as a multiple of 96dpi}
+\item{print.high}{whether to turn 3x into 6x (high, 576 dpi) resolution}
 }
 \description{
 This takes information about the desired graph size (in

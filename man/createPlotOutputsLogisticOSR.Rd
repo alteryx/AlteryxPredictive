@@ -6,6 +6,13 @@
 \usage{
 createPlotOutputsLogisticOSR(the.model, singular, config)
 }
+\arguments{
+\item{the.model}{model object}
+
+\item{singular}{is the model singular}
+
+\item{config}{configuration passed to the tool}
+}
 \description{
 Prepare the basic regression diagnostic plots if it is requested
 and their isn't the combination of singularities and the use of

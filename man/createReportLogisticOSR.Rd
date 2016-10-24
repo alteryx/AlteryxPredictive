@@ -6,6 +6,13 @@
 \usage{
 createReportLogisticOSR(the.model, config, model_type)
 }
+\arguments{
+\item{the.model}{model object}
+
+\item{config}{tool configuration}
+
+\item{model_type}{class of model}
+}
 \description{
 If the ANOVA table is requested then create it and add its results to the
 key-value table. Its creation will be surpressed if the car package isn't

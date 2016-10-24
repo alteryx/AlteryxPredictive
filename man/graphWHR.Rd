@@ -7,6 +7,21 @@
 graphWHR(inches = c("True", "False"), in.w, in.h, cm.w = NULL,
   cm.h = NULL, resolution = c("1x", "2x", "3x"), print.high = FALSE)
 }
+\arguments{
+\item{inches}{A flag whether the to measure dimensions using inches (as opposed to centimeters).}
+
+\item{in.w}{The width of the plot to produce in inches.}
+
+\item{in.h}{The height of the plot to produce in inches.}
+
+\item{cm.w}{The width of the plot to produce in centimeters.}
+
+\item{cm.h}{The height of the plot to produce in centimeters.}
+
+\item{resolution}{The resolution of the plot to produce expressed as multiple of 96 ppi.}
+
+\item{print.high}{Whether to actually turn 3x into 6x (high, 576 ppi) resolution.}
+}
 \description{
 The function graphWH takes information about the desired graph size (in
 inches or centemeters), the desired output resolution of 1x, 2x, 3x from a

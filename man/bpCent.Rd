@@ -2,10 +2,7 @@
 % Please edit documentation in R/commonutils.R
 \name{bpCent}
 \alias{bpCent}
-\title{Biplot of a Cluster Analysis Function
-The bpCent function is from Dan Putler's BCA package, and is included here to avoid
-the need of loading the Rcmdr package (with its GUI). The function creates a biplot
-of a cluster analysis solution.}
+\title{Biplot of a Cluster Analysis Function}
 \usage{
 bpCent(pc, clsAsgn, data.pts = TRUE, centroids = TRUE, choices = 1:2,
   scale = 1, pc.biplot = FALSE, var.axes = TRUE, col = palette()[1:2],
@@ -50,9 +47,28 @@ length two.}
 
 \item{xlabs}{A vector of character strings to label the first set of points:
 the default is to use the row dimname of x, or 1:n is the dimname is NULL.}
+
+\item{ylabs}{A vector of character strings to label the second set of points: the default is to use the row dimname of y, or 1:n is the dimname is NULL.}
+
+\item{expand}{An expansion factor to apply when plotting the second set of points relative to the first. This can be used to tweak the scaling of the two sets to a physically comparable scale.}
+
+\item{xlim}{Limits for the x axis in the units of the first set of variables.}
+
+\item{ylim}{Limits for the y axis in the units of the first set of variables.}
+
+\item{arrow.len}{The length of the arrow heads on the axes plotted in var.axes is true. The arrow head can be suppressed by arrow.len = 0.}
+
+\item{main}{graphical parameter}
+
+\item{sub}{graphical parameter}
+
+\item{xlab}{graphical parameter}
+
+\item{ylab}{graphical parameter}
+
+\item{...}{graphical parameters}
 }
 \description{
-Biplot of a Cluster Analysis Function
 The bpCent function is from Dan Putler's BCA package, and is included here to avoid
 the need of loading the Rcmdr package (with its GUI). The function creates a biplot
 of a cluster analysis solution.

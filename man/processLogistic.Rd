@@ -2,12 +2,22 @@
 % Please edit documentation in R/logisticregutils.R
 \name{processLogisticOSR}
 \alias{processLogisticOSR}
+\alias{processLogisticXDF}
 \title{Process Inputs}
 \usage{
 processLogisticOSR(inputs, config)
+
+processLogisticXDF(inputs, config)
+}
+\arguments{
+\item{inputs}{input data streams to the tool.}
+
+\item{config}{configuration parameters passed to the tool.}
 }
 \description{
 These two function take `inputs` and `config` and return the model object
 along with other elements essential to create the reports and plots
+
+Process inputs for XDF
 }
 

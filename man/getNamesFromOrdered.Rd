@@ -7,9 +7,9 @@
 getNamesFromOrdered(names, use_weights)
 }
 \arguments{
-\item{use_weights}{boolean for whether weights are in data}
+\item{names}{vector of names for data}
 
-\item{data_names}{vector of names for data}
+\item{use_weights}{boolean for whether weights are in data}
 }
 \value{
 list of x, y, and weights with respective names
