@@ -208,7 +208,7 @@ getYlevels.earth <- function(x, ...) {
 #' @export
 getYlevels.svm <- function(x, ...){
   if (x$type <= 2){
-    x$levels
+    x$levels[x$labels]
   } else {
     NULL
   }
