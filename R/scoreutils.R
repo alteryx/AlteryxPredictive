@@ -245,18 +245,10 @@ predProb.gbm <- function(x, new.data) {
   }
   pred <- predict(x, newdata = new.data, type = "response", n.trees = x$best.trees)
   if (class(pred) == "array") {
-    pred <- as.matrix(pred[,,1])
+    pred1 <- pred[,,1]
+    if (inherits(pred1, 'numeric')) pred1 <- t(as.matrix(pred1))
   }
-  if (is.matrix(pred) || is.data.frame(pred)) {
-    if (ncol(pred) == 1) {
-      out_pred <- cbind(1 - pred, pred)
-    } else {
-      out_pred <- pred
-    }
-  } else {
-    out_pred <- cbind(1 - pred, pred)
-  }
-  out_pred
+  as.data.frame(pred1)
 }
 
 predProb.glm <- function(x, new.data) {
