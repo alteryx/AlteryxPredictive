@@ -134,5 +134,5 @@ getResultsDecisionTree <- function(inputs, config) {
 
 runDecisionTree <- function(inputs, config){
   results <- getResultsDecisionTree(inputs, config)
-  writeOutputs(results)
+  writeOutputs(results, config)
 }
