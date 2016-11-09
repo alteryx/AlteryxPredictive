@@ -1,10 +1,21 @@
+#' General S3 Method for Validating config
 #' Error checking pre-model
 #' Does not return anything - just throws errror
 #'
 #' @param config list of config options
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
-checkValidConfigOSR <- function(config, the.data, names) {
+checkValidConfig <- function(config, the.data, names) {
+  UseMethod("checkValidConfig", config)
+}
+
+#' Error checking pre-model
+#' Does not return anything - just throws errror
+#'
+#' @param config list of config options
+#' @param the.data incoming data
+#' @param names list of x, y, w names for data
+checkValidConfig.OSR <- function(config, the.data, names) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   target <- the.data[[names$y]]
@@ -23,7 +34,7 @@ checkValidConfigOSR <- function(config, the.data, names) {
 #' @param config list of config options
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
-checkValidConfigXDF <- function(config, the.data, names) {
+checkValidConfig.XDF <- function(config, the.data, names) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   target <- the.data[[names$y]]
