@@ -144,7 +144,9 @@ adjustCP <- function(model, config) {
 processDT <- function(inputs, config) {
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
   the.data <- inputs$the.data
-  checkValidConfig(config, the.data, var_names, inputs$XDFInfo$is_XDF)
+  class(config) <- if(inputs$XDFInfo$is_XDF) c("XDF", class(config)) else c("OSR", class(config))
+
+  checkValidConfig(config, the.data, var_names)
 
   params <- createDTParams(config, var_names, inputs$XDFInfo)
   f_string <- if (inputs$XDFInfo$is_XDF) 'rxDTree' else 'rpart'
