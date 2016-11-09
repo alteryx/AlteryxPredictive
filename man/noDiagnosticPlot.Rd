@@ -6,6 +6,9 @@
 \usage{
 noDiagnosticPlot(msg)
 }
+\arguments{
+\item{msg}{message to accompany plot.}
+}
 \description{
 Function to create empty plot with a message
 }

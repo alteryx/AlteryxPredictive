@@ -24,11 +24,10 @@ exp_logistic_model <- glm(
 )
 
 test_that("admission data with logit link returns correct coefficients", {
+  skip_if_not_installed('RevoScaleR')
   result <- AlteryxPredictive:::runLogisticRegression(inputs, config)
   expect_equal(
     result$Object[[1]]$coefficients,
     exp_logistic_model$coefficients
   )
 })
-
-d <- AlteryxPredictive:::runLogisticRegression(inputs, config)

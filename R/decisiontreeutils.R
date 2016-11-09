@@ -27,7 +27,7 @@ checkValidConfig <- function(config, the.data, names, is_XDF) {
 #' Creation of components for model object evaluation
 #'
 #' @param config list of config options
-#' @param data list of datastream inputs
+#' @param names list of variable names (x, y and w)
 #' @param xdf_properties list of xdf details (is_XDF and xdf_path elements)
 #' @return list with components needed to create model
 createDTParams <- function(config, names, xdf_properties) {
@@ -107,18 +107,18 @@ adjustCP <- function(model, config) {
 
 #' Process DT model
 #'
-#' @param config list of configuration options
-#' @param data list of datastream objects
-#' @import rpart rpart.plot
+#' @param inputs input data streams to the tool
+#' @param config configuration passed to the tool
 #' @return list of results or results
+#' @import rpart rpart.plot
 #' @export
 processDT <- function(inputs, config) {
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
   the.data <- inputs$the.data
-  checkValidConfig(config, the.data, var_names, inputs$XDFinfo$is_XDF)
+  checkValidConfig(config, the.data, var_names, inputs$XDFInfo$is_XDF)
 
-  params <- createDTParams(config, var_names, inputs$XDFinfo)
-  f_string <- if (inputs$XDFinfo$is_XDF) 'rxDTree' else 'rpart'
+  params <- createDTParams(config, var_names, inputs$XDFInfo)
+  f_string <- if (inputs$XDFInfo$is_XDF) 'rxDTree' else 'rpart'
 
   args <- convertDTParamsToArgs(params, f_string)
   model <- do.call(f_string, args)
@@ -132,6 +132,7 @@ processDT <- function(inputs, config) {
 #'
 #' @param model model object
 #' @param config list of config options
+#' @param names names of variables (x, y and w)
 #' @param is_XDF boolean of whether model is XDF
 #' @return dataframe of piped results
 #' @importFrom magrittr %>% extract
@@ -139,19 +140,19 @@ createReportDT <- function(model, config, names, is_XDF) {
   # The output: Start with the pruning table (have rxDTree objects add rpart
   # inheritance for printing and plotting purposes).
   if (is_XDF) {
-    model_rpart <- rxAddInheritance(model)
-    printcp(model_rpart)
-    out <- capture.output(printcp(model_rpart))
-    model$xlevels <- do.call(match.fun("xdfLevels"),
-      list(paste0("~ ", paste(names$x, collapse = " + ")), xdf_path))
-    if (is.factor(target)) {
-      target_info <- do.call(match.fun("rxSummary"),
-        list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
-      if(length(target_info) == 1) {
-        model$yinfo <- list(
-          levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
-      }
-    }
+    # model_rpart <- rxAddInheritance(model)
+    # printcp(model_rpart)
+    # out <- capture.output(printcp(model_rpart))
+    # model$xlevels <- do.call(match.fun("xdfLevels"),
+    #   list(paste0("~ ", paste(names$x, collapse = " + ")), xdf_path))
+    # if (is.factor(target)) {
+    #   target_info <- do.call(match.fun("rxSummary"),
+    #     list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
+    #   if(length(target_info) == 1) {
+    #     model$yinfo <- list(
+    #       levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
+    #   }
+    # }
   } else {
     out <- capture.output(printcp(model))
   }
@@ -172,7 +173,8 @@ createReportDT <- function(model, config, names, is_XDF) {
     gsub("\\s+", "|", .) %>%
     data.frame(grp = "Prune", out = ., stringsAsFactors = FALSE)
 
-  model <- if (is_XDF) model_rpart else model
+  # Uncomment after fixing XDF code.
+  # model <- if (is_XDF) model_rpart else model
 
   leaves <- capture.output(model) %>%
     extract(grep("^node", .):length(.)) %>%

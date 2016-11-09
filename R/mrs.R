@@ -1,16 +1,24 @@
-# Supporting Macros for Working with Microsoft R Server
-# The function mrsLevels gets the names of potential factors in a table
-# Note 1: Applying names() to the returned mrsLevels objects, the names
-# of the factor variable can be determined.
-# Note 2: The set of factor variables altered in subsequent steps can be
-# addressed by using an approach such as
-# mrs_levels[names(mrs_levels) %in% desired_factor_names]
+#' Get MRS levels
+#'
+#' Get the names of potential factors in a table
+#' Note 1: Applying names() to the returned mrsLevels objects, the names of the
+#' factor variable can be determined.
+#' Note 2: The set of factor variables altered in subsequent steps can be
+#' addressed by using an approach such as
+#' mrs_levels[names(mrs_levels) %in% desired_factor_names]
+#'
+#' @param data  data
+#' @param loc_tmp loc_tmp
+#' @param rem_tmp rem_tmp
+#' @param rem_R rem_R
+#' @export
+#' @author Dan Putler
 mrsLevels <- function(data, loc_tmp, rem_tmp = NULL, rem_R = NULL) {
   con_string <- data@connectionString
   context <- unlist(strsplit(unlist(strsplit(con_string, ";"))[1], "DRIVER="))[2]
   if (context == "Teradata") {
     if(is.null(rem_tmp) || is.null(rem_R)) {
-      stop.Alteryx("Not all of the information about the Teradata platform has not be provided.")
+      stop.Alteryx2("Not all of the information about the Teradata platform has not be provided.")
     }
     cc <- RevoScaleR::RxInTeradata(connectionString = con_string, shareDir = loc_tmp, remoteShareDir = rem_tmp, revoPath = rem_R, wait = TRUE)
   } else {
@@ -24,18 +32,27 @@ mrsLevels <- function(data, loc_tmp, rem_tmp = NULL, rem_R = NULL) {
   the_levels
 }
 
-# The function mrsReorderedLevels takes the original factor levels in a
-# mrsLevels object and reorders them using an alpha sort on the level
-# labels
+#' Reorder MRS Labels
+#'
+#' Take the original factor levels in a mrsLevels object and reorder them
+#' using an alpha sort on the level labels.
+#'
+#' @param lev_obj mrs levels object
+#' @export
+#' @author Dan Putler
 mrsReorderedLevels <- function(lev_obj) {
   if (class(lev_obj) != "mrsLevels")
     stop("The provided argument is not a mrsLevels class object")
   lapply(lev_obj, function(x) x <- x[order(x)])
 }
 
-# The function mrsReorderFactors creates the appropriate information for
-# the colInfo arguments of RxSqlServerData and RxTeradata to get factor
-# levels in alpha order
+#' Create the appropriate information for the \code{colInfo} arguments of
+#' \code{RxSqlServerData} and \code{RxTeradata} to get factor
+#' levels in alpha order
+#'
+#' @inheritParams mrsLevels
+#' @export
+#' @author Dan Putler
 mrsReorderFactors <- function(data, loc_tmp, rem_tmp, rem_R) {
   the_levels <- mrsReorderedLevels(mrsLevels(data, loc_tmp, rem_tmp, rem_R))
   col_info <- list()
@@ -47,10 +64,20 @@ mrsReorderFactors <- function(data, loc_tmp, rem_tmp, rem_R) {
   col_info
 }
 
-# The function mrsDataObj takes the variables to be used in an analysis
-# along with information about the table and the platform (SQL Server or
-# Teradata) and then creates a data source object with alpha sorted
-# factor levels
+#' Create MRS data object
+#'
+#' Take the variables to be used in an analysis along with information about the
+#' table and the platform (SQL Server or Teradata) and then creates a data source
+#' object with alpha sorted factor levels.
+#'
+#' @param con_string  connection string
+#' @param table table
+#' @param fields fields
+#' @param loc_tmp loc_tmp
+#' @param rem_tmp rem_tmp
+#' @param rem_R rem_R
+#' @export
+#' @author Dan Putler
 mrsDataObj <- function(con_string, table, fields, loc_tmp, rem_tmp, rem_R) {
   context <- unlist(strsplit(unlist(strsplit(con_string, ";"))[1], "DRIVER="))[2]
   if (context == "Teradata") {
@@ -67,8 +94,14 @@ mrsDataObj <- function(con_string, table, fields, loc_tmp, rem_tmp, rem_R) {
   data_obj
 }
 
-# The function mrsGetXLevels determines the levels of any predictor variables
-# that are factors based on information in an object created by mrsDataObj
+#' Get MRS levels.
+#'
+#' Determine the levels of any predictor variables that are factors based on
+#' information in an object created by mrsDataObj
+#' @param data  data
+#' @param fields fields
+#' @export
+#' @author Dan Putler
 mrsGetXYLevels <- function(data, fields) {
   col_info <- data@colInfo
   out_list <- list()
@@ -87,9 +120,14 @@ mrsGetXYLevels <- function(data, fields) {
   out_list
 }
 
-# mrsTemp determines if an appropriate temporary directory for MRS related
-# work is present on the user's machine, creates one if not, and returns the
-# path to the directory
+#' Create a temp directory for MRS related work
+#'
+#' \code{mrsTemp} determines if an appropriate temporary directory for MRS related
+#' work is present on the user's machine, creates one if not, and returns the
+#' path to the directory
+#'
+#' @export
+#' @author Dan Putler
 mrsTemp <- function() {
   alteryx_temp <- getwd()
   dir_parts <- unlist(strsplit(alteryx_temp, "/"))
@@ -101,12 +139,19 @@ mrsTemp <- function() {
   mrs_temp
 }
 
-# mrsCorrectLevels examines the levels of relevant factors in new data and makes
-# them conform to the levels of the relevant factors on which the model is
-# based. This means placing unknown levels after known levels for factors that
-# have unknown levels in the new data, or adding missing factor levels and
-# sorting the levels for factors that have levels that are not present in the
-# new data
+#' Correct MRS levels.
+#'
+#' Examine the levels of relevant factors in new data and make
+#' them conform to the levels of the relevant factors on which the model is
+#' based. This means placing unknown levels after known levels for factors that
+#' have unknown levels in the new data, or adding missing factor levels and
+#' sorting the levels for factors that have levels that are not present in the
+#' new data
+#'
+#' @param e.lev existing data levels
+#' @param nd.lev new data levels
+#' @export
+#' @author Dan Putler
 mrsCorrectLevels <- function(e.lev, nd.lev) {
   out_list <- list()
   for (i in names(e.lev)) {
@@ -133,9 +178,15 @@ mrsCorrectLevels <- function(e.lev, nd.lev) {
   out_list
 }
 
-# mrsLevels2ColInfo takes the xlevels element of a predictive model object and
-# converts into a structrue that is correct as the colInfo argument to a MRS
-# in-platform data object
+#' Extract column info from MRS levels.
+#'
+#' Take the xlevels element of a predictive model object and convert into a
+#' structrue that is correct as the \code{colInfo} argument to a MRS
+#' in-platform data object
+#'
+#' @param levels x levels of MRS data object
+#' @export
+#' @author Dan Putler
 mrsLevels2ColInfo <- function(levels) {
   col_info <- list()
   for (i in names(levels)) {

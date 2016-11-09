@@ -3,6 +3,9 @@
 #' These two function take `inputs` and `config` and return the model object
 #' along with other elements essential to create the reports and plots
 #'
+#' @param inputs input data streams to the tool.
+#' @param config configuration parameters passed to the tool.
+#' @rdname processLogistic
 #' @export
 processLogisticOSR <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config[['Use Weights']])
@@ -11,7 +14,7 @@ processLogisticOSR <- function(inputs, config){
   ylevels <- levels(inputs$the.data[[1]])
   num_levels <- length(unique(ylevels))
   if (num_levels != 2) {
-    stop.Alteryx("The target variable must only have two unique values.")
+    stop.Alteryx2("The target variable must only have two unique values.")
   }
 
   the.formula <- makeFormula(var_names$x, var_names$y)
@@ -20,12 +23,12 @@ processLogisticOSR <- function(inputs, config){
   if (config[['Use Weights']]) {
     # Adjust the set of field names to remove the weight field
     # if weights are used
-    library(survey)
+    requireNamespace("survey")
     model_type <- "quasibinomial"
-    the.design <- svydesign(
+    the.design <- survey::svydesign(
       ids = ~1, weights = makeFormula(var_names$w, ""), data = the.data
     )
-    the.model <- svyglm(the.formula, family = quasibinomial(config$Link),
+    the.model <- survey::svyglm(the.formula, family = quasibinomial(config$Link),
       design = the.design)
   } else {
     model_type <- "binomial"
@@ -36,6 +39,8 @@ processLogisticOSR <- function(inputs, config){
 
 #' Process inputs for XDF
 #'
+#' @inheritParams processLogisticOSR
+#' @rdname processLogistic
 #' @export
 processLogisticXDF <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config[['Use Weights']])
@@ -81,6 +86,9 @@ processLogisticXDF <- function(inputs, config){
 #' key-value table. Its creation will be surpressed if the car package isn't
 #' present, if their were singularities in estimation, or if the input is an
 #' XDF file.
+#' @param the.model model object
+#' @param config tool configuration
+#' @param model_type class of model
 #' @export
 createReportLogisticOSR <- function(the.model, config, model_type) {
   glm.out1 <- Alteryx.ReportGLM(the.model)
@@ -96,8 +104,14 @@ createReportLogisticOSR <- function(the.model, config, model_type) {
   glm.out
 }
 
+#' Create report for logistic regression run on XDF
+#'
+#'
+#' @param the.model model object
+#' @param config tool configuration
+#' @param null.model null model created
 #' @export
-createReportLogisticXDF <- function(the.model, config, null.model, nOutput = 2) {
+createReportLogisticXDF <- function(the.model, config, null.model) {
   glm.out <- AlteryxReportRx(the.model, null.model$deviance)
   glm.out <- rbind(c("Model_Name", config[['Model Name']]), glm.out)
   glm.out <- rbind(glm.out, c("Model_Type", "binomial"))
@@ -111,6 +125,9 @@ createReportLogisticXDF <- function(the.model, config, null.model, nOutput = 2) 
 #' and their isn't the combination of singularities and the use of
 #' sampling weights.
 #'
+#' @param the.model model object
+#' @param singular is the model singular
+#' @param config configuration passed to the tool
 #' @export
 createPlotOutputsLogisticOSR <- function(the.model, singular, config){
   if (!(singular && config[['Use Weights']])) {
@@ -129,6 +146,8 @@ createPlotOutputsLogisticXDF <- function(){
 }
 
 #' Function to create empty plot with a message
+#'
+#' @param msg message to accompany plot.
 noDiagnosticPlot <- function(msg){
   plot(x = c(0,1), y = c(0,1), type = "n", main = "Plot not available",
     xlab = "", ylab = "", xaxt = "n", yaxt = "n"

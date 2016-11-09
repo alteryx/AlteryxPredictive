@@ -7,9 +7,9 @@
 getXdfLevels(formula, xdf)
 }
 \arguments{
-\item{xdf}{path to xdf file}
+\item{formula}{R formula}
 
-\item{form}{R formula}
+\item{xdf}{path to xdf file}
 }
 \value{
 names of levels - vector

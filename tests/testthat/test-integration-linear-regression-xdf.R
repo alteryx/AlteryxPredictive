@@ -18,6 +18,7 @@ inputs <- list(
 )
 
 test_that('linear regression works correctly on mtcars', {
+  skip_if_not_installed('RevoScaleR')
   results <- AlteryxPredictive:::runLinearRegression(inputs, config)
   exp_model <- lm(mpg ~ ., data = mtcars)
   expect_equal(

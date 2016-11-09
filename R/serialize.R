@@ -5,11 +5,8 @@
 #'
 #' @param the.object object to serialize
 #' @author Rob Bryan
-#' @export
 serializeObject <- function(the.object){
-  if (inherits(the.object,"Spatial")){
-    return(rgeos::writeWKT(the.object))
-  } else if (class(the.object) == "data.frame" && length(the.object) == 2 && the.object[[1]] == "POINT EMPTY" && the.object[[2]] == "SpatialIsNull"){
+  if (class(the.object) == "data.frame" && length(the.object) == 2 && the.object[[1]] == "POINT EMPTY" && the.object[[2]] == "SpatialIsNull"){
     return (as.character(the.object[[1]]))
   } else {
     return(rawToChar(serialize(the.object, connection = NULL, ascii = TRUE)))
@@ -25,17 +22,9 @@ serializeObject <- function(the.object){
 #'
 #' @param the.string string to unserialize
 #' @author Rob Bryan
-#' @export
 unserializeObject <- function(the.string){
-  if (identical(substr(the.string,1,2),"A\n"))
-    return(unserialize(charToRaw(as.character(the.string))) )
-  else{
-    tryCatch({
-      return(rgeos::readWKT(as.character(the.string)) )
-    }, error = function(err) {
-      AlteryxRDataX::AlteryxMessage("An empty or invalid spatial object was found.  Consider filtering them out if you are using Spatial Statistics.", 2, 3)
-      return( data.frame(cbind(the.string, "SpatialIsNull")))
-    })
+  if (identical(substr(the.string,1,2),"A\n")){
+    return(unserialize(charToRaw(as.character(the.string))))
   }
 }
 
@@ -51,7 +40,7 @@ checkModelObjects <- function(name, default){
   if(identical(names.field, c("Name", "Object"))) {
     invisible()
   } else {
-    stop.Alteryx("The input stream does not appear to be an R model object.")
+    stop.Alteryx2("The input stream does not appear to be an R model object.")
   }
 }
 

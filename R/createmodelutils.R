@@ -1,7 +1,7 @@
 #' Get names list for x, y, and weights
 #'
+#' @param names vector of names for data
 #' @param use_weights boolean for whether weights are in data
-#' @param data_names vector of names for data
 #' @return list of x, y, and weights with respective names
 #' @export
 getNamesFromOrdered <- function(names, use_weights) {

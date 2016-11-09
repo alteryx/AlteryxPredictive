@@ -2,9 +2,17 @@
 % Please edit documentation in R/linearregutils.R
 \name{createReportLinearOSR}
 \alias{createReportLinearOSR}
+\alias{createReportLinearXDF}
 \title{Create Reports}
 \usage{
 createReportLinearOSR(the.model, config)
+
+createReportLinearXDF(the.model, config)
+}
+\arguments{
+\item{the.model}{model object}
+
+\item{config}{configuration passed to the tool}
 }
 \description{
 If the ANOVA table is requested then create it and add its results to the

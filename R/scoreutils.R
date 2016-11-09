@@ -9,10 +9,12 @@
 # Authors: Ramnath Vaidyanthan and Dan Putler                                  #
 ################################################################################
 ## Helper Functions ----
-# Extract predictor variables from an R model call object
+#' Extract predictor variables from an R model call object
+#'
+#' @param x model object
 #' @export
-getXVars2 <- function(x){
-  UseMethod('getXVars2')
+getXVars <- function(x){
+  UseMethod('getXVars')
 }
 
 getXVarsFromCall <- function(x){
@@ -20,7 +22,7 @@ getXVarsFromCall <- function(x){
 }
 
 #' @export
-getXVars2.default <- function(x) {
+getXVars.default <- function(x) {
   the.call <- x$call
   if(class(the.call) != "call") stop("The argument was not a call object.")
   xvars <- getXVarsFromCall(x)
@@ -36,21 +38,32 @@ getXVars2.default <- function(x) {
 }
 
 #' @export
-getXVars2.naiveBayes <- function(x) {
+getXVars.naiveBayes <- function(x) {
   x$xvars
 }
 
 #' @export
-getXVars2.svm.formula <- getXVars2.naiveBayes
+getXVars.svm.formula <- getXVars.naiveBayes
 
+#' Remove non numeric elements from a list
+#'
+#' @param ll list
 #' @export
 noZeroLevels <- function(ll){Filter(Negate(is.numeric), ll)}
 
+
+#' Remove factors with null levels from a list
+#'
+#' @param ll list of factor levels.
 #' @export
 noNullLevels <- function(ll){Filter(Negate(is.null), ll)}
 
-# matchLevels coerces the levels in new data factors to exactly match the levels
-# of factors in the original data, and is needed for Revo ScaleR models
+#' Match levels of factors in original data with new data
+#'
+#' Coerce the levels in new data factors to exactly match the levels
+#' of factors in the original data, and is needed for Revo ScaleR models
+#' @param nd new data
+#' @param ol old factor levels
 #' @export
 matchLevels <- function(nd, ol) {
   # Address the non-standard way randomForest returns xlevel values
@@ -88,7 +101,9 @@ matchLevels <- function(nd, ol) {
   nd
 }
 
-## Get X Levels ----
+#' Get X Levels from model object
+#'
+#' @param x model object
 #' @export
 getXlevels <- function(x){
   UseMethod('getXlevels')
@@ -127,7 +142,10 @@ getXlevels.gbm <- function(x){
 }
 
 
-## Get Y levels ----
+#' Get Y levels from model object
+#'
+#' @param x model object.
+#' @param ... other parameters to pass to the function.
 #' @export
 getYlevels <- function(x, ...){
   UseMethod("getYlevels")
@@ -144,7 +162,7 @@ getYlevels.randomForest.formula <- function(x, ...){
 }
 
 #' @export
-getYlevels.rpart <- function(x, new.data){
+getYlevels.rpart <- function(x, new.data, ...){
   attributes(predict(x, newdata = new.data[1, , drop = FALSE]))$dimnames[[2]]
 }
 
@@ -190,7 +208,7 @@ getYlevels.earth <- function(x, ...) {
 #' @export
 getYlevels.svm <- function(x, ...){
   if (x$type <= 2){
-    x$levels
+    x$levels[x$labels]
   } else {
     NULL
   }
@@ -227,18 +245,10 @@ predProb.gbm <- function(x, new.data) {
   }
   pred <- predict(x, newdata = new.data, type = "response", n.trees = x$best.trees)
   if (class(pred) == "array") {
-    pred <- as.matrix(pred[,,1])
+    pred1 <- pred[,,1]
+    if (inherits(pred1, 'numeric')) pred1 <- t(as.matrix(pred1))
   }
-  if (is.matrix(pred) || is.data.frame(pred)) {
-    if (ncol(pred) == 1) {
-      out_pred <- cbind(1 - pred, pred)
-    } else {
-      out_pred <- pred
-    }
-  } else {
-    out_pred <- cbind(1 - pred, pred)
-  }
-  out_pred
+  as.data.frame(pred1)
 }
 
 predProb.glm <- function(x, new.data) {

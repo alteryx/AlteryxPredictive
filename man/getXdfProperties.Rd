@@ -8,6 +8,8 @@ getXdfProperties(input_name, default = NULL)
 }
 \arguments{
 \item{input_name}{name of incoming connection}
+
+\item{default}{default xdf settings for mocking in the R console}
 }
 \value{
 list with boolean is_XDF and string xdf_path representing

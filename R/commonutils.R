@@ -115,9 +115,12 @@ plotMeans <- function (response, factor1, factor2, error.bars = c("se", "sd",
 }
 
 
-#########
-# Trim Blanks function
 
+#' Trim Blanks Function
+#'
+#' This function trims blanks from text input
+#' @param text input text that may contain blanks
+#' @export
 trim.blanks <- function(text){
   gsub("^\ *", "", gsub("\ *$", "", text))
 }
@@ -212,12 +215,15 @@ matrixPipeDelim <- function (a.matrix, round.level = 5e-07){
 	out.vec
 }
 
-# The function pStars takes a vector of p-values and (1) converts them to text
-# and formats the "top-end" to be consistent with standard R reporting of
-# p-values and (2) creates a text column of "stars" to signify significance
-# levels
-# Author: Dan Putler
-
+#' Convert p-values to text.
+#'
+#' The function pStars takes a vector of p-values and (1) converts them to text
+#' and formats the "top-end" to be consistent with standard R reporting of
+#' p-values and (2) creates a text column of "stars" to signify significance
+#' levels.
+#' @param p.val vector of pvalues.
+#' @author Dan Putler
+#' @export
 pStars <- function (p.val){
   splitFun <- function(string) {
     the.split <- unlist(strsplit(string, "e"))
@@ -256,12 +262,17 @@ pStars <- function (p.val){
 }
 
 
-# The unitScale function standardizes variables so that their values fall in
-# the inclusive unit interval. The argument (x) must be an object that is, or
-# can be coerced to be, a numeric matrix. The function returns a matrix of values
-# whose columns have been standardized to have values that fall in the inclusive
-# unit interval.
-# Author: Dan Putler
+#' Unit Scale Function
+#'
+#' The unitScale function standardizes variables so that their values fall in the
+#' inclusive unit interval. The argument (x) must be an object that is, or can be
+#' coerced to be, a numeric matrix. The function returns a matrix of values whose
+#' columns have been standardized to have values that fall in the inclusive unit
+#' interval.
+#'
+#' @param x a numeric matrix object
+#' @export
+#' @author Dan Putler
 unitScale <- function(x) {
   if (!(class(x) %in% c("matrix", "data.frame", "numeric", "integer"))) {
     stop("The function argument cannot be coerced to be a matrix")
@@ -289,9 +300,51 @@ unitScale <- function(x) {
 }
 
 
-# The bpCent function is from Dan Putler's BCA package, and is included here to
-# avoid the need of loading the Rcmdr package (with its GUI). The function
-# creates a biplot of a cluster analysis solution.
+#' Biplot of a Cluster Analysis Function
+#'
+#'
+#' The bpCent function is from Dan Putler's BCA package, and is included here to avoid
+#' the need of loading the Rcmdr package (with its GUI). The function creates a biplot
+#' of a cluster analysis solution.
+#'
+#' @param pc The prcomp object of the data used in clustering.
+#' @param clsAsgn A vector containing the cluster assignment for each record in
+#'   the clustering data.
+#' @param data.pts If TRUE the point for each record is plotted.
+#' @param centroids If TRUE the centroid for each cluster is plotted.
+#' @param choices	length 2 vector specifying the components to plot.
+#' @param scale	The variables scaled by lambda ^ scale and the observations are
+#'   scaled by lambda ^ (1-scale), where lambda are the eigen values of the
+#'   principal components solution. scale should be between 0 and 1.
+#' @param pc.biplot	If true, then lambda = 1 and the observations are are scaled
+#'   up the sqrt(n) and the variables scaled down by sqrt(n). In this case the
+#'   inner product between variables approximate covariances, and the distances
+#'   between observations approximate Mahalanobis distance. Gabriel refers to
+#'   this as a "principal component biplot".
+#' @param var.axes	If TRUE the second set of points have arrows representing
+#'   them as (unscaled) axes.
+#' @param col	A vector of length 2 giving the colours for the first and second
+#'   set of points respectively (and the corresponding axes). If a single colour
+#'   is specified it will be used for both sets. If missing the default colour
+#'   is looked for in the palette: if there it and the next colour as used,
+#'   otherwise the first two colours of the paletter are used.
+#' @param cex	The character expansion factor used for labelling the points. The
+#'   labels can be of different sizes for the two sets by supplying a vector of
+#'   length two.
+#' @param xlabs	A vector of character strings to label the first set of points:
+#'   the default is to use the row dimname of x, or 1:n is the dimname is NULL.
+#' @param ylabs A vector of character strings to label the second set of points: the default is to use the row dimname of y, or 1:n is the dimname is NULL.
+#' @param expand An expansion factor to apply when plotting the second set of points relative to the first. This can be used to tweak the scaling of the two sets to a physically comparable scale.
+#' @param xlim Limits for the x axis in the units of the first set of variables.
+#' @param ylim Limits for the y axis in the units of the first set of variables.
+#' @param arrow.len The length of the arrow heads on the axes plotted in var.axes is true. The arrow head can be suppressed by arrow.len = 0.
+#' @param main graphical parameter
+#' @param sub graphical parameter
+#' @param xlab graphical parameter
+#' @param ylab graphical parameter
+#' @param ... graphical parameters
+#' @author Dan Putler
+#' @export
 bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
   choices = 1:2, scale = 1, pc.biplot=FALSE, var.axes = TRUE, col=palette()[1:2],
   cex = rep(par("cex"), 2), xlabs = NULL, ylabs = NULL, expand=1, xlim = NULL,
@@ -385,10 +438,16 @@ bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
 }
 
 
-# The function takes a matrix and two standardization vectors and standardizes
-# the variables based on substracting the first standardization vector from the
-# appropriate columns and then dividing by the second standarization parameter.
-# Author: Dan Putler
+#' Standardize a matrix
+#'
+#' The function takes a matrix and two standardization vectors and standardizes
+#' the variables based on subtracting the first standardization vector from the
+#' appropriate columns and then dividing by the second standarization parameter.
+#' @param x matrix to standardize
+#' @param std.vec1 vector to subtract from columns
+#' @param std.vec2 vector to divide the columns
+#' @author Dan Putler
+#' @export
 standardize <- function(x, std.vec1, std.vec2) {
   # Input checking
   if (!all(names(std.vec1) == names(std.vec2)))
@@ -403,13 +462,29 @@ standardize <- function(x, std.vec1, std.vec2) {
 
 
 
-# This function calculates the Calinski-Harabas index for all solutions
-# contained in a bootFlexclust object. It does it for each Rand test paired
-# comparison, so 100 bootstrap replicates of the Rand index will result in 200
-# Calinski-Harabase index values. This code borrows from the function index.G1
-# of Marek Walesiak and Andrzej Dudek's clusterSim package in terms of
-# implementing the sum of squares components
-# Author: Dan Putler
+#' Bootstrap Replicates of the Calinski-Harabas index for Cluster Validation
+#'
+#' This function calculates the Calinski-Harabas index for all solutions
+#' contained in a bootFlexclust object. It does it for each Rand test paired
+#' comparison, so 100 bootstrap replicates of the Rand index will result in 200
+#' Calinski-Harabase index values. This code borrows from the function index.G1
+#' of Marek Walesiak and Andrzej Dudek's clusterSim package in terms of
+#' implementing the sum of squares components
+#' @param xdat A numeric matrix of the data to be clustered.
+#' @param k_vals An integer vector giving the set of clustering solutions to be
+#'   examined.
+#' @param clstr1 The cluster assignments from a bootFlexclust object for one
+#'   side of the Rand index paired comparisons.
+#' @param clstr2 The cluster assignments from a bootFlexclust object for the
+#'   other side of the Rand index paired comparisons
+#' @param cntrs1 The cluster centers from a bootFlexclust object for one side of
+#'   the bootFlexclust Rand index paired comparisons.
+#' @param cntrs2 The cluster centers from a bootFlexclust object for the other
+#'   side of the bootFlexclust Rand index paired comparisons.
+#' @param method The clustering method, one of "kmn" (K-Means), "kmd"
+#'   (K-Medians), and "neuralgas" (neural gas).
+#' @author Dan Putler
+#' @export
 bootCH <- function(xdat, k_vals, clstr1, clstr2, cntrs1, cntrs2,
   method = c("kmn", "kmd", "neuralgas")) {
   method = match.arg(method)
@@ -494,7 +569,8 @@ varImpPlot.Alteryx <- function(x, sort=TRUE, n.var=min(30, nrow(x$importance)),
 #' @param in.h the height of the plot to produce in inches.
 #' @param cm.w the width of the plot to produce in cm.
 #' @param cm.h the height of the plot to produce in cm.
-#' @param resolution the resolution of the plot to produce as a multiple of 96dpi
+#' @param graph.resolution the resolution of the plot to produce as a multiple
+#'   of 96dpi
 #' @param print.high whether to turn 3x into 6x (high, 576 dpi) resolution
 #' @author Dan Putler
 #' @export
@@ -593,6 +669,61 @@ wrapTable <- function(dframe, width = 6, first.rnames = TRUE, round.level = 0.00
   out.vec
 }
 
+#' GraphWHR Function
+#'
+#' The function graphWH takes information about the desired graph size (in
+#' inches or centemeters), the desired output resolution of 1x, 2x, 3x from a
+#' base of 96 dpi, and and (in the case of 3x) whether high (576 dpi) resolution
+#' should be used to determine the appropriate width, height, and res values to
+#' provide the AlteryxGraph device.
+#' @param inches A flag whether the to measure dimensions using inches (as opposed to centimeters).
+#' @param in.w The width of the plot to produce in inches.
+#' @param in.h The height of the plot to produce in inches.
+#' @param cm.w The width of the plot to produce in centimeters.
+#' @param cm.h The height of the plot to produce in centimeters.
+#' @param resolution The resolution of the plot to produce expressed as multiple of 96 ppi.
+#' @param print.high Whether to actually turn 3x into 6x (high, 576 ppi) resolution.
+#' @export
+#' @author Dan Putler
+graphWHR <- function(inches = c("True", "False"), in.w , in.h, cm.w = NULL,
+    cm.h = NULL, resolution = c("1x", "2x", "3x"), print.high = FALSE) {
+  # Set the dpi
+  if (resolution == "")
+    resolution <- "1x"
+  else
+    resolution <- match.arg(resolution)
+  dpi <- 96
+  if (resolution == "2x")
+    dpi <- 192
+  if (resolution == "3x" && !print.high)
+    dpi <- 288
+  if (resolution == "3x" && print.high)
+    dpi <- 576
+
+  # Set the width and height
+  if (inches == "")
+    inches <- "True"
+  else
+    inches <- match.arg(inches)
+
+  if (in.w == "")
+    in.w <- "5.50"
+  in.w <- as.numeric(in.w)
+
+  if (in.h == "")
+    in.h <- "5.75"
+  in.h <- as.numeric(in.h)
+
+  if (inches == "False") {
+    in.w <- 0.393701*as.numeric(cm.w)
+    in.h <- 0.393701*as.numeric(cm.h)
+  }
+  width = round(dpi*in.w)
+  height = round(dpi*in.h)
+  c(width, height, dpi)
+}
+
+
 #' Create a valid name for an R object
 #'
 #' The function validName takes an R object name as its argument, then and (1)
@@ -602,7 +733,7 @@ wrapTable <- function(dframe, width = 6, first.rnames = TRUE, round.level = 0.00
 #' @export
 validName <- function(name) {
   if (!is.character(name) || length(name) > 1)
-    stop.Alteryx("The name provided needs to be a character string")
+    stop.Alteryx2("The name provided needs to be a character string")
   if (name != make.names(name)) {
     old.name <- name
     name <- gsub("\\.", "\\_", make.names(name))

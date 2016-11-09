@@ -11,6 +11,8 @@ createReportDT(model, config, names, is_XDF)
 
 \item{config}{list of config options}
 
+\item{names}{names of variables (x, y and w)}
+
 \item{is_XDF}{boolean of whether model is XDF}
 }
 \value{

@@ -1,4 +1,8 @@
-writeOutputs <- function(results){
+writeOutputs <- function(results, ...) {
+  UseMethod('writeOutputs')
+}
+
+writeOutputs.GLM <- function(results, config){
   # Report
   write.Alteryx2(results$report, nOutput = 1)
 
@@ -14,8 +18,39 @@ writeOutputs <- function(results){
   write.Alteryx2(the.obj, nOutput = 3)
 }
 
+writeOutputs.DecisionTree <- function(results, config) {
+  # Report Output
+  write.Alteryx2(results$report, nOutput = 1)
+
+  # Tree Plot
+  whr <- graphWHR2(inches = config$tree.inches, in.w = config$tree.in.w,
+    in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h,
+    graph.resolution = config$tree.graph.resolution, print.high = TRUE
+  )
+  AlteryxGraph2(results$treePlot(), nOutput = 2, width = whr[1], height = whr[2],
+    res = whr[3], pointsize = config$tree.pointsize
+  )
+
+  # Model Object
+  the.obj <- prepModelForOutput(config$`Model Name`, results$model)
+  write.Alteryx2(the.obj, nOutput = 3)
+
+  # Prune Plot
+  whr <- graphWHR2(inches = config$prune.inches, in.w = config$prune.in.w,
+    in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h,
+    graph.resolution = config$prune.graph.resolution, print.high = FALSE
+  )
+  AlteryxGraph2(results$prunePlot(), nOutput = 4, width = whr[1], height = whr[2],
+    res = whr[3], pointsize = config$prune.pointsize
+  )
+
+  # Interactive Dashboard
+  AlteryxRviz::renderInComposer(results$dashboard, nOutput = 5)
+}
+
+# Logistic Regression ----
 getResultsLogisticRegression <- function(inputs, config){
-  library(car)
+  requireNamespace("car")
   # Modify the link so that it can be passed on to R.
   if (config$Link == "complementary log-log"){
     config$Link <- "cloglog"
@@ -32,15 +67,19 @@ getResultsLogisticRegression <- function(inputs, config){
       createPlotOutputsLogisticOSR(d$the.model, FALSE, config)
     }
   }
-  list(model = d$the.model, report = glm.out, plot = plot.out)
-}
-runLogisticRegression <- function(inputs, config){
-  results <- getResultsLogisticRegression(inputs, config)
-  writeOutputs(results)
+  results <- list(model = d$the.model, report = glm.out, plot = plot.out)
+  class(results) <- "GLM"
+  results
 }
 
+runLogisticRegression <- function(inputs, config){
+  results <- getResultsLogisticRegression(inputs, config)
+  writeOutputs(results, config)
+}
+
+# Linear Regression ----
 getResultsLinearRegression <- function(inputs, config){
-  library(car)
+  requireNamespace("car")
   config$`Model Name`= validName(config$`Model Name`)
   if (inputs$XDFInfo$is_XDF){
     the.model <- processLinearXDF(inputs, config)
@@ -51,15 +90,20 @@ getResultsLinearRegression <- function(inputs, config){
     lm.out <- createReportLinearOSR(the.model, config)
     plot.out <- function(){createPlotOutputsLinearOSR(the.model)}
   }
-  list(model = the.model, report = lm.out, plot = plot.out)
+
+  results <- list(model = the.model, report = lm.out, plot = plot.out)
+  class(results) <- "GLM"
+  results
 }
 
 runLinearRegression <- function(inputs, config){
   results <- getResultsLinearRegression(inputs, config)
-  writeOutputs(results)
+  writeOutputs(results, config)
 }
 
-runDecisionTree <- function(inputs, config){
+
+# Decision Tree ----
+getResultsDecisionTree <- function(inputs, config) {
   # Set the seed to get run-over-run consistency
   set.seed(1)
 
@@ -75,32 +119,20 @@ runDecisionTree <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
 
   the.model <- processDT(inputs, config)
-  the.report <- createReportDT(the.model, config, var_names, inputs$XDFinfo$is_XDF)
+  the.report <- createReportDT(the.model, config, var_names, inputs$XDFInfo$is_XDF)
   makeTreePlot <- function(){createTreePlotDT(the.model, config)}
   makePrunePlot <- function(){createPrunePlotDT(the.model)}
+  dashboard <- createDashboardDT(the.model, inputs$XDFInfo$is_XDF)
 
-  # Report Output
-  write.Alteryx2(the.report, nOutput = 1)
+  results <- list(model = the.model, report = the.report,
+    treePlot = makeTreePlot, prunePlot = makePrunePlot,
+    dashboard = dashboard
+  )
+  class(results) <- "DecisionTree"
+  results
+}
 
-  # Tree Plot
-  whr <- graphWHR2(inches = config$tree.inches, in.w = config$tree.in.w,
-    in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h,
-    graph.resolution = config$tree.graph.resolution, print.high = TRUE)
-  AlteryxGraph2(makeTreePlot(), nOutput = 2, width = whr[1], height = whr[2], res = whr[3],
-    pointsize = config$tree.pointsize)
-
-  # Model Object
-  the.obj <- prepModelForOutput(config$model.name, the.model)
-  write.Alteryx2(the.obj, nOutput = 3)
-
-  # Prune Plot
-  whr <- graphWHR2(inches = config$prune.inches, in.w = config$prune.in.w,
-    in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h,
-    graph.resolution = config$prune.graph.resolution, print.high = FALSE)
-  AlteryxGraph2(makePrunePlot(), nOutput = 4, width = whr[1], height = whr[2], res = whr[3],
-    pointsize = config$prune.pointsize)
-
-  # Interactive Dashboard
-  dashboard <- createDashboardDT(the.model, inputs$XDFinfo$is_XDF)
-  AlteryxRviz::renderInComposer(dashboard, nOutput = 5)
+runDecisionTree <- function(inputs, config){
+  results <- getResultsDecisionTree(inputs, config)
+  writeOutputs(results, config)
 }

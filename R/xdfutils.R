@@ -1,6 +1,6 @@
 #' extract levels from xdf data
 #'
-#' @param form R formula
+#' @param formula R formula
 #' @param xdf path to xdf file
 #' @return names of levels - vector
 #' @export
@@ -19,6 +19,7 @@ getXdfLevels <- function(formula, xdf) {
 #' extract xdf properties from incoming xdf data
 #'
 #' @param input_name name of incoming connection
+#' @param default default xdf settings for mocking in the R console
 #' @return list with boolean is_XDF and string xdf_path representing
 #'  whether data is XDF and the path of the data
 #' @import rjson
