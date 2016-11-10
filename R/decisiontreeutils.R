@@ -82,16 +82,12 @@ createDTParams <- function(config, names, xdf_properties) {
   params$usesurrogate <- which(unlist(usesurrogate, use.names = F)) - 1
 
   # get max bins param
-  if(xdf_properties$is_XDF && !is.na(as.numeric(config$maxNumBins))) {
-    maxNumBins <- config$maxNumBins
-    if(maxNumBins < 2) {
-      stop.Alteryx2("The minimum bins is 2")
-    } else {
-      params$maxNumBins <- maxNumBins
-    }
-  }
+  params$maxNumBins <- config$maxNumBins
+
   params
 }
+
+
 
 #' Map parameter names for OSR and XDF
 #'
