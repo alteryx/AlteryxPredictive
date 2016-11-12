@@ -59,7 +59,7 @@ checkValidConfig.XDF <- function(config, the.data, names) {
 #' @param names list of variable names (x, y and w)
 #' @param xdf_properties list of xdf details (is_XDF and xdf_path elements)
 #' @return list with components needed to create model
-createDTParams <- function(config, names, xdf_properties) {
+createDTParams <- function(config, names) {
   # use lists to hold params for rpart and rxDTree functions
   params <- config[c('minsplit', 'minbucket', 'xval', 'maxdepth')]
   params <- modifyList(params, list(
@@ -144,7 +144,7 @@ processDT <- function(inputs, config) {
 
   checkValidConfig(config, the.data, var_names)
 
-  params <- createDTParams(config, var_names, inputs$XDFInfo)
+  params <- createDTParams(config, var_names)
   f_string <- if (inputs$XDFInfo$is_XDF) 'rxDTree' else 'rpart'
 
   args <- convertDTParamsToArgs(params, f_string)
