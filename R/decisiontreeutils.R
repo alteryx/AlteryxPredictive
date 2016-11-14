@@ -159,6 +159,7 @@ processDT <- function(inputs, config) {
 #' @param out results from printcp
 #' @return list of piped results
 #' @importFrom magrittr %>% extract
+#' @export
 getReportObjectDT <- function(model, out) {
   model_sum <- out %>%
     extract(grep("^Variable", .):grep("^n=", .)) %>%
@@ -202,7 +203,7 @@ createReportDT <- function(model, config = NULL, names = NULL, xdf_path = NULL) 
 #' @importFrom magrittr %>% extract
 createReportDT.rpart <- function(model, config, names, xdf_path) {
   out <- capture.output(printcp(model))
-  reportObj <- getReportObjDT(model, out)
+  reportObj <- getReportObjectDT(model, out)
 
   leaves <- capture.output(model) %>%
     extract(grep("^node", .):length(.)) %>%
@@ -242,7 +243,7 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
     }
   }
 
-  reportObj <- getReportObjDT(model, out)
+  reportObj <- getReportObjectDT(model, out)
 
   model <- model_rpart
 
@@ -330,7 +331,7 @@ createDashboardDT.rpart <- function(model) {
 #'
 #' @param model model object
 #' @import htmltools
-createDashboardDT.rpart <- function(model) {
+createDashboardDT.rxDTree <- function(model) {
   k1 = tags$div(tags$h4(
     "Interactive Visualizations are not supported for Revolution Enterprise"
   ))
