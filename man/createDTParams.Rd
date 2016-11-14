@@ -4,7 +4,7 @@
 \alias{createDTParams}
 \title{Creation of components for model object evaluation}
 \usage{
-createDTParams(config, names, xdf_properties)
+createDTParams(config, names)
 }
 \arguments{
 \item{config}{list of config options}

@@ -2,16 +2,16 @@
 % Please edit documentation in R/decisiontreeutils.R
 \name{createDashboardDT}
 \alias{createDashboardDT}
-\title{Create Interactive Dashboard}
+\title{Generic S3 Class
+Create Interactive Dashboard}
 \usage{
-createDashboardDT(model, is_XDF)
+createDashboardDT(model)
 }
 \arguments{
 \item{model}{model object}
-
-\item{is_XDF}{boolean of whether model is XDF}
 }
 \description{
+Generic S3 Class
 Create Interactive Dashboard
 }
 
