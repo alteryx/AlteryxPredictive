@@ -52,6 +52,15 @@ checkValidConfig.XDF <- function(config, the.data, names) {
   }
 }
 
+#' Error checking pre-model defaults to OSR
+#' Does not return anything - just throws errror
+#'
+#' @param config list of config options
+#' @param the.data incoming data
+#' @param names list of x, y, w names for data
+checkValidConfig.default <- function(config, the.data, names) {
+  checkValidConfig.OSR(config, the.data, names)
+}
 
 #' Creation of components for model object evaluation
 #'
@@ -327,11 +336,11 @@ createDashboardDT.rpart <- function(model) {
   k1
 }
 
-#' Create Interactive Dashboard for rxDTree model
+#' Create Interactive Dashboard for default model
 #'
 #' @param model model object
 #' @import htmltools
-createDashboardDT.rxDTree <- function(model) {
+createDashboardDT.default <- function(model) {
   k1 = tags$div(tags$h4(
     "Interactive Visualizations are not supported for Revolution Enterprise"
   ))
