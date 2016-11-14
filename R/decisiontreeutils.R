@@ -140,7 +140,6 @@ adjustCP <- function(model, config) {
 processDT <- function(inputs, config) {
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
   the.data <- inputs$the.data
-  class(config) <- if(inputs$XDFInfo$is_XDF) c("XDF", class(config)) else c("OSR", class(config))
 
   checkValidConfig(config, the.data, var_names)
 
@@ -154,36 +153,13 @@ processDT <- function(inputs, config) {
   adjustCP(model, config)
 }
 
-
-#' Get data for static report (grp|out pipes)
+#' Get common report objects
 #'
 #' @param model model object
-#' @param config list of config options
-#' @param names names of variables (x, y and w)
-#' @param is_XDF boolean of whether model is XDF
-#' @return dataframe of piped results
+#' @param out results from printcp
+#' @return list of piped results
 #' @importFrom magrittr %>% extract
-createReportDT <- function(model, config, names, is_XDF) {
-  # The output: Start with the pruning table (have rxDTree objects add rpart
-  # inheritance for printing and plotting purposes).
-  if (is_XDF) {
-    # model_rpart <- rxAddInheritance(model)
-    # printcp(model_rpart)
-    # out <- capture.output(printcp(model_rpart))
-    # model$xlevels <- do.call(match.fun("xdfLevels"),
-    #   list(paste0("~ ", paste(names$x, collapse = " + ")), xdf_path))
-    # if (is.factor(target)) {
-    #   target_info <- do.call(match.fun("rxSummary"),
-    #     list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
-    #   if(length(target_info) == 1) {
-    #     model$yinfo <- list(
-    #       levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
-    #   }
-    # }
-  } else {
-    out <- capture.output(printcp(model))
-  }
-
+getReportObjectDT <- function(model, out) {
   model_sum <- out %>%
     extract(grep("^Variable", .):grep("^n=", .)) %>%
     .[. != ""] %>%
@@ -200,8 +176,33 @@ createReportDT <- function(model, config, names, is_XDF) {
     gsub("\\s+", "|", .) %>%
     data.frame(grp = "Prune", out = ., stringsAsFactors = FALSE)
 
-  # Uncomment after fixing XDF code.
-  # model <- if (is_XDF) model_rpart else model
+  list(model_sum = model_sum, model_Call = model_call, prune_tbl = prune_tbl)
+}
+
+#' Generic S3 class
+#' Get data for static report (grp|out pipes)
+#'
+#' @param model model object
+#' @param config list of config options
+#' @param names names of variables (x, y and w)
+#' @param xdf_path string of xdf file location
+#' @return dataframe of piped results
+#' @importFrom magrittr %>% extract
+createReportDT <- function(model, config = NULL, names = NULL, xdf_path = NULL) {
+  UseMethod("createReportDT", model)
+}
+
+#' Get data for static report (grp|out pipes) for rpart model
+#'
+#' @param model model object
+#' @param config list of config options
+#' @param names names of variables (x, y and w)
+#' @param xdf_path string of xdf file location
+#' @return dataframe of piped results
+#' @importFrom magrittr %>% extract
+createReportDT.rpart <- function(model, config, names, xdf_path) {
+  out <- capture.output(printcp(model))
+  reportObj <- getReportObjDT(model, out)
 
   leaves <- capture.output(model) %>%
     extract(grep("^node", .):length(.)) %>%
@@ -210,11 +211,52 @@ createReportDT <- function(model, config, names, is_XDF) {
     gsub("\\s", "<nbsp/>", .) %>%
     data.frame(grp = "Leaves", out = ., stringsAsFactors = FALSE)
 
-  # Indicate that this is an object of class rpart or rxDTree
   rpart_out <- rbind(
     c("Model_Name", config$model.name),
-    model_call, model_sum, prune_tbl, leaves,
-    c("Model_Class", if (is_XDF) 'rxDTree' else 'rpart')
+    reportObj$model_call, reportObj$model_sum, reportObj$prune_tbl, reportObj$leaves,
+    c("Model_Class", 'rpart')
+  )
+  rpart_out
+}
+
+#' Get data for static report (grp|out pipes) for rxDTree model
+#'
+#' @param model model object
+#' @param config list of config options
+#' @param names names of variables (x, y and w)
+#' @param xdf_path string of xdf file location
+#' @return dataframe of piped results
+#' @importFrom magrittr %>% extract
+createReportDT.rxDTree <- function(model, config, names, xdf_path) {
+  model_rpart <- rxAddInheritance(model)
+  printcp(model_rpart)
+  out <- capture.output(printcp(model_rpart))
+  model$xlevels <- do.call(match.fun("xdfLevels"),
+                           list(paste0("~ ", paste(names$x, collapse = " + ")), xdf_path))
+  if (is.factor(target)) {
+    target_info <- do.call(match.fun("rxSummary"),
+                           list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
+    if(length(target_info) == 1) {
+      model$yinfo <- list(
+        levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
+    }
+  }
+
+  reportObj <- getReportObjDT(model, out)
+
+  model <- model_rpart
+
+  leaves <- capture.output(model) %>%
+    extract(grep("^node", .):length(.)) %>%
+    gsub(">", "&gt;", .) %>%
+    gsub("<", "&lt;", .) %>%
+    gsub("\\s", "<nbsp/>", .) %>%
+    data.frame(grp = "Leaves", out = ., stringsAsFactors = FALSE)
+
+  rpart_out <- rbind(
+    c("Model_Name", config$model.name),
+    reportObj$model_call, reportObj$model_sum, reportObj$prune_tbl, leaves,
+    c("Model_Class", 'rxDTree')
   )
   rpart_out
 }
@@ -244,42 +286,54 @@ createPrunePlotDT <- function(model){
   title(main = "Pruning Plot", line=5)
 }
 
+#' Generic S3 Class
 #' Create Interactive Dashboard
 #'
 #' @param model model object
-#' @param is_XDF boolean of whether model is XDF
 #' @import htmltools
-createDashboardDT <- function(model, is_XDF) {
+createDashboardDT <- function(model) {
+  UseMethod("createDashboardDT", model)
+}
 
-  ## Interactive Visualization
-  if (is_XDF){
-    k1 = tags$div(tags$h4(
-      "Interactive Visualizations are not supported for Revolution Enterprise"
-    ))
-    # renderInComposer(k1, nOutput = 5)
+#' Create Interactive Dashboard for rpart model
+#'
+#' @param model model object
+#' @import htmltools
+createDashboardDT.rpart <- function(model) {
+  if (!(packageVersion('AlteryxRviz') >= "0.2.5")){
+    k1 = tags$div(
+      tags$h4("You need AlteryxRviz >= 0.2.5")
+    )
   } else {
-    if (!(packageVersion('AlteryxRviz') >= "0.2.5")){
-      k1 = tags$div(
-        tags$h4("You need AlteryxRviz >= 0.2.5")
-      )
-    } else {
-      #model = rpart(Species ~ ., data = iris)
-      tooltipParams = list(
-        width = '250px',
-        top = '130px',
-        left = '100px'
-      )
-      dt = AlteryxRviz::renderTree(model, tooltipParams = tooltipParams)
-      vimp = AlteryxRviz::varImpPlot(model, height = 300)
+    #model = rpart(Species ~ ., data = iris)
+    tooltipParams = list(
+      width = '250px',
+      top = '130px',
+      left = '100px'
+    )
+    dt = AlteryxRviz::renderTree(model, tooltipParams = tooltipParams)
+    vimp = AlteryxRviz::varImpPlot(model, height = 300)
 
-      cmat = if (!is.null(model$frame$yval2)){
-        AlteryxRviz::iConfusionMatrix(AlteryxRviz::getConfMatrix(model), height = 300)
-      }  else {
-        tags$div(h1('Confusion Matrix Not Valid'), height = 300)
-      }
-
-      k1 = AlteryxRviz::dtDashboard(dt, vimp, cmat)
+    cmat = if (!is.null(model$frame$yval2)){
+      AlteryxRviz::iConfusionMatrix(AlteryxRviz::getConfMatrix(model), height = 300)
+    }  else {
+      tags$div(h1('Confusion Matrix Not Valid'), height = 300)
     }
+
+    k1 = AlteryxRviz::dtDashboard(dt, vimp, cmat)
   }
+
+  k1
+}
+
+#' Create Interactive Dashboard for rxDTree model
+#'
+#' @param model model object
+#' @import htmltools
+createDashboardDT.rpart <- function(model) {
+  k1 = tags$div(tags$h4(
+    "Interactive Visualizations are not supported for Revolution Enterprise"
+  ))
+
   k1
 }
