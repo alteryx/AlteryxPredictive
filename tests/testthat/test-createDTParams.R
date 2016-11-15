@@ -23,30 +23,33 @@ config <- list(
   maxNumBins = 4
 )
 
+class(config) <- "OSR"
+
 test_that("non XDF results give expected param list", {
   xdf_properties <- list(
     is_XDF = FALSE,
     xdf_path = ""
   )
 
-  expect_that(createDTParams(config, names, xdf_properties), is_equivalent_to(
+  expect_that(createDTParams(config, names), is_equivalent_to(
     list(
-      is_XDF = FALSE,
-      xdf_path = "",
       minsplit = 1,
       minbucket = 1,
       xval = 1,
       maxdepth = 1,
-      method = "class",
       cp = .01,
       data = quote(the.data),
       formula = formula("y ~ a + b + c"),
       weights = c("w"),
+      method = "class",
       parms = list(split = "gini"),
-      usesurrogate = 1
+      usesurrogate = 1,
+      maxNumBins = 4
     )
   ))
 })
+
+class(config) <- "XDF"
 
 test_that("XDF results give expected param list", {
   xdf_properties <- list(
@@ -54,19 +57,17 @@ test_that("XDF results give expected param list", {
     xdf_path = "xdf"
   )
 
-  expect_that(createDTParams(config, names, xdf_properties), is_equivalent_to(
+  expect_that(createDTParams(config, names), is_equivalent_to(
     list(
-      is_XDF = TRUE,
-      xdf_path = "xdf",
       minsplit = 1,
       minbucket = 1,
       xval = 1,
       maxdepth = 1,
-      method = "class",
       cp = .01,
       data = quote(the.data),
       formula = formula("y ~ a + b + c"),
       weights = c("w"),
+      method = "class",
       parms = list(split = "gini"),
       usesurrogate = 1,
       maxNumBins = 4
