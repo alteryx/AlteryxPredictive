@@ -241,7 +241,7 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
   model_rpart <- rxAddInheritance(model)
   printcp(model_rpart)
   out <- capture.output(printcp(model_rpart))
-  model$xlevels <- do.call(match.fun("xdfLevels"),
+  model$xlevels <- do.call(match.fun("getXdfLevels"),
                            list(paste0("~ ", paste(names$x, collapse = " + ")), xdf_path))
   if (is.factor(target)) {
     target_info <- do.call(match.fun("rxSummary"),
