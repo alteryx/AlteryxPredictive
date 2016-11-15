@@ -19,6 +19,12 @@ checkValidConfig.OSR <- function(config, the.data, names) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   target <- the.data[[names$y]]
+  if (is.numeric(target) && length(unique(target)) < 5) {
+    AlteryxMessage2(
+      "The target variable is numeric, however, it has 4 or fewer unique values.",
+      iType = 2, iPriority = 3)
+  }
+
   if(cp < 0 || cp > 1) {
     stop.Alteryx2("The complexity parameter must be between 0 and 1. Please try again.")
   }
@@ -37,12 +43,6 @@ checkValidConfig.OSR <- function(config, the.data, names) {
 checkValidConfig.XDF <- function(config, the.data, names) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
-  target <- the.data[[names$y]]
-  if (is.numeric(target) && length(unique(target)) < 5 && !is_XDF) {
-    AlteryxMessage2(
-      "The target variable is numeric, however, it has 4 or fewer unique values.",
-      iType = 2, iPriority = 3)
-  }
   if(cp < 0 || cp > 1) {
     stop.Alteryx2("The complexity parameter must be between 0 and 1. Please try again.")
   }
