@@ -66,7 +66,6 @@ checkValidConfig.default <- function(config, the.data, names) {
 #'
 #' @param config list of config options
 #' @param names list of variable names (x, y and w)
-#' @param xdf_properties list of xdf details (is_XDF and xdf_path elements)
 #' @return list with components needed to create model
 createDTParams <- function(config, names) {
   # use lists to hold params for rpart and rxDTree functions

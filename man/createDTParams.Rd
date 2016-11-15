@@ -10,8 +10,6 @@ createDTParams(config, names)
 \item{config}{list of config options}
 
 \item{names}{list of variable names (x, y and w)}
-
-\item{xdf_properties}{list of xdf details (is_XDF and xdf_path elements)}
 }
 \value{
 list with components needed to create model
