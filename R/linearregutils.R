@@ -66,6 +66,7 @@ processLinearXDF <- function(inputs, config){
 #' @param config configuration passed to the tool
 #' @rdname processElasticNet
 #' @export
+#' @import glmnet
 processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
   #getNamesFromOrdered returns a list with elements x (names of x variables),
@@ -73,14 +74,16 @@ processElasticNet <- function(inputs, config){
 
   # FIXME: Revisit what we pass to the weights argument.
   if (config$`Use Weight`){
-    the.model <- glmnet(x = inputs$the.data[,var_names$x], y = inputs$the.data[,var_names$y],
-                        family = "gaussian", weights = inputs$the.data[,var_names$w],
-                        alpha = config$`alpha`, intercept  = config$`Omit Constant`)
-
+    the.model <- glmnet::glmnet(x = inputs$the.data[,var_names$x],
+      y = inputs$the.data[,var_names$y], family = "gaussian",
+      weights = inputs$the.data[,var_names$w], alpha = config$`alpha`,
+      intercept  = config$`Omit Constant`
+    )
   } else {
-    the.model <- glmnet(x = inputs$the.data[,var_names$x], y = inputs$the.data[,var_names$y],
-                        family = "gaussian", alpha = config$`alpha`,
-                        intercept  = config$`Omit Constant`)
+    the.model <- glmnet(x = inputs$the.data[,var_names$x],
+      y = inputs$the.data[,var_names$y], family = "gaussian",
+      alpha = config$`alpha`, intercept  = config$`Omit Constant`
+    )
   }
   return(the.model)
 }
