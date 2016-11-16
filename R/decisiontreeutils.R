@@ -241,10 +241,10 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
   printcp(model_rpart)
   out <- capture.output(printcp(model_rpart))
   model$xlevels <- do.call(match.fun("getXdfLevels"),
-                           list(paste0("~ ", paste(names$x, collapse = " + ")), xdf_path))
+                           list(formula = as.formula(paste0("~ ", paste(names$x, collapse = " + "))), xdf = xdf_path))
   if (is.factor(target)) {
     target_info <- do.call(match.fun("rxSummary"),
-                           list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
+                           list(formula = as.formula(paste0("~ ", names$y)), data = xdf_path))[["categorical"]]
     if(length(target_info) == 1) {
       model$yinfo <- list(
         levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
