@@ -7,7 +7,8 @@ config <- list(
   `Use Weights` = FALSE,
   `Weight Vec` = NULL,
   `X Vars` = c('disp', 'hp', 'drat', 'wt', 'qsec'),
-  `Y Var` = 'mpg'
+  `Y Var` = 'mpg',
+  regularization = FALSE
 )
 
 inputs <- list(
