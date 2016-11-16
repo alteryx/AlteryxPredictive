@@ -6,16 +6,16 @@ config <- list(
   `Omit Constant` = FALSE,
   `Use Weights` = FALSE,
   `Weight Vec` = NULL,
-  `X Vars` = names(mtcars)[-1],
+  `X Vars` = c('disp', 'hp', 'drat', 'wt', 'qsec'),
   `Y Var` = 'mpg'
 )
 
 inputs <- list(
-  the.data = mtcars,
+  the.data = mtcars[,c(config$`Y Var`, config$`X Vars`)],
   XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
 )
 
-exp_model <- lm(mpg ~ ., data = mtcars)
+exp_model <- lm(mpg ~ ., data = inputs$the.data)
 test_that('linear regression works correctly on mtcars', {
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs, config)
   expect_equal(results$model$coefficients, exp_model$coefficients)
@@ -28,8 +28,8 @@ coef_dframe <- data.frame(
 )
 
 
-testDir = '~/Desktop/SNIPPETS/dev/Predictive_Refresh/Linear_Regression/Extras/Tests/'
-comment = 'This workflow tests that mtcars data returns correct coefficients'
+# testDir = '~/Desktop/SNIPPETS/dev/Predictive_Tools/Linear_Regression/Extras/Tests/'
+# comment = 'This workflow tests that mtcars data returns correct coefficients'
 # AlteryxRhelper::makeWorkflow2(
 #   template = file.path(testDir, "SampleTest.yxmd"),
 #   repl = list(

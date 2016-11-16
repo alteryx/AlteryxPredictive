@@ -38,7 +38,7 @@ coef_dframe <- data.frame(
   Coefficient = format(coefs, digits = 5)
 )
 
-testDir = '~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests'
+testDir = '~/Desktop/SNIPPETS/dev/Predictive_Tools/Logistic_Regression/Extras/Tests'
 comment = 'This workflow tests that apiclus data with weights returns corrects coefficients.'
 # AlteryxRhelper::makeWorkflow2(
 #   template = file.path(testDir, "SampleTest.yxmd"),

@@ -6,7 +6,7 @@ config <- list(
   `Model Name` = 'Basic_Logistic_Regression',
   `Use Weights` = FALSE,
   `Weight Vec` = NULL,
-  `X Vars` = c('gre', 'gpa', 'rank'),
+  `X Vars` = c('gre', 'gpa'),
   `Y Var` = 'admit'
 )
 
@@ -18,7 +18,7 @@ inputs <- list(
 
 #' ### Run and Create Outputs
 exp_logistic_model <- glm(
-  admit ~ gre + gpa + rank, data = AlteryxPredictive::admission,
+  admit ~ gre + gpa, data = AlteryxPredictive::admission,
   family = binomial(logit)
 )
 coefs2dframe <- function(mod){
@@ -39,14 +39,14 @@ test_that("admission data with logit link returns correct coefficients", {
 })
 
 
-testDir = '~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests'
+testDir = '~/Desktop/SNIPPETS/dev/Predictive_Tools/Logistic_Regression/Extras/Tests'
 comment = 'This workflow tests that admission data with logit link returns correct coefficients'
 # AlteryxRhelper::makeWorkflow2(
 #   template = file.path(testDir, "SampleTest.yxmd"),
 #   repl = list(
 #     list(node = 2, data = inputs$the.data, type = 'input'),
 #     list(node = 8, data = config, type = 'config'),
-#     list(node = 15, data = coef_dframe, type = 'input'),
+#     list(node = 15, data = coefs_dframe, type = 'input'),
 #     list(node = 17, data = comment, type = 'text'),
 #     list(node = 16, data = 'Logistic Regression Test', type = 'text')
 #   ),
