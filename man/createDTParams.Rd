@@ -4,14 +4,12 @@
 \alias{createDTParams}
 \title{Creation of components for model object evaluation}
 \usage{
-createDTParams(config, names, xdf_properties)
+createDTParams(config, names)
 }
 \arguments{
 \item{config}{list of config options}
 
 \item{names}{list of variable names (x, y and w)}
-
-\item{xdf_properties}{list of xdf details (is_XDF and xdf_path elements)}
 }
 \value{
 list with components needed to create model
