@@ -224,10 +224,11 @@ createReportDT.rpart <- function(model, config, names, xdf_path) {
 
   rpart_out <- rbind(
     c("Model_Name", config$model.name),
-    reportObj$model_call, reportObj$model_sum, reportObj$prune_tbl, reportObj$leaves,
+    reportObj$model_call, reportObj$model_sum, reportObj$prune_tbl, leaves,
     c("Model_Class", 'rpart')
   )
-  rpart_out
+
+  list(out = rpart_out, model = model)
 }
 
 #' Get data for static report (grp|out pipes) for rxDTree model
@@ -247,7 +248,7 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
   model$xlevels <- do.call(match.fun("getXdfLevels"),
                            list(formula = as.formula(paste0("~ ", paste(names$x, collapse = " + "))), xdf = xdf_path))
 
-  target_all_data <- RevoScaleR::rxSummary(makeFormula(var_names$y, ""), data = xdf_path)
+  target_all_data <- RevoScaleR::rxSummary(makeFormula(names$y, ""), data = xdf_path)
   if (target_all_data$categorical.type == "none") {
     target_info <- target_all_data$categorical
     if(length(target_info) == 1) {
@@ -256,22 +257,20 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
     }
   }
 
-  reportObj <- getReportObjectDT(model, out)
-  model <- model_rpart
-
-  leaves <- capture.output(model) %>%
+  leaves <- capture.output(model_rpart) %>%
     extract(grep("^node", .):length(.)) %>%
     gsub(">", "&gt;", .) %>%
     gsub("<", "&lt;", .) %>%
     gsub("\\s", "<nbsp/>", .) %>%
     data.frame(grp = "Leaves", out = ., stringsAsFactors = FALSE)
 
+  reportObj <- getReportObjectDT(model, out)
   rpart_out <- rbind(
     c("Model_Name", config$model.name),
     reportObj$model_call, reportObj$model_sum, reportObj$prune_tbl, leaves,
     c("Model_Class", 'rxDTree')
   )
-  rpart_out
+  list(out = rpart_out, model = model, model_rpart = model_rpart)
 }
 
 #' Create Tree Plot
