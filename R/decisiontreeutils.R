@@ -174,18 +174,12 @@ getReportObjectDT <- function(model, out) {
     .[. != ""] %>%
     data.frame(grp = "Model_Sum", out = ., stringsAsFactors = FALSE)
 
-  model_call <- out %>%
-    extract(grep("^r", .):(grep("^Variable", .) - 1)) %>%
-    .[. != ""] %>%
-    paste(collapse = "") %>%
-    data.frame(grp = "Call", out = ., stringsAsFactors = FALSE)
-
   prune_tbl <- out %>%
     extract((grep("^\\s*CP", .) + 1):length(.)) %>%
     gsub("\\s+", "|", .) %>%
     data.frame(grp = "Prune", out = ., stringsAsFactors = FALSE)
 
-  list(model_sum = model_sum, model_Call = model_call, prune_tbl = prune_tbl)
+  list(model_sum = model_sum, prune_tbl = prune_tbl)
 }
 
 #' Generic S3 class
@@ -220,9 +214,13 @@ createReportDT.rpart <- function(model, config, names, xdf_path) {
     gsub("\\s", "<nbsp/>", .) %>%
     data.frame(grp = "Leaves", out = ., stringsAsFactors = FALSE)
 
+  call <- capture.output(model$call) %>%
+    paste(., collapse = "") %>%
+    data.frame(grp = "Call", out = ., stringsAsFactors = FALSE)
+
   rpart_out <- rbind(
     c("Model_Name", config$model.name),
-    reportObj$model_call, reportObj$model_sum, reportObj$prune_tbl, reportObj$leaves,
+    call, reportObj$model_sum, reportObj$prune_tbl, reportObj$leaves,
     c("Model_Class", 'rpart')
   )
   rpart_out
@@ -241,7 +239,10 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
   printcp(model_rpart)
   out <- capture.output(printcp(model_rpart))
   model$xlevels <- do.call(match.fun("getXdfLevels"),
-                           list(paste0("~ ", paste(names$x, collapse = " + ")), xdf_path))
+                           list(paste0("~ ", paste(names$x, collapse = " + ")),
+                                xdf_path
+                                )
+                           )
   if (is.factor(target)) {
     target_info <- do.call(match.fun("rxSummary"),
                            list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
@@ -255,6 +256,11 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
 
   model <- model_rpart
 
+  call <- capture.output(model$call) %>%
+    paste(., collapse = "") %>%
+    gsub("xdf_path", xdf_path, .) %>%
+    data.frame(grp = "Call", out = ., stringsAsFactors = FALSE)
+
   leaves <- capture.output(model) %>%
     extract(grep("^node", .):length(.)) %>%
     gsub(">", "&gt;", .) %>%
@@ -264,7 +270,7 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
 
   rpart_out <- rbind(
     c("Model_Name", config$model.name),
-    reportObj$model_call, reportObj$model_sum, reportObj$prune_tbl, leaves,
+    call, reportObj$model_sum, reportObj$prune_tbl, leaves,
     c("Model_Class", 'rxDTree')
   )
   rpart_out
