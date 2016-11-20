@@ -108,7 +108,7 @@ convertDTParamsToArgs <- function(params, f_string) {
       parms = "parms", usesurrogate = "usesurrogate", minsplit = "minsplit",
       minbucket = "minbucket", xval = "xval", maxdepth = "maxdepth", cp = "cp"
     ),
-    rxDTree = c(xdf_path = "data", formula = "formula", weights = "pweights", method = "method",
+    rxDTree = c(data = "data", formula = "formula", weights = "pweights", method = "method",
       parms = "parms", usesurrogate = "useSurrogate", maxNumBins = "maxNumBins",
       minsplit = "minSplit", minbucket = "minBucket", xval = "xVal",
       maxdepth = "maxDepth", cp = "cp"
@@ -128,7 +128,6 @@ adjustCP <- function(model, config) {
     cp_table <- as.data.frame(model$cptable)
     pos_cp <- cp_table$CP[(cp_table$xerror - 0.5*cp_table$xstd) <= min(cp_table$xerror)]
     new_cp <- pos_cp[1]
-    #print(cp_table)
     if (cp_table$xerror[1] == min(cp_table$xerror)) {
       stop.Alteryx2("The minimum cross validation error occurs for a CP value where there are no splits. Specify a complexity parameter and try again.")
     }
@@ -153,8 +152,11 @@ processDT <- function(inputs, config) {
 
   params <- createDTParams(config, var_names)
   f_string <- if (inputs$XDFInfo$is_XDF) 'rxDTree' else 'rpart'
+  if (inputs$XDFInfo$is_XDF)
+    params$data <- inputs$XDFInfo$xdf_path
 
   args <- convertDTParamsToArgs(params, f_string)
+
   model <- do.call(f_string, args)
 
   # Post-model Error checking & cp adjustment if specified to "Auto"
@@ -223,7 +225,8 @@ createReportDT.rpart <- function(model, config, names, xdf_path) {
     call, reportObj$model_sum, reportObj$prune_tbl, reportObj$leaves,
     c("Model_Class", 'rpart')
   )
-  rpart_out
+
+  list(out = rpart_out, model = model)
 }
 
 #' Get data for static report (grp|out pipes) for rxDTree model
@@ -237,15 +240,15 @@ createReportDT.rpart <- function(model, config, names, xdf_path) {
 createReportDT.rxDTree <- function(model, config, names, xdf_path) {
   model_rpart <- rxAddInheritance(model)
   printcp(model_rpart)
+
   out <- capture.output(printcp(model_rpart))
+
   model$xlevels <- do.call(match.fun("getXdfLevels"),
-                           list(paste0("~ ", paste(names$x, collapse = " + ")),
-                                xdf_path
-                                )
-                           )
-  if (is.factor(target)) {
-    target_info <- do.call(match.fun("rxSummary"),
-                           list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
+                           list(formula = as.formula(paste0("~ ", paste(names$x, collapse = " + "))), xdf = xdf_path))
+
+  target_all_data <- RevoScaleR::rxSummary(makeFormula(names$y, ""), data = xdf_path)
+  if (target_all_data$categorical.type == "none") {
+    target_info <- target_all_data$categorical
     if(length(target_info) == 1) {
       model$yinfo <- list(
         levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
@@ -268,12 +271,13 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
     gsub("\\s", "<nbsp/>", .) %>%
     data.frame(grp = "Leaves", out = ., stringsAsFactors = FALSE)
 
+  reportObj <- getReportObjectDT(model, out)
   rpart_out <- rbind(
     c("Model_Name", config$model.name),
     call, reportObj$model_sum, reportObj$prune_tbl, leaves,
     c("Model_Class", 'rxDTree')
   )
-  rpart_out
+  list(out = rpart_out, model = model, model_rpart = model_rpart)
 }
 
 #' Create Tree Plot
