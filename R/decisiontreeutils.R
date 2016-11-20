@@ -176,18 +176,12 @@ getReportObjectDT <- function(model, out) {
     .[. != ""] %>%
     data.frame(grp = "Model_Sum", out = ., stringsAsFactors = FALSE)
 
-  model_call <- out %>%
-    extract(grep("^r", .):(grep("^Variable", .) - 1)) %>%
-    .[. != ""] %>%
-    paste(collapse = "") %>%
-    data.frame(grp = "Call", out = ., stringsAsFactors = FALSE)
-
   prune_tbl <- out %>%
     extract((grep("^\\s*CP", .) + 1):length(.)) %>%
     gsub("\\s+", "|", .) %>%
     data.frame(grp = "Prune", out = ., stringsAsFactors = FALSE)
 
-  list(model_sum = model_sum, model_Call = model_call, prune_tbl = prune_tbl)
+  list(model_sum = model_sum, prune_tbl = prune_tbl)
 }
 
 #' Generic S3 class
@@ -222,9 +216,17 @@ createReportDT.rpart <- function(model, config, names, xdf_path) {
     gsub("\\s", "<nbsp/>", .) %>%
     data.frame(grp = "Leaves", out = ., stringsAsFactors = FALSE)
 
+  call <- capture.output(model$call) %>%
+    paste(., collapse = "") %>%
+    data.frame(grp = "Call", out = ., stringsAsFactors = FALSE)
+
   rpart_out <- rbind(
     c("Model_Name", config$model.name),
+<<<<<<< HEAD
+    call, reportObj$model_sum, reportObj$prune_tbl, reportObj$leaves,
+=======
     reportObj$model_call, reportObj$model_sum, reportObj$prune_tbl, leaves,
+>>>>>>> 2f16fee8ecec77154a7e0858de1c2d5c45db59aa
     c("Model_Class", 'rpart')
   )
 
@@ -246,18 +248,41 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
   out <- capture.output(printcp(model_rpart))
 
   model$xlevels <- do.call(match.fun("getXdfLevels"),
+<<<<<<< HEAD
+                           list(paste0("~ ", paste(names$x, collapse = " + ")),
+                                xdf_path
+                                )
+                           )
+  if (is.factor(target)) {
+    target_info <- do.call(match.fun("rxSummary"),
+                           list(paste0("~ ", names$y), data = xdf.path))[["categorical"]]
+=======
                            list(formula = as.formula(paste0("~ ", paste(names$x, collapse = " + "))), xdf = xdf_path))
 
   target_all_data <- RevoScaleR::rxSummary(makeFormula(names$y, ""), data = xdf_path)
   if (target_all_data$categorical.type == "none") {
     target_info <- target_all_data$categorical
+>>>>>>> 2f16fee8ecec77154a7e0858de1c2d5c45db59aa
     if(length(target_info) == 1) {
       model$yinfo <- list(
         levels = as.character(target_info[[1]][,1]), counts = target_info[[1]][,2])
     }
   }
 
+<<<<<<< HEAD
+  reportObj <- getReportObjectDT(model, out)
+
+  model <- model_rpart
+
+  call <- capture.output(model$call) %>%
+    paste(., collapse = "") %>%
+    gsub("xdf_path", xdf_path, .) %>%
+    data.frame(grp = "Call", out = ., stringsAsFactors = FALSE)
+
+  leaves <- capture.output(model) %>%
+=======
   leaves <- capture.output(model_rpart) %>%
+>>>>>>> 2f16fee8ecec77154a7e0858de1c2d5c45db59aa
     extract(grep("^node", .):length(.)) %>%
     gsub(">", "&gt;", .) %>%
     gsub("<", "&lt;", .) %>%
@@ -267,7 +292,7 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
   reportObj <- getReportObjectDT(model, out)
   rpart_out <- rbind(
     c("Model_Name", config$model.name),
-    reportObj$model_call, reportObj$model_sum, reportObj$prune_tbl, leaves,
+    call, reportObj$model_sum, reportObj$prune_tbl, leaves,
     c("Model_Class", 'rxDTree')
   )
   list(out = rpart_out, model = model, model_rpart = model_rpart)
