@@ -222,7 +222,7 @@ createReportDT.rpart <- function(model, config, names, xdf_path) {
 
   rpart_out <- rbind(
     c("Model_Name", config$model.name),
-    call, reportObj$model_sum, reportObj$prune_tbl, reportObj$leaves,
+    call, reportObj$model_sum, reportObj$prune_tbl, leaves,
     c("Model_Class", 'rpart')
   )
 
@@ -257,21 +257,20 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
 
   reportObj <- getReportObjectDT(model, out)
 
-  model <- model_rpart
-
   call <- capture.output(model$call) %>%
     paste(., collapse = "") %>%
     gsub("xdf_path", xdf_path, .) %>%
     data.frame(grp = "Call", out = ., stringsAsFactors = FALSE)
 
-  leaves <- capture.output(model) %>%
+  leaves <- capture.output(model_rpart) %>%
     extract(grep("^node", .):length(.)) %>%
     gsub(">", "&gt;", .) %>%
     gsub("<", "&lt;", .) %>%
     gsub("\\s", "<nbsp/>", .) %>%
     data.frame(grp = "Leaves", out = ., stringsAsFactors = FALSE)
 
-  reportObj <- getReportObjectDT(model, out)
+  reportObj <- getReportObjectDT(model_rpart, out)
+
   rpart_out <- rbind(
     c("Model_Name", config$model.name),
     call, reportObj$model_sum, reportObj$prune_tbl, leaves,
