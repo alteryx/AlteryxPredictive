@@ -255,8 +255,6 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
     }
   }
 
-  reportObj <- getReportObjectDT(model, out)
-
   call <- capture.output(model$call) %>%
     paste(., collapse = "") %>%
     gsub("xdf_path", xdf_path, .) %>%
