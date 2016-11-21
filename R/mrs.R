@@ -42,7 +42,7 @@ mrsLevels <- function(data, loc_tmp, rem_tmp = NULL, rem_R = NULL) {
 #' @author Dan Putler
 mrsReorderedLevels <- function(lev_obj) {
   if (class(lev_obj) != "mrsLevels")
-    stop("The provided argument is not a mrsLevels class object")
+    stop.Alteryx2("The provided argument is not a mrsLevels class object")
   lapply(lev_obj, function(x) x <- x[order(x)])
 }
 
