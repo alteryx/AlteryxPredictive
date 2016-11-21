@@ -238,7 +238,7 @@ createReportDT.rpart <- function(model, config, names, xdf_path) {
 #' @return dataframe of piped results
 #' @importFrom magrittr %>% extract
 createReportDT.rxDTree <- function(model, config, names, xdf_path) {
-  model_rpart <- rxAddInheritance(model)
+  model_rpart <- RevoScaleR::rxAddInheritance(model)
   printcp(model_rpart)
 
   out <- capture.output(printcp(model_rpart))
