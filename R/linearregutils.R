@@ -1,6 +1,6 @@
 #' Process Linear Regression Inputs
 #'
-#' These two function take `inputs` and `config` and return the model object
+#' These two functions take `inputs` and `config` and return the model object
 #' along with other elements essential to create the reports and plots
 #'
 #' @param inputs input data streams to the tool
@@ -53,6 +53,37 @@ processLinearXDF <- function(inputs, config){
     smear <- RevoScaleR::rxSummary(~ Resid, data = resids.path,
       transforms = list(Resid = exp(Resid)))
     the.model$smearing.adj <- smear$sDataFrame[1,2]
+  }
+  return(the.model)
+}
+
+#' Process Elastic Net Inputs
+#'
+#' This function takes `inputs` and `config` and returns the model object
+#' along with other elements essential to create the reports and plots
+#'
+#' @param inputs input data streams to the tool
+#' @param config configuration passed to the tool
+#' @rdname processElasticNet
+#' @export
+#' @import glmnet
+processElasticNet <- function(inputs, config){
+  var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
+  #getNamesFromOrdered returns a list with elements x (names of x variables),
+  #y (name of y variable), and w (name of weight variable, if used)
+
+  # FIXME: Revisit what we pass to the weights argument.
+  if (config$`Use Weight`){
+    the.model <- glmnet::glmnet(x = inputs$the.data[,var_names$x],
+      y = inputs$the.data[,var_names$y], family = "gaussian",
+      weights = inputs$the.data[,var_names$w], alpha = config$`alpha`,
+      intercept  = config$`Omit Constant`
+    )
+  } else {
+    the.model <- glmnet(x = inputs$the.data[,var_names$x],
+      y = inputs$the.data[,var_names$y], family = "gaussian",
+      alpha = config$`alpha`, intercept  = config$`Omit Constant`
+    )
   }
   return(the.model)
 }

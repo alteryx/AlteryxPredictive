@@ -81,18 +81,24 @@ runLogisticRegression <- function(inputs, config){
 getResultsLinearRegression <- function(inputs, config){
   requireNamespace("car")
   config$`Model Name`= validName(config$`Model Name`)
-  if (inputs$XDFInfo$is_XDF){
-    the.model <- processLinearXDF(inputs, config)
-    lm.out <- createReportLinearXDF(the.model, config)
-    plot.out <- function(){createPlotOutputsLinearXDF()}
+  if (!(config$regularization)) {
+    if (inputs$XDFInfo$is_XDF){
+      the.model <- processLinearXDF(inputs, config)
+      lm.out <- createReportLinearXDF(the.model, config)
+      plot.out <- function(){createPlotOutputsLinearXDF()}
+    } else {
+      the.model <- processLinearOSR(inputs, config)
+      lm.out <- createReportLinearOSR(the.model, config)
+      plot.out <- function(){createPlotOutputsLinearOSR(the.model)}
+    }
+    results <- list(model = the.model, report = lm.out, plot = plot.out)
+    class(results) <- "GLM"
   } else {
-    the.model <- processLinearOSR(inputs, config)
-    lm.out <- createReportLinearOSR(the.model, config)
-    plot.out <- function(){createPlotOutputsLinearOSR(the.model)}
+    the.model <- processElasticNet(inputs, config)
+    #NOTE: lm.out and plot.out to follow once the model creation portion is finished
+    results <- list(model = the.model, report = NULL, plot = NULL)
+    class(results) <- "GLMNET"
   }
-
-  results <- list(model = the.model, report = lm.out, plot = plot.out)
-  class(results) <- "GLM"
   results
 }
 
