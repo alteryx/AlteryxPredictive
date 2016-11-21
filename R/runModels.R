@@ -125,15 +125,21 @@ getResultsDecisionTree <- function(inputs, config) {
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
 
   the.model <- processDT(inputs, config)
-  the.report <- createReportDT(the.model, config, var_names, inputs$XDFInfo$xdf_path)
-  makeTreePlot <- function(){createTreePlotDT(the.model, config)}
-  makePrunePlot <- function(){createPrunePlotDT(the.model)}
+
+  the.report.list <- createReportDT(the.model, config, var_names, inputs$XDFInfo$xdf_path)
+  the.model <- the.report.list$model
+  the.model.rpart <- if(inputs$XDFInfo$is_XDF) the.report.list$model_rpart else the.model
+  the.report <- the.report.list$out
+
+  makeTreePlot <- function(){createTreePlotDT(the.model.rpart, config)}
+  makePrunePlot <- function(){createPrunePlotDT(the.model.rpart)}
   dashboard <- createDashboardDT(the.model)
 
   results <- list(model = the.model, report = the.report,
     treePlot = makeTreePlot, prunePlot = makePrunePlot,
     dashboard = dashboard
   )
+
   class(results) <- "DecisionTree"
   results
 }

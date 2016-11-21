@@ -13,7 +13,7 @@
 #' @family Alteryx.Report
 Alteryx.ReportLM <- function (lm.obj){
   if (class(lm.obj) != "lm")
-    stop("The object provided is not a glm class object")
+    stop.Alteryx2("The object provided is not a glm class object")
   full.sum <- summary(lm.obj)
   the.call <- paste(capture.output(full.sum$call), collapse = "")
   the.call = gsub("\\s\\s", "", the.call)
@@ -69,7 +69,7 @@ Alteryx.ReportLM <- function (lm.obj){
 #' @family Alteryx.Report
 Alteryx.ReportGLM <- function (glm.obj){
   if (class(glm.obj)[1] != "glm" && class(glm.obj)[2] != "glm")
-    stop("The object provided is not a glm class object")
+    stop.Alteryx2("The object provided is not a glm class object")
   full.sum <- summary(glm.obj)
   the.call <- paste(capture.output(full.sum$call), collapse = "")
   the.call = gsub("\\s\\s", "", the.call)
@@ -132,7 +132,7 @@ Alteryx.ReportAnova <- function (model.obj)
 {
   if (class(model.obj)[1] != "lm" && class(model.obj)[1] !=
       "glm" && class(model.obj)[2] != "glm") {
-    stop("The object provided is not a lm or glm class object")
+    stop.Alteryx2("The object provided is not a lm or glm class object")
   }
   the.anova <- car::Anova(model.obj, type = "II")
   response <- attributes(the.anova)$heading[2]
@@ -169,7 +169,7 @@ Alteryx.ReportAnova <- function (model.obj)
 # Author: Dan Putler
 Alteryx.ParseCoefSum <- function(coef_sum) {
   if(!is.character(coef_sum)) {
-    stop("The argument to the function must be a character vector")
+    stop.Alteryx2("The argument to the function must be a character vector")
   }
   # parseRow is the function that is used in the apply function
   parseRow <- function(a_row) {
@@ -217,7 +217,7 @@ Alteryx.ParseCoefSum <- function(coef_sum) {
 # Author: Dan Putler
 Alteryx.ParseAnova <- function(the_anova, obj.class) {
   if(!is.character(the_anova)) {
-    stop("The argument to the function must be a character vector")
+    stop.Alteryx2("The argument to the function must be a character vector")
   }
   # parseRow is the function that is used in the apply function
   parseRow <- function(a_row, obj.class) {
@@ -263,7 +263,7 @@ Alteryx.ParseAnova <- function(the_anova, obj.class) {
 #' @export
 AlteryxReportRx <- function (rx.obj, null.deviance = NULL) {
   if (!(class(rx.obj) %in% c("rxLinMod","rxLogit","rxGlm")))
-    stop("The object provided is not an appropriate RevoScaleR class object")
+    stop.Alteryx2("The object provided is not an appropriate RevoScaleR class object")
   the.call <- paste(capture.output(rx.obj$call), collapse = "")
   the.call = gsub("\\s\\s", "", the.call)
   # The coefficients and related estimates need to be done by class

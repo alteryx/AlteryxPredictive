@@ -23,14 +23,14 @@ plotMeans <- function (response, factor1, factor2, error.bars = c("se", "sd",
     col = palette(), ...)
 {
     if (!is.numeric(response))
-        stop("Argument response must be numeric.")
+        stop.Alteryx2("Argument response must be numeric.")
     xlab
     ylab
     legend.lab
     error.bars <- match.arg(error.bars)
     if (missing(factor2)) {
         if (!is.factor(factor1))
-            stop("Argument factor1 must be a factor.")
+            stop.Alteryx2("Argument factor1 must be a factor.")
         valid <- complete.cases(factor1, response)
         factor1 <- factor1[valid]
         response <- response[valid]
@@ -61,7 +61,7 @@ plotMeans <- function (response, factor1, factor2, error.bars = c("se", "sd",
     }
     else {
         if (!(is.factor(factor1) | is.factor(factor2)))
-            stop("Arguments factor1 and factor2 must be factors.")
+            stop.Alteryx2("Arguments factor1 and factor2 must be factors.")
         valid <- complete.cases(factor1, factor2, response)
         factor1 <- factor1[valid]
         factor2 <- factor2[valid]
@@ -90,7 +90,7 @@ plotMeans <- function (response, factor1, factor2, error.bars = c("se", "sd",
         if (length(lty) == 1)
             lty <- rep(lty, n.levs.2)
         if (n.levs.2 > length(col))
-            stop(sprintf("Number of groups for factor2, %d, exceeds number of distinct colours, %d.",
+            stop.Alteryx2(sprintf("Number of groups for factor2, %d, exceeds number of distinct colours, %d.",
                 n.levs.2, length(col)))
         plot(c(1, n.levs.1 * 1.4), yrange, type = "n", xlab = xlab,
             ylab = ylab, axes = FALSE, main = main, ...)
@@ -275,7 +275,7 @@ pStars <- function (p.val){
 #' @author Dan Putler
 unitScale <- function(x) {
   if (!(class(x) %in% c("matrix", "data.frame", "numeric", "integer"))) {
-    stop("The function argument cannot be coerced to be a matrix")
+    stop.Alteryx2("The function argument cannot be coerced to be a matrix")
   }
   if (class(x) == "data.frame") {
     x <- data.matrix(x)
@@ -284,13 +284,13 @@ unitScale <- function(x) {
     x <- as.matrix(x)
   }
   if (class(as.vector(x[,1])) == "character") {
-    stop("The function argument must consist of numeric and/or integer data")
+    stop.Alteryx2("The function argument must consist of numeric and/or integer data")
   }
   min.x <- apply(x, 2, min)
   max.x <- apply(x, 2, max)
   max.min <- max.x - min.x
   if (any(max.min == 0)) {
-    stop("One or more of the provided data columns has a single data value")
+    stop.Alteryx2("One or more of the provided data columns has a single data value")
   }
   # Subtract the column minimums
   x <- sweep(x, 2, min.x)
@@ -350,12 +350,12 @@ bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
   cex = rep(par("cex"), 2), xlabs = NULL, ylabs = NULL, expand=1, xlim = NULL,
   ylim = NULL, arrow.len = 0.1, main = NULL, sub = NULL, xlab = NULL,
   ylab = NULL, ...) {
-    if(length(choices) != 2) stop("length of choices must be 2")
+    if(length(choices) != 2) stop.Alteryx2("length of choices must be 2")
     if(!length(scores <- pc$x))
-	stop(gettextf("object '%s' has no scores", deparse(substitute(x))),
+	stop.Alteryx2(gettextf("object '%s' has no scores", deparse(substitute(x))),
              domain = NA)
     if(is.complex(scores))
-        stop("biplots are not defined for complex PCA")
+        stop.Alteryx2("biplots are not defined for complex PCA")
     lam <- pc$sdev[choices]
     n <- NROW(scores)
     lam <- lam * sqrt(n)
@@ -451,9 +451,9 @@ bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
 standardize <- function(x, std.vec1, std.vec2) {
   # Input checking
   if (!all(names(std.vec1) == names(std.vec2)))
-    stop("The two standarization vectors must have the same names")
+    stop.Alteryx2("The two standarization vectors must have the same names")
   if (!all(dimnames(x)[[2]] == names(std.vec1)))
-    stop("The data matrix and the standaridization vectors must have the same names")
+    stop.Alteryx2("The data matrix and the standaridization vectors must have the same names")
   x <- sweep(x, 2, std.vec1)
   x <- sweep(x, 2, std.vec2, FUN="/")
   x
@@ -536,7 +536,7 @@ bootCH <- function(xdat, k_vals, clstr1, clstr2, cntrs1, cntrs2,
 varImpPlot.Alteryx <- function(x, sort=TRUE, n.var=min(30, nrow(x$importance)),
   type=NULL, class=NULL, scale=TRUE, main="Variable Importance Plot", ...) {
   if(!inherits(x, "randomForest")) {
-    stop("This function only works for objects of class `randomForest'")
+    stop.Alteryx2("This function only works for objects of class `randomForest'")
   }
   imp <- randomForest::importance(x, class=class, scale=scale, type=type, ...)
   print(colnames(imp))

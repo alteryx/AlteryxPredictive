@@ -24,7 +24,7 @@ getXVarsFromCall <- function(x){
 #' @export
 getXVars.default <- function(x) {
   the.call <- x$call
-  if(class(the.call) != "call") stop("The argument was not a call object.")
+  if(class(the.call) != "call") stop.Alteryx2("The argument was not a call object.")
   xvars <- getXVarsFromCall(x)
   xvars <- xvars[xvars != "-1"]
   chkNewLine <- function(string) {
@@ -76,7 +76,7 @@ matchLevels <- function(nd, ol) {
     ol.names <- names(ol)
     ol.names <- ol.names[!is.na(ol.names)]
     if (!all(ol.names %in% the.factors))
-      stop("There are factor variables in the model that are not present in the data to be scored.")
+      stop.Alteryx2("There are factor variables in the model that are not present in the data to be scored.")
 
     # The function to use with sapply to determine which factors have different
     # levels in the new data versus the levels used in model estimation.
