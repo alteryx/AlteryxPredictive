@@ -67,20 +67,23 @@ processLinearXDF <- function(inputs, config){
 #' @rdname processElasticNet
 #' @export
 #' @import glmnet
+#' Convert data frame into a numeric matrix, filtering out non-numeric columns
+df2NumericMatrix <- function(x){
+  numNonNumericCols <- NCOL(Filter(Negate(is.numeric), x))
+  if (numNonNumericCols == NCOL(x)){
+    AlteryxMessage2("All of the provided variables were non-numeric. Please provide at least one numeric variable and try again.", iType = 2, iPriority = 3)
+    stop.Alteryx2()
+  } else if (numNonNumericCols > 0){
+    AlteryxMessage2("Non-numeric variables were included to glmnet. They are now being removed.", iType = 1, iPriority = 3)
+    Filter(is.numeric, x)
+  }
+}
+
 processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
   glmFun <- if (config$cv_glmnet) glmnet::cv.glmnet else glmnet::glmnet
-  testnum <- sapply(inputs$the.data[,var_names$x], is.numeric)
-  testind <- which(testnum)
-  if (length(testind) < NCOL(inputs$the.data[,var_names$x])) {
-    AlteryxMessage2("Non-numeric variables were included to glmnet. They are now being removed.", iType = 1, iPriority = 3)
-    if (length(testind) == 0) {
-      AlteryxMessage2("All of the provided variables were non-numeric. Please provide at least one numeric variable and try again.", iType = 2, iPriority = 3)
-      stop.Alteryx2()
-    }
-    inputs$the.data[,var_names$x] <- (inputs$the.data[,var_names$x])[,testind]
-  }
-  funParams <- list(x = as.matrix(inputs$the.data[,var_names$x]),
+  x <- df2numericMatrix(inputs$the.data[,var_names$x])
+  funParams <- list(x = x,
                     y = inputs$the.data[,var_names$y], family = 'gaussian',
                     intercept  = config$`Omit Constant`, standardize = config$standardize_pred,
                     weights = if (!is.null(var_names$w)) inputs$the.data[,var_names$w] else NULL,
