@@ -194,6 +194,12 @@ convertDTParamsToArgs <- function(params, f_string) {
       parms = "parms", usesurrogate = "useSurrogate", maxNumBins = "maxNumBins",
       minsplit = "minSplit", minbucket = "minBucket", xval = "xVal",
       maxdepth = "maxDepth", cp = "cp"
+    ),
+    C5.0 = c(data = "data", formula = "formula", trials = "trials", rules = "rules",
+      weights = "weights", subset = "subset", bands = "bands", winnow = "winnow",
+      noGlobalPruning = "noGlobalPruning", CF = "CF", minCases = "minCases",
+      fuzzyThreshold = "fuzzyThreshold", sample = "sample", seed = "seed",
+      earlyStopping = "earlyStopping"
     )
   )
   to_rename <- intersect(names(fmap$rpart), names(params))
