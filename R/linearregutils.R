@@ -74,16 +74,41 @@ processElasticNet <- function(inputs, config){
 
   # FIXME: Revisit what we pass to the weights argument.
   if (config$`Use Weight`){
-    the.model <- glmnet::glmnet(x = inputs$the.data[,var_names$x],
-      y = inputs$the.data[,var_names$y], family = "gaussian",
-      weights = inputs$the.data[,var_names$w], alpha = config$`alpha`,
-      intercept  = config$`Omit Constant`
-    )
+    if (!(config$`cv_glmnet`)) {
+      the.model <- glmnet::glmnet(x = inputs$the.data[,var_names$x],
+                                  y = inputs$the.data[,var_names$y], family = "gaussian",
+                                  weights = inputs$the.data[,var_names$w], alpha = config$`alpha`,
+                                  intercept  = config$`Omit Constant`, standardize = config$standardize_pred
+      )
+    } else {
+      the.model <- glmnet::cv.glmnet(x = inputs$the.data[,var_names$x],
+                                  y = inputs$the.data[,var_names$y], family = "gaussian",
+                                  weights = inputs$the.data[,var_names$w], alpha = config$`alpha`,
+                                  intercept  = config$`Omit Constant`, nfolds = config$`nfolds`,
+                                  standardize = config$standardize_pred
+      )
+    }
   } else {
-    the.model <- glmnet(x = inputs$the.data[,var_names$x],
-      y = inputs$the.data[,var_names$y], family = "gaussian",
-      alpha = config$`alpha`, intercept  = config$`Omit Constant`
-    )
+    if (!(config$`cv_glmnet`)) {
+      the.model <- glmnet(x = inputs$the.data[,var_names$x],
+                          y = inputs$the.data[,var_names$y], family = "gaussian",
+                          alpha = config$`alpha`, intercept  = config$`Omit Constant`,
+                          standardize = config$standardize_pred
+      )
+    } else {
+      the.model <- glmnet(x = inputs$the.data[,var_names$x],
+                          y = inputs$the.data[,var_names$y], family = "gaussian",
+                          alpha = config$`alpha`, intercept  = config$`Omit Constant`,
+                          nfolds = config$`nfolds`, standardize = config$standardize_pred
+      )
+    }
+  }
+  #Now we need to save the user's preference for the value of lambda that will be used
+  #in scoring
+  if (config$`lambda_1se`) {
+    the.model$lambda_pred <- lambda.1se
+  } else {
+    the.model$lambda_pred <- lambda.min
   }
   return(the.model)
 }
