@@ -144,8 +144,12 @@ checkValidConfig.default <- function(config, the.data, names) {
 #' @param names list of variable names (x, y and w)
 #' @return list with components needed to create model
 createDTParams <- function(config, names) {
-  # use lists to hold params for rpart and rxDTree functions
-  params <- config[c('minsplit', 'minbucket', 'xval', 'maxdepth')]
+  # use lists to hold params
+  params <- config[c('minsplit', 'minbucket', 'xval', 'maxdepth',
+                     'trials', 'rules', 'subset', 'bands',
+                     'bands.check', 'winnow', 'CF', 'minCases',
+                     'fuzzyThreshold', 'sample', 'seed', 'earlyStopping'
+                     )]
   params <- modifyList(params, list(
     cp = if (config$cp %in% c("Auto", "")) 1e-5 else as.numeric(config$cp),
     data = quote(the.data),
@@ -167,6 +171,8 @@ createDTParams <- function(config, names) {
 
   # get max bins param
   params$maxNumBins <- config$maxNumBins
+
+  params$noGlobalPruning <- !(config$GlobalPruning)
 
   params
 }
