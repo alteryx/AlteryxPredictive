@@ -52,6 +52,29 @@ checkValidConfig.XDF <- function(config, the.data, names) {
   }
 }
 
+#' Error checking pre-model
+#' Does not return anything - just throws errror
+#'
+#' @param config list of config options
+#' @param the.data incoming data
+#' @param names list of x, y, w names for data
+#' @import assertthat
+checkValidConfig.C50 <- function(config, the.data, names) {
+  library("assertthat")
+
+  # check on trials
+  Alteryx_assert(is.numeric(config$trials),
+                 "trials must be a numeric value"
+                 )
+  Alteryx_assert(is.wholenumber(config$trials),
+                 "trials must be a whole number"
+                 )
+  Alteryx_assert(config$trials >= 1,
+                 "trials must be at least 1"
+                 )
+
+}
+
 #' Error checking pre-model defaults to OSR
 #' Does not return anything - just throws errror
 #'
