@@ -212,6 +212,13 @@ convertDTParamsToArgs <- function(params, f_string) {
 #' @param config list of config options
 #' @return model obj after adjusting complexity parameter
 adjustCP <- function(model, config) {
+  UseMethod(adjustCP, model)
+}
+
+#' Adjusts config based on results if config was initially "Auto"
+#'
+#' @inheritParams adjustCP
+adjustCP.rpart <- function(model, config) {
   if(is.na(as.numeric(config$cp)) && (config$cp == "Auto" || config$cp == "")) {
     cp_table <- as.data.frame(model$cptable)
     pos_cp <- cp_table$CP[(cp_table$xerror - 0.5*cp_table$xstd) <= min(cp_table$xerror)]
@@ -223,6 +230,27 @@ adjustCP <- function(model, config) {
   } else {
     model
   }
+}
+
+#' Adjusts config based on results if config was initially "Auto"
+#'
+#' @inheritParams adjustCP
+adjustCP.rxDTree <- function(model, config) {
+  adjustCP.rpart(model, config)
+}
+
+#' Adjusts config based on results if config was initially "Auto"
+#'
+#' @inheritParams adjustCP
+adjustCP.C5.0 <- function(model, config) {
+  model
+}
+
+#' Adjusts config based on results if config was initially "Auto"
+#'
+#' @inheritParams adjustCP
+adjustCP.default <- function(model, config) {
+  adjustCP.rpart(model, config)
 }
 
 #' Process DT model
