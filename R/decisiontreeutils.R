@@ -64,12 +64,66 @@ checkValidConfig.C50 <- function(config, the.data, names) {
 
   # check on trials
   Alteryx_assert(is.boundedInt(config$trials, min = 1),
-                 "trials must be a numeric value"
+                 "trials must be a integer with value at least 1"
                  )
 
   # check on rules
   Alteryx_assert(is.logical(config$rules),
                  "rules must be a boolean value"
+                 )
+
+  # check on subset
+  Alteryx_assert(is.logical(config$subset),
+                 "subset must be a boolean value"
+                 )
+
+  # check on bands and bands.check
+  Alteryx_assert(is.logical(config$bands.check),
+                 "bands.check must be a boolean value"
+                 )
+
+  Alteryx_assert(is.boundedInt(config$bands, min = 2, max = 1000),
+                 "bands must be integer between 2 and 1000, inclusive"
+                 )
+
+  # check on winnow
+  Alteryx_assert(is.logical(config$winnow),
+                 "winnow must be a boolean value"
+                 )
+
+  # check on GlobalPruning
+  Alteryx_assert(is.logical(config$GlobalPruning),
+                 "GlobalPruning must be a boolean value"
+                 )
+
+  # check on CF
+  Alteryx_assert(is.boundedReal(config$bands, min = 0, max = 1, closed = FALSE),
+                 "bands must be strictly between 0 and 1"
+                 )
+
+  # check on minCases
+  Alteryx_assert(is.boundedInt(config$minCases, min = 1),
+                 "minCases must be a integer with value at least 1"
+                 )
+
+  # check on fuzzyThreshold
+  Alteryx_assert(is.logical(config$fuzzyThreshold),
+                 "fuzzyThreshold must be a boolean value"
+                 )
+
+  # check on sample
+  Alteryx_assert(is.boundedReal(config$sample, min = 0, max = 1, closed = c(TRUE, FALSE)),
+                 "sample must be in range greater than or equal to 0 and strictly less than 1"
+                 )
+
+  # check on seed
+  Alteryx_assert(is.integerValue(config$seed),
+                 "seed must be a integer"
+                 )
+
+  # check on earlyStopping
+  Alteryx_assert(is.logical(config$earlyStopping),
+                 "earlyStopping must be a boolean value"
                  )
 
 }
