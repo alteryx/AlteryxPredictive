@@ -73,6 +73,11 @@ checkValidConfig.C50 <- function(config, the.data, names) {
                  "trials must be at least 1"
                  )
 
+  # check on rules
+  Alteryx_assert(is.logical(config$rules),
+                 "rules must be a boolean value"
+                 )
+
 }
 
 #' Error checking pre-model defaults to OSR
