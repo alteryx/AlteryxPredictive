@@ -69,47 +69,25 @@ processLinearXDF <- function(inputs, config){
 #' @import glmnet
 processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
-  #getNamesFromOrdered returns a list with elements x (names of x variables),
-  #y (name of y variable), and w (name of weight variable, if used)
-
-  # FIXME: Revisit what we pass to the weights argument.
-  if (config$`Use Weight`){
-    if (!(config$`cv_glmnet`)) {
-      the.model <- glmnet::glmnet(x = inputs$the.data[,var_names$x],
-                                  y = inputs$the.data[,var_names$y], family = "gaussian",
-                                  weights = inputs$the.data[,var_names$w], alpha = config$`alpha`,
-                                  intercept  = config$`Omit Constant`, standardize = config$standardize_pred
-      )
-    } else {
-      the.model <- glmnet::cv.glmnet(x = inputs$the.data[,var_names$x],
-                                  y = inputs$the.data[,var_names$y], family = "gaussian",
-                                  weights = inputs$the.data[,var_names$w], alpha = config$`alpha`,
-                                  intercept  = config$`Omit Constant`, nfolds = config$`nfolds`,
-                                  standardize = config$standardize_pred
-      )
+  glmFun <- if (config$cv_glmnet) glmnet::cv.glmnet else glmnet::glmnet
+  testnum <- sapply(inputs$the.data[,var_names$x], is.numeric)
+  testind <- which(testnum)
+  if (length(testind) < NCOL(inputs$the.data[,var_names$x])) {
+    AlteryxMessage2("Non-numeric variables were included to glmnet. They are now being removed.", iType = 1, iPriority = 3)
+    if (length(testind) == 0) {
+      AlteryxMessage2("All of the provided variables were non-numeric. Please provide at least one numeric variable and try again.", iType = 2, iPriority = 3)
+      stop.Alteryx2()
     }
-  } else {
-    if (!(config$`cv_glmnet`)) {
-      the.model <- glmnet(x = inputs$the.data[,var_names$x],
-                          y = inputs$the.data[,var_names$y], family = "gaussian",
-                          alpha = config$`alpha`, intercept  = config$`Omit Constant`,
-                          standardize = config$standardize_pred
-      )
-    } else {
-      the.model <- glmnet(x = inputs$the.data[,var_names$x],
-                          y = inputs$the.data[,var_names$y], family = "gaussian",
-                          alpha = config$`alpha`, intercept  = config$`Omit Constant`,
-                          nfolds = config$`nfolds`, standardize = config$standardize_pred
-      )
-    }
+    inputs$the.data[,var_names$x] <- (inputs$the.data[,var_names$x])[,testind]
   }
-  #Now we need to save the user's preference for the value of lambda that will be used
-  #in scoring
-  if (config$`lambda_1se`) {
-    the.model$lambda_pred <- lambda.1se
-  } else {
-    the.model$lambda_pred <- lambda.min
-  }
+  funParams <- list(x = as.matrix(inputs$the.data[,var_names$x]),
+                    y = inputs$the.data[,var_names$y], family = 'gaussian',
+                    intercept  = config$`Omit Constant`, standardize = config$standardize_pred,
+                    weights = if (!is.null(var_names$w)) inputs$the.data[,var_names$w] else NULL,
+                    nfolds = if (config$cv_glmnet) config$nfolds else NULL
+  )
+  the.model <- do.call(glmFun, Filter(Negate(is.null), funParams))
+  the.model$lambda_pred <- config$lambda
   return(the.model)
 }
 
