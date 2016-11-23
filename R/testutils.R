@@ -1,8 +1,8 @@
-#' check whether some number is whole number
+#' check whether some number is an integerValue
 #'
 #' @param x numeric to attempt to coerce to whole number
 #' @param precision precision to compare to nearest whole number
-is.wholenumber <- function(x, precision = .Machine$double.eps^.5) {
+is.integerValue <- function(x, precision = .Machine$double.eps^.5) {
   abs(x - round(x)) < precision
 }
 
@@ -39,4 +39,23 @@ Alteryx_assert.error <- function(exp, msg, ...) {
 #' @inheritParams Alteryx_assert
 Alteryx_assert.default <- function(exp, msg, ...) {
   Alteryx_assert.error(exp, msg, ...)
+}
+
+#' checks whether real value is between min and max
+#'
+#' @param val value to check
+#' @param min lower bound
+#' @param max upper bound
+#' @param closed logical or length-2 logical vector whether range is closed
+is.boundedReal <- function(val, min = -Inf, max = Inf, closed = TRUE) {
+  closed <- if (length(closed) == 1) rep(closed, 2) else closed[1:2]
+  is.numeric(val) && min <= val && max >= val &&
+    (closed[1] || min != val) && (closed[2] || max != val)
+}
+
+#' checks whether real value is between min and max
+#'
+#' @inheritParams is.boundedReal
+is.boundedInt <- function(val, min = -Inf, max = Inf, closed = TRUE) {
+  is.integerValue(val) && is.boundedReal(val = val, min = min, max = max, closed = closed)
 }
