@@ -63,14 +63,8 @@ checkValidConfig.C50 <- function(config, the.data, names) {
   library("assertthat")
 
   # check on trials
-  Alteryx_assert(is.numeric(config$trials),
+  Alteryx_assert(is.boundedInt(config$trials, min = 1),
                  "trials must be a numeric value"
-                 )
-  Alteryx_assert(is.wholenumber(config$trials),
-                 "trials must be a whole number"
-                 )
-  Alteryx_assert(config$trials >= 1,
-                 "trials must be at least 1"
                  )
 
   # check on rules
