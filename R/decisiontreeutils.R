@@ -267,7 +267,14 @@ processDT <- function(inputs, config) {
   checkValidConfig(config, the.data, var_names)
 
   params <- createDTParams(config, var_names)
-  f_string <- if (inputs$XDFInfo$is_XDF) 'rxDTree' else 'rpart'
+
+  if (config$algorithm.rpart)
+    fstring <- 'rpart'
+  else if(config$algorithm$C5.0)
+    fstring <- 'C5.0'
+  if (inputs$XDFInfo$is_XDF)
+    fstring <- 'rxDTree'
+
   if (inputs$XDFInfo$is_XDF)
     params$data <- inputs$XDFInfo$xdf_path
 
