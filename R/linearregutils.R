@@ -67,24 +67,30 @@ processLinearXDF <- function(inputs, config){
 #' @rdname processElasticNet
 #' @export
 #' @import glmnet
+#' Convert data frame into a numeric matrix, filtering out non-numeric columns
+df2NumericMatrix <- function(x){
+  numNonNumericCols <- NCOL(Filter(Negate(is.numeric), x))
+  if (numNonNumericCols == NCOL(x)){
+    AlteryxMessage2("All of the provided variables were non-numeric. Please provide at least one numeric variable and try again.", iType = 2, iPriority = 3)
+    stop.Alteryx2()
+  } else if (numNonNumericCols > 0){
+    AlteryxMessage2("Non-numeric variables were included to glmnet. They are now being removed.", iType = 1, iPriority = 3)
+    Filter(is.numeric, x)
+  }
+}
+
 processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
-  #getNamesFromOrdered returns a list with elements x (names of x variables),
-  #y (name of y variable), and w (name of weight variable, if used)
-
-  # FIXME: Revisit what we pass to the weights argument.
-  if (config$`Use Weight`){
-    the.model <- glmnet::glmnet(x = inputs$the.data[,var_names$x],
-      y = inputs$the.data[,var_names$y], family = "gaussian",
-      weights = inputs$the.data[,var_names$w], alpha = config$`alpha`,
-      intercept  = config$`Omit Constant`
-    )
-  } else {
-    the.model <- glmnet(x = inputs$the.data[,var_names$x],
-      y = inputs$the.data[,var_names$y], family = "gaussian",
-      alpha = config$`alpha`, intercept  = config$`Omit Constant`
-    )
-  }
+  glmFun <- if (config$cv_glmnet) glmnet::cv.glmnet else glmnet::glmnet
+  x <- df2numericMatrix(inputs$the.data[,var_names$x])
+  funParams <- list(x = x,
+                    y = inputs$the.data[,var_names$y], family = 'gaussian',
+                    intercept  = config$`Omit Constant`, standardize = config$standardize_pred,
+                    weights = if (!is.null(var_names$w)) inputs$the.data[,var_names$w] else NULL,
+                    nfolds = if (config$cv_glmnet) config$nfolds else NULL
+  )
+  the.model <- do.call(glmFun, Filter(Negate(is.null), funParams))
+  the.model$lambda_pred <- config$lambda
   return(the.model)
 }
 
