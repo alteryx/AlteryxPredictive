@@ -82,7 +82,7 @@ df2NumericMatrix <- function(x){
 processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
   glmFun <- if (config$cv_glmnet) glmnet::cv.glmnet else glmnet::glmnet
-  x <- df2numericMatrix(inputs$the.data[,var_names$x])
+  x <- df2NumericMatrix(inputs$the.data[,var_names$x])
   funParams <- list(x = x,
                     y = inputs$the.data[,var_names$y], family = 'gaussian',
                     intercept  = config$`Omit Constant`, standardize = config$standardize_pred,
