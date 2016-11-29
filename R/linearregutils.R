@@ -90,7 +90,21 @@ processElasticNet <- function(inputs, config){
                     nfolds = if (config$cv_glmnet) config$nfolds else NULL
   )
   the.model <- do.call(glmFun, Filter(Negate(is.null), funParams))
-  the.model$lambda_pred <- config$lambda
+  if (config$cv_glmnet) {
+    #The predict function used with objects of class cv.glmnet can be
+    #called with s = "lambda.1se" or s = "lambda.min" .
+    if (config$lambda_1se) {
+      the.model$lambda_pred <- "lambda.1se"
+    } else {
+      the.model$lambda_pred <- "lambda.min"
+    }
+  } else {
+    #When the predict function is called with glmnet objects, it either
+    #needs a specific value of lambda, or must be called with s= NULL,
+    #in which case the predictions will be made at every lambda value in the sequence.
+    the.model$lambda_pred <- lambda_no_cv
+  }
+
   return(the.model)
 }
 
