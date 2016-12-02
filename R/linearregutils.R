@@ -159,3 +159,51 @@ createPlotOutputsLinearOSR <- function(the.model){
 createPlotOutputsLinearXDF <- function(){
   noDiagnosticPlot("The diagnostic plot is not available for XDF based models")
 }
+
+#' Prepare the glmnet/cv.glmnet plot featuring the L1 norm on the x axis.
+#'
+#' @param the.model model object
+#' @export
+createFirstPlotOutputGLMNET <- function(the.model){
+  if (inherits(the.model, "cv.glmnet")) {
+    plotted_obj <- the.model$glmnet.fit
+  } else {
+    plotted_obj <- the.model
+  }
+  plot(the.model, xvar = "norm")
+}
+
+#' Prepare the glmnet/cv.glmnet plot featuring log(lambda) on the x axis.
+#'
+#' @param the.model model object
+#' @export
+createSecondPlotOutputGLMNET <- function(the.model){
+  if (inherits(the.model, "cv.glmnet")) {
+    plotted_obj <- the.model$glmnet.fit
+  } else {
+    plotted_obj <- the.model
+  }
+  plot(the.model, xvar = "lambda")
+}
+
+#' Prepare the glmnet/cv.glmnet plot featuring the fraction of deviance
+#' explained on the x axis.
+#'
+#' @param the.model model object
+#' @export
+createThirdPlotOutputGLMNET <- function(the.model){
+  if (inherits(the.model, "cv.glmnet")) {
+    plotted_obj <- the.model$glmnet.fit
+  } else {
+    plotted_obj <- the.model
+  }
+  plot(the.model, xvar = "dev")
+}
+
+#' Prepare the cv.glmnet plot featuring the mean squared error vs log(lambda).
+#'
+#' @param the.model model object
+#' @export
+createCVPlotOutputGLMNET <- function(the.model){
+  plot(the.model)
+}

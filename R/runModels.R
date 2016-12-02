@@ -95,8 +95,19 @@ getResultsLinearRegression <- function(inputs, config){
     class(results) <- "GLM"
   } else {
     the.model <- processElasticNet(inputs, config)
-    #NOTE: lm.out and plot.out to follow once the model creation portion is finished
-    results <- list(model = the.model, report = NULL, plot = NULL)
+    #NOTE: lm.out to follow once the model creation portion is finished
+    plot.one <- function(){createFirstPlotOutputGLMNET(the.model)}
+    plot.two <- function(){createSecondPlotOutputGLMNET(the.model)}
+    plot.three <- function(){createThirdPlotOutputGLMNET(the.model)}
+    if (config$internal_cv) {
+      plot.internalcv <- function(){createCVPlotOutputGLMNET(the.model)}
+      results <- list(model = the.model, report = NULL, first_plot = plot.one,
+                      second_plot = plot.two, third_plot = plot_three,
+                      internal_cv_plot = plot.internalcv)
+    } else {
+      results <- list(model = the.model, report = NULL, first_plot = plot.one,
+                      second_plot = plot.two, third_plot = plot_three)
+    }
     class(results) <- "GLMNET"
   }
   results
