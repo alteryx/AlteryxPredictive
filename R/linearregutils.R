@@ -102,7 +102,7 @@ processElasticNet <- function(inputs, config){
     #When the predict function is called with glmnet objects, it either
     #needs a specific value of lambda, or must be called with s= NULL,
     #in which case the predictions will be made at every lambda value in the sequence.
-    the.model$lambda_pred <- lambda_no_cv
+    the.model$lambda_pred <- config$lambda_no_cv
   }
   #Since glmnet and cv.glmnet don't produce a formula, we'll need to save the names
   #of the predictor variables in order to use getXvars downstream, which is required by
