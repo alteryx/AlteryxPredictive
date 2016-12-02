@@ -205,3 +205,28 @@ scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL,
 }
 
 scoreModel.rxDForest <- scoreModel.rxDTree
+
+scoreModel.elnet <- function(mod.obj, new.data) {
+  #The code in the score tool has already subsetted the columns of the original
+  #data to be scored, so there's no need to subset in that case.
+  #However, we need to perform the subsetting and column ordering in case of future tools
+  #that might use scoreModel. Unfortunately, glmnet isn't smart enough to order the columns
+  #correctly in the predict function if they're provided in the wrong order.
+  used_x_vars <- AlteryxPredictive::getXVars(mod.obj)
+  if (!all(used_x_vars %in% colnames(new.data))) {
+    missing_x_vars <- used_x_vars[!(used_x_vars %in% colnames(new.data))]
+    if (length(missing_x_vars) == 1) {
+      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing the variable ", missing_x_vars, ". Please make sure you provide this variable and try again"))
+    } else {
+      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing the variables ", missing_x_vars, ". Please make sure you provide these variables and try again"))
+    }
+  }
+  used_data <- new.data[,used_x_vars]
+  library(glmnet)
+  score <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred)
+  return(score)
+}
+scoreModel.cv.glmnet <- scoreModel.elnet
+
+#Note: When doing this for logistic regression, I'll need to update to differentiate between
+#elnet and lognet types. I can test whether mod.obj$glmnet.fit inherits elnet.
