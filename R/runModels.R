@@ -18,6 +18,17 @@ writeOutputs.GLM <- function(results, config){
   write.Alteryx2(the.obj, nOutput = 3)
 }
 
+writeOutputs.GLMNET <- function(results, config) {
+  write.Alteryx2(results$Coefficients, nOutput = 1)
+  list_obj_to_plot <- c('norm', 'lambda', 'dev', plot.internalcv)
+  list_obj_to_plot <- list_obj_to_plot[list_obj_to_plot %in% names(results)]
+  for (plot_objs in 1:length(list_obj_to_plot)) {
+    write.Alteryx2(results[plot_objs], nOutput = 2)
+  }
+  the.obj <- prepModelForOutput(config$`Model Name`, results$model)
+  write.Alteryx2(the.obj, nOutput = 3)
+}
+
 writeOutputs.DecisionTree <- function(results, config) {
   # Report Output
   write.Alteryx2(results$report, nOutput = 1)
@@ -96,18 +107,15 @@ getResultsLinearRegression <- function(inputs, config){
   } else {
     the.model <- processElasticNet(inputs, config)
     #NOTE: lm.out to follow once the model creation portion is finished
-    plot.one <- function(){createFirstPlotOutputGLMNET(the.model)}
-    plot.two <- function(){createSecondPlotOutputGLMNET(the.model)}
-    plot.three <- function(){createThirdPlotOutputGLMNET(the.model)}
+    results <- append(
+      plyr::llply(c('norm', 'lambda', 'dev'), createPlotOutputsGLMNET),
+      list(model = the.model)
+    )
     if (config$internal_cv) {
-      plot.internalcv <- function(){createCVPlotOutputGLMNET(the.model)}
-      results <- list(model = the.model, report = NULL, first_plot = plot.one,
-                      second_plot = plot.two, third_plot = plot_three,
-                      internal_cv_plot = plot.internalcv)
-    } else {
-      results <- list(model = the.model, report = NULL, first_plot = plot.one,
-                      second_plot = plot.two, third_plot = plot_three)
+      results <- append(results, list(plot.internalcv = plot(the.model)))
     }
+    coefs_out <- createReportGLMNET(the.model)
+    results <- append(results, list(Coefficients = coefs_out))
     class(results) <- "GLMNET"
   }
   results

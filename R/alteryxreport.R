@@ -337,21 +337,3 @@ AlteryxReportRx <- function (rx.obj, null.deviance = NULL) {
   summary.df
 }
 
-#' Create a data frame with elnet/cv.glmnet containing an elnet model object summary
-#'
-#'
-#' The function Alteryx.ReportGLMNET creates a data frame of an elnet/cv.glmnet model's summary
-#' output that can more easily be handled by Alteryx's reporting tools. The
-#' function returns a data frame containing the model's coeffcients.
-#'
-#' @param glmnet_obj glmnet or cv.glmnet model object whose summary output is put into a data frame
-#' @author Bridget Toomey
-#' @export
-#' @family Alteryx.Report
-Alteryx.ReportGLMNET <- function(glmnet_obj) {
-
-}
-
-
-
-

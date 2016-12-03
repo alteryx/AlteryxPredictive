@@ -138,7 +138,26 @@ createReportLinearXDF <- function(the.model, config){
   lm.out <- rbind(c("Model_Name", config$`Model Name`), lm.out)
   lm.out
 }
+#' Create a data frame with elnet/cv.glmnet containing an elnet model object summary
+#'
+#'
+#' The function createReportGLMNET creates a data frame of an elnet/cv.glmnet model's summary
+#' output that can more easily be handled by Alteryx's reporting tools. The
+#' function returns a data frame containing the model's coeffcients.
+#'
+#' @param glmnet_obj glmnet or cv.glmnet model object whose non-zero coefficients are
+#'  put into a data frame
+#' @author Bridget Toomey
+#' @export
+#' @family Alteryx.Report
 
+createReportGLMNET <- function(glmnet_obj) {
+  coefs_out <- glmnet::coef(glmnet_obj, s = glmnet_obj$lambda_pred)
+  #Coerce this result to a vector so we can put it in a data.frame
+  #along with the variable names.
+  coefs_out <- as(coefs_out, "vector")
+  return(data.frame("Names_of_nonzero_coefficients", "Coefficient_values"))
+}
 
 #' Create Plots
 #'
@@ -160,50 +179,14 @@ createPlotOutputsLinearXDF <- function(){
   noDiagnosticPlot("The diagnostic plot is not available for XDF based models")
 }
 
-#' Prepare the glmnet/cv.glmnet plot featuring the L1 norm on the x axis.
-#'
+#' Prepare the glmnet/cv.glmnet plots
 #' @param the.model model object
+#' @param xvar the name of the variable to be plotted on the x axis
 #' @export
-createFirstPlotOutputGLMNET <- function(the.model){
-  if (inherits(the.model, "cv.glmnet")) {
-    plotted_obj <- the.model$glmnet.fit
-  } else {
-    plotted_obj <- the.model
-  }
-  plot(the.model, xvar = "norm")
+
+createPlotOutputsGLMNET <- function(the.model, xvar, ...){
+  plot_obj <- if (inherits(the.model, "cv.glmnet")) the.model$glmnet.fit else the.model
+  function(){plot(plot_obj, xvar = xvar, ...)}
 }
 
-#' Prepare the glmnet/cv.glmnet plot featuring log(lambda) on the x axis.
-#'
-#' @param the.model model object
-#' @export
-createSecondPlotOutputGLMNET <- function(the.model){
-  if (inherits(the.model, "cv.glmnet")) {
-    plotted_obj <- the.model$glmnet.fit
-  } else {
-    plotted_obj <- the.model
-  }
-  plot(the.model, xvar = "lambda")
-}
 
-#' Prepare the glmnet/cv.glmnet plot featuring the fraction of deviance
-#' explained on the x axis.
-#'
-#' @param the.model model object
-#' @export
-createThirdPlotOutputGLMNET <- function(the.model){
-  if (inherits(the.model, "cv.glmnet")) {
-    plotted_obj <- the.model$glmnet.fit
-  } else {
-    plotted_obj <- the.model
-  }
-  plot(the.model, xvar = "dev")
-}
-
-#' Prepare the cv.glmnet plot featuring the mean squared error vs log(lambda).
-#'
-#' @param the.model model object
-#' @export
-createCVPlotOutputGLMNET <- function(the.model){
-  plot(the.model)
-}
