@@ -92,7 +92,7 @@ runLogisticRegression <- function(inputs, config){
 getResultsLinearRegression <- function(inputs, config){
   requireNamespace("car")
   config$`Model Name`= validName(config$`Model Name`)
-  if (!(config$regularization)) {
+  if ((is.null(config$regularization))||(!(config$regularization))) {
     if (inputs$XDFInfo$is_XDF){
       the.model <- processLinearXDF(inputs, config)
       lm.out <- createReportLinearXDF(the.model, config)
@@ -106,13 +106,18 @@ getResultsLinearRegression <- function(inputs, config){
     class(results) <- "GLM"
   } else {
     the.model <- processElasticNet(inputs, config)
-    #NOTE: lm.out to follow once the model creation portion is finished
-    results <- append(
-      plyr::llply(c('norm', 'lambda', 'dev'), createPlotOutputsGLMNET),
-      list(model = the.model)
-    )
-    if (config$internal_cv) {
-      results <- append(results, list(plot.internalcv = plot(the.model)))
+    #We don't need to worry about backwards compatibility in this section.
+    #In order to enter this side of the outer if loop, config$regularization
+    #must exist and be true. Thus, config$display_graphs must exist as well.
+    results <- list(model = the.model)
+    if (config$display_graphs) {
+      results <- append(
+        plyr::llply(c('norm', 'lambda', 'dev'), createPlotOutputsGLMNET),
+        results
+      )
+      if (config$internal_cv) {
+        results <- append(results, list(plot.internalcv = plot(the.model)))
+      }
     }
     coefs_out <- createReportGLMNET(the.model)
     results <- append(results, list(Coefficients = coefs_out))
