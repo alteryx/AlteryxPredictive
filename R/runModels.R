@@ -92,7 +92,7 @@ runLogisticRegression <- function(inputs, config){
 getResultsLinearRegression <- function(inputs, config){
   requireNamespace("car")
   config$`Model Name`= validName(config$`Model Name`)
-  if (!(config$regularization)) {
+  if ((is.null(config$regularization))||(!(config$regularization))) {
     if (inputs$XDFInfo$is_XDF){
       the.model <- processLinearXDF(inputs, config)
       lm.out <- createReportLinearXDF(the.model, config)
