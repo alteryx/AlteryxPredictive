@@ -336,3 +336,4 @@ AlteryxReportRx <- function (rx.obj, null.deviance = NULL) {
   summary.df <- rbind(summary.df, coef.str)
   summary.df
 }
+

@@ -81,8 +81,8 @@ df2NumericMatrix <- function(x){
 
 processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
-  glmFun <- if (config$cv_glmnet) glmnet::cv.glmnet else glmnet::glmnet
-  x <- df2numericMatrix(inputs$the.data[,var_names$x])
+  glmFun <- if (config$internal_cv) glmnet::cv.glmnet else glmnet::glmnet
+  x <- df2NumericMatrix(inputs$the.data[,var_names$x])
   funParams <- list(x = x,
                     y = inputs$the.data[,var_names$y], family = 'gaussian',
                     intercept  = config$`Omit Constant`, standardize = config$standardize_pred,
@@ -90,7 +90,25 @@ processElasticNet <- function(inputs, config){
                     nfolds = if (config$cv_glmnet) config$nfolds else NULL
   )
   the.model <- do.call(glmFun, Filter(Negate(is.null), funParams))
-  the.model$lambda_pred <- config$lambda
+  if (config$cv_glmnet) {
+    #The predict function used with objects of class cv.glmnet can be
+    #called with s = "lambda.1se" or s = "lambda.min" .
+    if (config$lambda_1se) {
+      the.model$lambda_pred <- "lambda.1se"
+    } else {
+      the.model$lambda_pred <- "lambda.min"
+    }
+  } else {
+    #When the predict function is called with glmnet objects, it either
+    #needs a specific value of lambda, or must be called with s= NULL,
+    #in which case the predictions will be made at every lambda value in the sequence.
+    the.model$lambda_pred <- config$lambda_no_cv
+  }
+  #Since glmnet and cv.glmnet don't produce a formula, we'll need to save the names
+  #of the predictor variables in order to use getXvars downstream, which is required by
+  #scoreModel.
+  the.model$xvars <- colnames(x)
+
   return(the.model)
 }
 
@@ -120,7 +138,26 @@ createReportLinearXDF <- function(the.model, config){
   lm.out <- rbind(c("Model_Name", config$`Model Name`), lm.out)
   lm.out
 }
+#' Create a data frame with elnet/cv.glmnet containing an elnet model object summary
+#'
+#'
+#' The function createReportGLMNET creates a data frame of an elnet/cv.glmnet model's summary
+#' output that can more easily be handled by Alteryx's reporting tools. The
+#' function returns a data frame containing the model's coeffcients.
+#'
+#' @param glmnet_obj glmnet or cv.glmnet model object whose non-zero coefficients are
+#'  put into a data frame
+#' @author Bridget Toomey
+#' @export
+#' @family Alteryx.Report
 
+createReportGLMNET <- function(glmnet_obj) {
+  coefs_out <- glmnet::coef(glmnet_obj, s = glmnet_obj$lambda_pred)
+  #Coerce this result to a vector so we can put it in a data.frame
+  #along with the variable names.
+  coefs_out <- as(coefs_out, "vector")
+  return(data.frame("Names_of_nonzero_coefficients", "Coefficient_values"))
+}
 
 #' Create Plots
 #'
@@ -141,3 +178,15 @@ createPlotOutputsLinearOSR <- function(the.model){
 createPlotOutputsLinearXDF <- function(){
   noDiagnosticPlot("The diagnostic plot is not available for XDF based models")
 }
+
+#' Prepare the glmnet/cv.glmnet plots
+#' @param the.model model object
+#' @param xvar the name of the variable to be plotted on the x axis
+#' @export
+
+createPlotOutputsGLMNET <- function(the.model, xvar, ...){
+  plot_obj <- if (inherits(the.model, "cv.glmnet")) the.model$glmnet.fit else the.model
+  function(){plot(plot_obj, xvar = xvar, ...)}
+}
+
+
