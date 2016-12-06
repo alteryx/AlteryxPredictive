@@ -153,7 +153,6 @@ createReportLinearXDF <- function(the.model, config){
 #' @family Alteryx.Report
 
 createReportGLMNET <- function(glmnet_obj) {
-  library(glmnet)
   coefs_out <- coef(glmnet_obj, s = glmnet_obj$lambda_pred)
   #Coerce this result to a vector so we can put it in a data.frame
   #along with the variable names.

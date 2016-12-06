@@ -5,7 +5,7 @@
 #' @param score.field name given to the score field
 #' @param ... additional arguments
 #' @export
-#' @author Ramnath Vaidyanathan, Dan Putler
+#' @author Ramnath Vaidyanathan, Dan Putler, Bridget Toomey
 #' @rdname scoreModel
 scoreModel <- function(mod.obj, new.data, score.field = "Score", ...) {
   UseMethod('scoreModel')
