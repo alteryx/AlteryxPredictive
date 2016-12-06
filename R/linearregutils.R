@@ -75,8 +75,10 @@ df2NumericMatrix <- function(x){
     stop.Alteryx2()
   } else if (numNonNumericCols > 0){
     AlteryxMessage2("Non-numeric variables were included to glmnet. They are now being removed.", iType = 1, iPriority = 3)
-    Filter(is.numeric, x)
+    x <- Filter(is.numeric, x)
   }
+  x <- as.matrix(x)
+  return(x)
 }
 
 processElasticNet <- function(inputs, config){
@@ -90,7 +92,7 @@ processElasticNet <- function(inputs, config){
                     nfolds = if (config$internal_cv) config$nfolds else NULL
   )
   the.model <- do.call(glmFun, Filter(Negate(is.null), funParams))
-  if (config$cv_glmnet) {
+  if (config$internal_cv) {
     #The predict function used with objects of class cv.glmnet can be
     #called with s = "lambda.1se" or s = "lambda.min" .
     if (config$lambda_1se) {
