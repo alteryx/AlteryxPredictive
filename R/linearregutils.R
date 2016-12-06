@@ -156,8 +156,8 @@ createReportGLMNET <- function(glmnet_obj) {
   coefs_out <- coef(glmnet_obj, s = glmnet_obj$lambda_pred)
   #Coerce this result to a vector so we can put it in a data.frame
   #along with the variable names.
-  coefs_out <- as(coefs_out, "vector")
-  return(data.frame("Names_of_nonzero_coefficients", "Coefficient_values"))
+  vector_coefs_out <- as(coefs_out, "vector")
+  return(data.frame(Names_of_nonzero_coefficients = rownames(coefs_out), Coefficient_values = vector_coefs_out))
 }
 
 #' Create Plots
