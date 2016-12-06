@@ -87,7 +87,7 @@ processElasticNet <- function(inputs, config){
                     y = inputs$the.data[,var_names$y], family = 'gaussian',
                     intercept  = config$`Omit Constant`, standardize = config$standardize_pred,
                     weights = if (!is.null(var_names$w)) inputs$the.data[,var_names$w] else NULL,
-                    nfolds = if (config$cv_glmnet) config$nfolds else NULL
+                    nfolds = if (config$internal_cv) config$nfolds else NULL
   )
   the.model <- do.call(glmFun, Filter(Negate(is.null), funParams))
   if (config$cv_glmnet) {
