@@ -23,7 +23,10 @@ writeOutputs.GLMNET <- function(results, config) {
   if (config$display_graphs) {
     list_obj_to_plot <- c('norm', 'lambda', 'dev', 'plot.internalcv')
     list_obj_to_plot <- list_obj_to_plot[list_obj_to_plot %in% names(results)]
-    plyr::l_ply(.data = list_obj_to_plot, .fun = AlteryxGraph2, nOutput = 2)
+    for (i in 1:length(list_obj_to_plot)) {
+      current_func <- list_obj_to_plot[i]
+      AlteryxGraph2(currentfunc(), nOutput = 2)
+    }
   }
   the.obj <- prepModelForOutput(config$`Model Name`, results$model)
   write.Alteryx2(the.obj, nOutput = 3)
@@ -112,11 +115,11 @@ getResultsLinearRegression <- function(inputs, config){
     results <- list(model = the.model)
     if (config$display_graphs) {
       results <- append(
-        plyr::llply(c('norm', 'lambda', 'dev'), createPlotOutputsGLMNET),
+        plyr::llply(c('norm', 'lambda', 'dev'), createPlotOutputsGLMNET, the.model = the.model),
         results
       )
       if (config$internal_cv) {
-        results <- append(results, list(plot.internalcv = plot(the.model)))
+        results <- append(results, list(plot.internalcv = function(){plot(the.model, xvar = xvar, ...)}))
       }
     }
     coefs_out <- createReportGLMNET(the.model)
