@@ -21,11 +21,9 @@ writeOutputs.GLM <- function(results, config){
 writeOutputs.GLMNET <- function(results, config) {
   write.Alteryx2(results$Coefficients, nOutput = 1)
   if (config$display_graphs) {
-    list_obj_to_plot <- c('norm', 'lambda', 'dev', plot.internalcv)
+    list_obj_to_plot <- c('norm', 'lambda', 'dev', 'plot.internalcv')
     list_obj_to_plot <- list_obj_to_plot[list_obj_to_plot %in% names(results)]
-    for (plot_objs in 1:length(list_obj_to_plot)) {
-      AlteryxGraph2(results[plot_objs], nOutput = 2)
-    }
+    plyr::l_ply(.data = list_obj_to_plot, .fun = AlteryxGraph2, nOutput = 2)
   }
   the.obj <- prepModelForOutput(config$`Model Name`, results$model)
   write.Alteryx2(the.obj, nOutput = 3)
