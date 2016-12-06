@@ -90,7 +90,7 @@ processElasticNet <- function(inputs, config){
                     nfolds = if (config$internal_cv) config$nfolds else NULL
   )
   the.model <- do.call(glmFun, Filter(Negate(is.null), funParams))
-  if (config$cv_glmnet) {
+  if (config$internal_cv) {
     #The predict function used with objects of class cv.glmnet can be
     #called with s = "lambda.1se" or s = "lambda.min" .
     if (config$lambda_1se) {
