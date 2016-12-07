@@ -423,7 +423,7 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
 #'
 #' @inheritParams createReportDT
 #' @return dataframe of piped results
-createReportDT.C5.0 <- function(model, config, name, xdf_path) {
+createReportDT.C5.0 <- function(model, config, names, xdf_path) {
   list(out = capture.output(summary(model)), model = model, model_rpart = NULL)
 }
 
