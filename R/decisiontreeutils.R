@@ -59,7 +59,7 @@ checkValidConfig.XDF <- function(config, the.data, names) {
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
 #' @import assertthat
-checkValidConfig.C50 <- function(config, the.data, names) {
+checkValidConfig.C5.0 <- function(config, the.data, names) {
   # check on trials
   Alteryx_assert(is.boundedInt(config$trials, min = 1),
                  "trials must be a integer with value at least 1"
