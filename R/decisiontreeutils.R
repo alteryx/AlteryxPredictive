@@ -126,6 +126,9 @@ checkValidConfig.C50 <- function(config, the.data, names) {
                  "earlyStopping must be a boolean value"
                  )
 
+  # check on model.algorithm
+  Alteryx_assert(config$model.algorithm %in% c("rpart", "C5.0"))
+
 }
 
 #' Error checking pre-model defaults to OSR
