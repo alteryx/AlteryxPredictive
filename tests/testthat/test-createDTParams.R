@@ -23,7 +23,7 @@ config <- list(
   maxNumBins = 4
 )
 
-class(config) <- "OSR"
+class(config) <- "rpart"
 
 test_that("non XDF results give expected param list", {
   xdf_properties <- list(

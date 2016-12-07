@@ -15,7 +15,7 @@ checkValidConfig <- function(config, the.data, names) {
 #' @param config list of config options
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
-checkValidConfig.OSR <- function(config, the.data, names) {
+checkValidConfig.rpart <- function(config, the.data, names) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   target <- the.data[[names$y]]
@@ -131,14 +131,14 @@ checkValidConfig.C50 <- function(config, the.data, names) {
 
 }
 
-#' Error checking pre-model defaults to OSR
+#' Error checking pre-model defaults to rpart
 #' Does not return anything - just throws errror
 #'
 #' @param config list of config options
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
 checkValidConfig.default <- function(config, the.data, names) {
-  checkValidConfig.OSR(config, the.data, names)
+  checkValidConfig.rpart(config, the.data, names)
 }
 
 #' Creation of components for model object evaluation
@@ -182,7 +182,7 @@ createDTParams <- function(config, names) {
 
 
 
-#' Map parameter names for OSR and XDF
+#' Map parameter names for rpart and XDF
 #'
 #' @param f_string string of function
 #' @param params list of decision tree params

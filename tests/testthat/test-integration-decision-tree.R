@@ -19,7 +19,7 @@ config <- list(
   `Y Var` = "Species"
 )
 
-class(config) <- "OSR"
+class(config) <- "rpart"
 
 inputs <- list(
   the.data = iris[, c(config$`Y Var`, config$`X Vars`)],
