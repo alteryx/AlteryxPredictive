@@ -4,12 +4,14 @@
 \alias{createReportDT.C5.0}
 \title{Get data for static report for C5.0 model}
 \usage{
-\method{createReportDT}{C5.0}(model, config, name, xdf_path)
+\method{createReportDT}{C5.0}(model, config, names, xdf_path)
 }
 \arguments{
 \item{model}{model object}
 
 \item{config}{list of config options}
+
+\item{names}{names of variables (x, y and w)}
 
 \item{xdf_path}{string of xdf file location}
 }
