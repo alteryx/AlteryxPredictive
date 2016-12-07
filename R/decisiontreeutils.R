@@ -268,12 +268,9 @@ processDT <- function(inputs, config) {
 
   params <- createDTParams(config, var_names)
 
-  if (config$algorithm.rpart)
-    fstring <- 'rpart'
-  else if(config$algorithm$C5.0)
-    fstring <- 'C5.0'
+  f_string <- config$model.algorithm
   if (inputs$XDFInfo$is_XDF)
-    fstring <- 'rxDTree'
+    f_string <- 'rxDTree'
 
   if (inputs$XDFInfo$is_XDF)
     params$data <- inputs$XDFInfo$xdf_path
