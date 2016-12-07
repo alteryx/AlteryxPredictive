@@ -483,10 +483,31 @@ createTreePlotDT.default <- function(model, config) {
 #' Create Prune Plot
 #'
 #' @param model model object
-createPrunePlotDT <- function(model){
+createPrunePlotDT <- function(model) {
+  UseMethod("createPrunePlotDT", model)
+}
+
+#' Create Prune Plot
+#'
+#' @inheritParams createPrunePlotDT
+createPrunePlotDT.rpart <- function(model) {
   par(mar = c(5, 4, 6, 2) + 0.1)
   rpart::plotcp(model, main = NULL)
   title(main = "Pruning Plot", line=5)
+}
+
+#' Create Prune Plot
+#'
+#' @inheritParams createPrunePlotDT
+createPrunePlotDT.rxDTree <- function(model) {
+  createPrunePlotDT.rpart(model)
+}
+
+#' Create Prune Plot
+#'
+#' @inheritParams createPrunePlotDT
+createPrunePlotDT.C5.0 <- function(model) {
+  NULL
 }
 
 #' Generic S3 Class
