@@ -177,36 +177,61 @@ createDTParams <- function(config, names) {
 
   params$noGlobalPruning <- !(config$GlobalPruning)
 
+  params$surrogatestyle <- if (config$total.correct) 0 else 1
+
+  class(params) <- class(config)
+
   params
 }
 
-
-
-#' Map parameter names for rpart and XDF
+#' Map parameter names to function argument names
 #'
-#' @param f_string string of function
 #' @param params list of decision tree params
-#' @return list with named parameters for f_string
-convertDTParamsToArgs <- function(params, f_string) {
-  fmap <- list(
-    rpart = c(data = "data", formula = "formula", weights = "weights", method = "method",
-      parms = "parms", usesurrogate = "usesurrogate", minsplit = "minsplit",
-      minbucket = "minbucket", xval = "xval", maxdepth = "maxdepth", cp = "cp"
-    ),
-    rxDTree = c(data = "data", formula = "formula", weights = "pweights", method = "method",
-      parms = "parms", usesurrogate = "useSurrogate", maxNumBins = "maxNumBins",
-      minsplit = "minSplit", minbucket = "minBucket", xval = "xVal",
-      maxdepth = "maxDepth", cp = "cp"
-    ),
-    C5.0 = c(data = "data", formula = "formula", trials = "trials", rules = "rules",
-      weights = "weights", subset = "subset", bands = "bands", winnow = "winnow",
-      noGlobalPruning = "noGlobalPruning", CF = "CF", minCases = "minCases",
-      fuzzyThreshold = "fuzzyThreshold", sample = "sample", seed = "seed",
-      earlyStopping = "earlyStopping"
-    )
-  )
-  to_rename <- intersect(names(fmap$rpart), names(params))
-  plyr::rename(params[to_rename], fmap[[f_string]], warn_missing = F)
+#' @return list with named parameters  for function
+convertDTParamsToArgs <- function(params) {
+  UseMethod("convertDTParamsToArgs", params)
+}
+
+#' Map parameter names to function arg names for rpart
+#'
+#' @inheritParams convertDTParamsToArgs
+#' @return list with named parameters for rpart
+convertDTParamsToArgs.rpart <- function(params) {
+  params[c("formula", "data", "weights", "method", "parms", "minsplit",
+           "minbucket", "cp", "usesurrogate", "maxdepth", "xval",
+           "surrogatestyle")]
+}
+
+#' Map parameter names to function arg names for rxDTree
+#'
+#' @inheritParams convertDTParamsToArgs
+#' @return list with named parameters for rxDTree
+convertDTParamsToArgs.rxDTree <- function(params) {
+  args_rpart <- params[c("formula", "data", "weights", "method", "parms",
+                         "minsplit", "minbucket", "cp", "usesurrogate",
+                         "maxdepth", "xval", "surrogatestyle", "maxNumBins")]
+  plyr::rename(args_rpart, c("weights" = "pweights",
+                             "usesurrogate" = "useSurrogate",
+                             "minsplit" = "minSplit",
+                             "minbucket" = "minBucket",
+                             "xval" = "xVal",
+                             "maxdepth" = "maxDepth",
+                             "surrogatestyle" = "surrogateStyle"
+  ),
+  warn_missing = FALSE)
+}
+
+#' Map parameter names to function arg names for C5.0
+#'
+#' @inheritParams convertDTParamsToArgs
+#' @return list with named parameters for C5.0
+convertDTParamsToArgs.C5.0 <- function(params) {
+  control <- params[c("subset", "bands", "winnow", "noGlobalPruning", "CF",
+                      "minCases", "fuzzyThreshold", "sample", "seed",
+                      "earlyStoping")]
+
+  args <- params[c("trials", "rules", "weights", "formula", "data")]
+  args$control <- control
 }
 
 #' Adjusts config based on results if config was initially "Auto"
