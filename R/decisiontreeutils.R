@@ -508,11 +508,23 @@ createDashboardDT.rpart <- function(model) {
 
 #' Create Interactive Dashboard for default model
 #'
-#' @param model model object
+#' @inheritParams createDashboardDT
+#' @import htmltools
+createDashboardDT.rxDTree <- function(model) {
+  k1 = tags$div(tags$h4(
+    "Interactive Visualizations are not supported for Revolution R Enterprise"
+  ))
+
+  k1
+}
+
+#' Create Interactive Dashboard for default model
+#'
+#' @inheritParams createDashboardDT
 #' @import htmltools
 createDashboardDT.default <- function(model) {
   k1 = tags$div(tags$h4(
-    "Interactive Visualizations are not supported for Revolution Enterprise"
+    paste0("Interactive Visualizations are not supported for ", class(model)[1], " model types")
   ))
 
   k1
