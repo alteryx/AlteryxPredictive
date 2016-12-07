@@ -303,7 +303,7 @@ processDT <- function(inputs, config) {
   if (inputs$XDFInfo$is_XDF)
     params$data <- inputs$XDFInfo$xdf_path
 
-  args <- convertDTParamsToArgs(params, f_string)
+  args <- convertDTParamsToArgs(params)
 
   model <- do.call(f_string, args)
 
