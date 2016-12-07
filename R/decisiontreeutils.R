@@ -406,8 +406,18 @@ createReportDT.C5.0 <- function(model, config, name, xdf_path) {
 #'
 #' @param model model object
 #' @param config configuration object
+#' @return graphs
 #' @export
-createTreePlotDT <- function(model, config){
+createTreePlotDT <- function(model, config) {
+  UseMethod("creatTreePlotDT", model)
+}
+
+#' Create Tree Plot for rpart model
+#'
+#' @inheritParams createTreePlotDT
+#' @return graphs
+#' @export
+createTreePlotDT.rpart <- function(model, config) {
   leaf_sum <- if (model$method != "class") 0 else if (config$do.counts == TRUE) 2 else 4
   uniform <- config$b.dist
   fallen <- !uniform
@@ -416,6 +426,35 @@ createTreePlotDT <- function(model, config){
     model, type = 0, extra = leaf_sum, uniform = uniform, fallen.leaves = fallen,
     main = "Tree Plot", cex = 1
   )
+}
+
+#' Create Tree Plot for rxDTree model
+#'
+#' @inheritParams createTreePlotDT
+#' @return graphs
+#' @export
+createTreePlotDT.rxDTree <- function(model, config) {
+  createTreePlotDT.rpart(model, config)
+}
+
+#' Create Tree Plot for C5.0 model
+#'
+#' @inheritParams createTreePlotDT
+#' @return graphs
+#' @export
+createTreePlotDT.C5.0 <- function(model, config) {
+  par(mar = c(5, 4, 6, 2) + 0.1)
+  plot(model, trials = config$trials)
+}
+
+#' Create Tree Plot for C5.0 model
+#'
+#' @inheritParams createTreePlotDT
+#' @return graphs
+#' @export
+createTreePlotDT.default <- function(model, config) {
+  par(mar = c(5, 4, 6, 2) + 0.1)
+  plot(model)
 }
 
 #' Create Prune Plot
