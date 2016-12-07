@@ -322,10 +322,7 @@ createReportDT <- function(model, config = NULL, names = NULL, xdf_path = NULL) 
 
 #' Get data for static report (grp|out pipes) for rpart model
 #'
-#' @param model model object
-#' @param config list of config options
-#' @param names names of variables (x, y and w)
-#' @param xdf_path string of xdf file location
+#' @inheritParams createReportDT
 #' @return dataframe of piped results
 #' @importFrom magrittr %>% extract
 createReportDT.rpart <- function(model, config, names, xdf_path) {
@@ -354,10 +351,7 @@ createReportDT.rpart <- function(model, config, names, xdf_path) {
 
 #' Get data for static report (grp|out pipes) for rxDTree model
 #'
-#' @param model model object
-#' @param config list of config options
-#' @param names names of variables (x, y and w)
-#' @param xdf_path string of xdf file location
+#' @inheritParams createReportDT
 #' @return dataframe of piped results
 #' @importFrom magrittr %>% extract
 createReportDT.rxDTree <- function(model, config, names, xdf_path) {
@@ -398,6 +392,14 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
     c("Model_Class", 'rxDTree')
   )
   list(out = rpart_out, model = model, model_rpart = model_rpart)
+}
+
+#' Get data for static report for C5.0 model
+#'
+#' @inheritParams createReportDT
+#' @return dataframe of piped results
+createReportDT.C5.0 <- function(model, config, name, xdf_path) {
+  list(out = capture.output(summary(model)), model = model, model_rpart = NULL)
 }
 
 #' Create Tree Plot
