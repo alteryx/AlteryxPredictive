@@ -18,14 +18,18 @@ writeOutputs.GLM <- function(results, config){
   write.Alteryx2(the.obj, nOutput = 3)
 }
 
+
 writeOutputs.GLMNET <- function(results, config) {
   write.Alteryx2(results$Coefficients, nOutput = 1)
   if (config$display_graphs) {
-    list_obj_to_plot <- c('norm', 'lambda', 'dev', 'plot.internalcv')
-    list_obj_to_plot <- list_obj_to_plot[list_obj_to_plot %in% names(results)]
+    list_obj_to_plot <- c('norm', 'lambda', 'dev')
+    plot_obj <- results$model
+    if (config$internal_cv) {
+      AlteryxGraph2(plot(results$model), nOutput = 2)
+      plot_obj <- plot_obj$glmnet.fit
+    }
     for (i in 1:length(list_obj_to_plot)) {
-      current_func <- list_obj_to_plot[i]
-      AlteryxGraph2(currentfunc(), nOutput = 2)
+      AlteryxGraph2(plot(plot_obj, xvar = list_obj_to_plot[i]), nOutput = 2)
     }
   }
   the.obj <- prepModelForOutput(config$`Model Name`, results$model)
@@ -113,19 +117,20 @@ getResultsLinearRegression <- function(inputs, config){
     #In order to enter this side of the outer if loop, config$regularization
     #must exist and be true. Thus, config$display_graphs must exist as well.
     results <- list(model = the.model)
-    if (config$display_graphs) {
-      results <- append(
-        plyr::llply(c('norm', 'lambda', 'dev'), createPlotOutputsGLMNET, the.model = the.model),
-        results
-      )
-      if (config$internal_cv) {
-        results <- append(results, list(plot.internalcv = function(){plot(the.model, xvar = xvar, ...)}))
-      }
-    }
+#     if (config$display_graphs) {
+#       results <- append(
+#         plyr::alply(c('norm', 'lambda', 'dev'), createPlotOutputsGLMNET, the.model = the.model),
+#         results
+#       )
+#       if (config$internal_cv) {
+#         results <- append(results, list(plot.internalcv = function(){plot(the.model, xvar = xvar, ...)}))
+#       }
+#     }
     coefs_out <- createReportGLMNET(the.model)
     results <- append(results, list(Coefficients = coefs_out))
     class(results) <- "GLMNET"
   }
+  print("got results")
   results
 }
 
