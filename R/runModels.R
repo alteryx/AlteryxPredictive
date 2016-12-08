@@ -117,15 +117,6 @@ getResultsLinearRegression <- function(inputs, config){
     #In order to enter this side of the outer if loop, config$regularization
     #must exist and be true. Thus, config$display_graphs must exist as well.
     results <- list(model = the.model)
-#     if (config$display_graphs) {
-#       results <- append(
-#         plyr::alply(c('norm', 'lambda', 'dev'), createPlotOutputsGLMNET, the.model = the.model),
-#         results
-#       )
-#       if (config$internal_cv) {
-#         results <- append(results, list(plot.internalcv = function(){plot(the.model, xvar = xvar, ...)}))
-#       }
-#     }
     coefs_out <- createReportGLMNET(the.model)
     results <- append(results, list(Coefficients = coefs_out))
     class(results) <- "GLMNET"
