@@ -18,15 +18,22 @@ writeOutputs.GLM <- function(results, config){
   write.Alteryx2(the.obj, nOutput = 3)
 }
 
+
 writeOutputs.GLMNET <- function(results, config) {
   write.Alteryx2(results$Coefficients, nOutput = 1)
   if (config$display_graphs) {
-    list_obj_to_plot <- c('norm', 'lambda', 'dev', 'plot.internalcv')
-    list_obj_to_plot <- list_obj_to_plot[list_obj_to_plot %in% names(results)]
-    for (i in 1:length(list_obj_to_plot)) {
-      current_func <- list_obj_to_plot[i]
-      AlteryxGraph2(currentfunc(), nOutput = 2)
+    list_obj_to_plot <- c('norm', 'lambda', 'dev')
+    plot_obj <- results$model
+    if (config$internal_cv) {
+      AlteryxGraph2(plot(results$model), nOutput = 5)
+      plot_obj <- plot_obj$glmnet.fit
     }
+    #Note: We're using different outputs for these because there currently
+    #appears to be a bug. An error frequently occurs when they're all sent
+    #to the same output.
+    AlteryxGraph2(plot(plot_obj, xvar = list_obj_to_plot[1]), nOutput = 2)
+    AlteryxGraph2(plot(plot_obj, xvar = list_obj_to_plot[2]), nOutput = 2)
+    AlteryxGraph2(plot(plot_obj, xvar = list_obj_to_plot[3]), nOutput = 4)
   }
   the.obj <- prepModelForOutput(config$`Model Name`, results$model)
   write.Alteryx2(the.obj, nOutput = 3)
@@ -108,20 +115,12 @@ getResultsLinearRegression <- function(inputs, config){
     results <- list(model = the.model, report = lm.out, plot = plot.out)
     class(results) <- "GLM"
   } else {
+    print("latest version as of noon 12-08")
     the.model <- processElasticNet(inputs, config)
     #We don't need to worry about backwards compatibility in this section.
     #In order to enter this side of the outer if loop, config$regularization
     #must exist and be true. Thus, config$display_graphs must exist as well.
     results <- list(model = the.model)
-    if (config$display_graphs) {
-      results <- append(
-        plyr::llply(c('norm', 'lambda', 'dev'), createPlotOutputsGLMNET, the.model = the.model),
-        results
-      )
-      if (config$internal_cv) {
-        results <- append(results, list(plot.internalcv = function(){plot(the.model, xvar = xvar, ...)}))
-      }
-    }
     coefs_out <- createReportGLMNET(the.model)
     results <- append(results, list(Coefficients = coefs_out))
     class(results) <- "GLMNET"

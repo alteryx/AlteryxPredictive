@@ -180,14 +180,4 @@ createPlotOutputsLinearXDF <- function(){
   noDiagnosticPlot("The diagnostic plot is not available for XDF based models")
 }
 
-#' Prepare the glmnet/cv.glmnet plots
-#' @param the.model model object
-#' @param xvar the name of the variable to be plotted on the x axis
-#' @export
-
-createPlotOutputsGLMNET <- function(the.model, xvar, ...){
-  plot_obj <- if (inherits(the.model, "cv.glmnet")) the.model$glmnet.fit else the.model
-  function(){plot(plot_obj, xvar = xvar, ...)}
-}
-
 
