@@ -148,7 +148,7 @@ createDTParams <- function(config, names) {
   # use lists to hold params
   params <- config[c('minsplit', 'minbucket', 'xval', 'maxdepth',
                      'trials', 'rules', 'subset', 'bands',
-                     'bands.check', 'winnow', 'CF', 'minCases',
+                     'winnow', 'CF', 'minCases',
                      'fuzzyThreshold', 'sample', 'seed', 'earlyStopping'
                      )]
   params <- modifyList(params, list(
@@ -157,6 +157,9 @@ createDTParams <- function(config, names) {
     formula = makeFormula(names$x, names$y),
     weights = names$w
   ))
+
+  if (!config$bands.check)
+    params$bands <- 0
 
   # get method and parms params
   if (config$select.type){
