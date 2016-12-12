@@ -15,11 +15,12 @@ config <- list(
   use.gini = TRUE, use.information = FALSE, use.weights = FALSE,
   usesurrogate.0 = FALSE, usesurrogate.1 = FALSE, usesurrogate.2 = TRUE,
   `X Vars` = c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
-  xval.folds = 10,
-  `Y Var` = "Species"
+  xval.folds = 10, `Y Var` = "Species", model.algorithm = "rpart",
+  display.static = TRUE, trials = 1, rules = FALSE, subset = FALSE,
+  bands.check = FALSE, bands = 10, winnow = FALSE, GlobalPruning = TRUE,
+  CF = .25, minCases = 2, fuzzyThreshold = TRUE, sample = 0, seed = 1,
+  earlyStopping = TRUE
 )
-
-class(config) <- "rpart"
 
 inputs <- list(
   the.data = iris[, c(config$`Y Var`, config$`X Vars`)],
