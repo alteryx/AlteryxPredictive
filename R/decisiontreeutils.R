@@ -238,12 +238,16 @@ convertDTParamsToArgsrxDTree <- function(params) {
 #' @param params list of decision tree params
 #' @return list with named parameters for C5.0
 convertDTParamsToArgsC5.0 <- function(params) {
-  control <- params[c("subset", "bands", "winnow", "noGlobalPruning", "CF",
-                      "minCases", "fuzzyThreshold", "sample", "seed",
-                      "earlyStoping")]
+  arg_names <- c("formula", "data", "trials", "rules", "weights")
+  control_names <- c("subset", "bands", "winnow", "noGlobalPruning", "CF",
+                     "minCases", "fuzzyThreshold", "sample", "seed",
+                     "earlyStoping")
 
-  args <- params[c("trials", "rules", "weights", "formula", "data")]
-  args$control <- control
+  control <- params[intersect(control_names, names(params))]
+  args <- params[intersect(arg_names, names(params))]
+
+  args$control <- do.call(C5.0Control, control)
+  args
 }
 
 #' Adjusts config based on results if config was initially "Auto"
