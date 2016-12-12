@@ -105,8 +105,8 @@ checkValidConfigC5.0 <- function(config, the.data, names) {
                  )
 
   # check on CF
-  Alteryx_assert(is.boundedReal(config$bands, min = 0, max = 1, closed = FALSE),
-                 "bands must be strictly between 0 and 1"
+  Alteryx_assert(is.boundedReal(config$CF, min = 0, max = 1, closed = FALSE),
+                 "CF must be strictly between 0 and 1"
                  )
 
   # check on minCases
@@ -135,7 +135,8 @@ checkValidConfigC5.0 <- function(config, the.data, names) {
                  )
 
   # check on model.algorithm
-  Alteryx_assert(config$model.algorithm %in% c("rpart", "C5.0"))
+  Alteryx_assert(config$model.algorithm %in% c("rpart", "C5.0", "rxDTree"),
+                 "model.algorithm must be rpart, C5.0 or rxDTree")
 
 }
 
@@ -298,6 +299,7 @@ adjustCP.default <- function(model, config) {
 #' @param config configuration passed to the tool
 #' @return list of results or results
 #' @import rpart rpart.plot
+#' @import C50
 #' @export
 processDT <- function(inputs, config) {
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
