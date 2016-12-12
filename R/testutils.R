@@ -50,7 +50,7 @@ Alteryx_assert.default <- function(exp, msg, ...) {
 is.boundedReal <- function(val, min = -Inf, max = Inf, closed = TRUE) {
   closed <- if (length(closed) == 1) rep(closed, 2) else closed[1:2]
   is.numeric(val) && min <= val && max >= val &&
-    (!closed[1] || min != val) && (!closed[2] || max != val)
+    (closed[1] || min != val) && (closed[2] || max != val)
 }
 
 #' checks whether real value is between min and max
