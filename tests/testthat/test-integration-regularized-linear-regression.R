@@ -30,7 +30,7 @@ test_that('regularized linear regression works correctly on mtcars', {
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs, config)
   temp_coefs <- coef(exp_model, s = 1, exact = FALSE)
   vector_coefs_out <- as(temp_coefs, "vector")
-  expect_equal(results$Coefficients,
+  expect_equal(results$coefficients,
                data.frame(Names_of_nonzero_coefficients = rownames(temp_coefs), Coefficient_values = vector_coefs_out))
 })
 
@@ -69,6 +69,6 @@ test_that('regularized linear regression with internal CV works correctly on mtc
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs2, config2)
   temp_coefs <- coef(exp_model, s = "lambda.1se", exact = FALSE)
   vector_coefs_out <- as(temp_coefs, "vector")
-  expect_equal(results$Coefficients,
+  expect_equal(results$coefficients,
                data.frame(Names_of_nonzero_coefficients = rownames(temp_coefs), Coefficient_values = vector_coefs_out))
 })

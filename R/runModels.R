@@ -20,7 +20,8 @@ writeOutputs.GLM <- function(results, config){
 
 
 writeOutputs.GLMNET <- function(results, config) {
-  write.Alteryx2(results$Coefficients, nOutput = 1)
+  write.Alteryx2(results$coefficients, nOutput = 1)
+  results$model$coefficients <- results$coefficients
   if (config$display_graphs) {
     list_obj_to_plot <- c('norm', 'lambda', 'dev')
     plot_obj <- results$model
@@ -121,7 +122,7 @@ getResultsLinearRegression <- function(inputs, config){
     #must exist and be true. Thus, config$display_graphs must exist as well.
     results <- list(model = the.model)
     coefs_out <- createReportGLMNET(the.model)
-    results <- append(results, list(Coefficients = coefs_out))
+    results <- append(results, list(coefficients = coefs_out))
     class(results) <- "GLMNET"
   }
   results
