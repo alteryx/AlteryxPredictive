@@ -85,9 +85,14 @@ checkValidConfigC5.0 <- function(config, the.data, names) {
                  "bands.check must be a boolean value"
                  )
 
-  Alteryx_assert(is.boundedInt(config$bands, min = 2, max = 1000),
-                 "bands must be integer between 2 and 1000, inclusive"
+  Alteryx_assert(is.boundedInt(config$bands, min = 0, max = 1000),
+                 "bands must be integer between 0 and 1000, inclusive"
                  )
+
+  Alteryx_assert(config$bands != 1,
+                 "bands must be integer between 0 and 1000, inclusive"
+                 )
+
 
   # check on winnow
   Alteryx_assert(is.logical(config$winnow),
