@@ -4,10 +4,12 @@
 \alias{convertDTParamsToArgs}
 \title{Map parameter names to function argument names}
 \usage{
-convertDTParamsToArgs(params)
+convertDTParamsToArgs(params, model.algorithm)
 }
 \arguments{
 \item{params}{list of decision tree params}
+
+\item{model.algorithm}{model function to call}
 }
 \value{
 list with named parameters  for function
