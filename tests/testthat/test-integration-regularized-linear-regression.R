@@ -54,7 +54,7 @@ config2 <- list(
   display_graphs = checkboxInput('%Question.display_graphs%', TRUE)
 )
 
-inputs <- list(
+inputs2 <- list(
   the.data = mtcars[,c(config2$`Y Var`, config2$`X Vars`)],
   XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
 )
@@ -62,11 +62,11 @@ inputs <- list(
 #Since the results will depend on the folds used with cross-validation, we need to set the seed
 #before both runs.
 set.seed(1)
-exp_model <- glmnet::cv.glmnet(x = as.matrix((inputs$the.data)[,(config$`X Vars`)]), y = (inputs$the.data)$mpg,
+exp_model <- glmnet::cv.glmnet(x = as.matrix((inputs2$the.data)[,(config$`X Vars`)]), y = (inputs2$the.data)$mpg,
                                family = 'gaussian', alpha = .5, standardize = TRUE, intercept=TRUE, nfolds = 5)
 test_that('regularized linear regression with internal CV works correctly on mtcars', {
   set.seed(1)
-  results <- AlteryxPredictive:::getResultsLinearRegression(inputs, config2)
+  results <- AlteryxPredictive:::getResultsLinearRegression(inputs2, config2)
   temp_coefs <- coef(exp_model, s = "lambda.1se", exact = FALSE)
   vector_coefs_out <- as(temp_coefs, "vector")
   expect_equal(results$Coefficients,
