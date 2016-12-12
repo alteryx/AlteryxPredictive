@@ -197,9 +197,11 @@ convertDTParamsToArgs <- function(params, model.algorithm) {
 #' @param params list of decision tree params
 #' @return list with named parameters for rpart
 convertDTParamsToArgsrpart <- function(params) {
-  params[c("formula", "data", "weights", "method", "parms", "minsplit",
-           "minbucket", "cp", "usesurrogate", "maxdepth", "xval",
-           "surrogatestyle")]
+  arg_names <- c("formula", "data", "weights", "method", "parms", "minsplit",
+                 "minbucket", "cp", "usesurrogate", "maxdepth", "xval",
+                 "surrogatestyle")
+
+  params[intersect(names(params), arg_names)]
 }
 
 #' Map parameter names to function arg names for rxDTree
@@ -207,9 +209,13 @@ convertDTParamsToArgsrpart <- function(params) {
 #' @param params list of decision tree params
 #' @return list with named parameters for rxDTree
 convertDTParamsToArgsrxDTree <- function(params) {
-  args_rpart <- params[c("formula", "data", "weights", "method", "parms",
-                         "minsplit", "minbucket", "cp", "usesurrogate",
-                         "maxdepth", "xval", "surrogatestyle", "maxNumBins")]
+
+  params_rpart <- c("formula", "data", "weights", "method", "parms",
+                    "minsplit", "minbucket", "cp", "usesurrogate",
+                    "maxdepth", "xval", "surrogatestyle", "maxNumBins")
+
+  args_rpart <- params[intersect(names(params), params_rpart)]
+
   plyr::rename(args_rpart, c("weights" = "pweights",
                              "usesurrogate" = "useSurrogate",
                              "minsplit" = "minSplit",
@@ -240,7 +246,7 @@ convertDTParamsToArgsC5.0 <- function(params) {
 #' @param config list of config options
 #' @return model obj after adjusting complexity parameter
 adjustCP <- function(model, config) {
-  UseMethod(adjustCP, model)
+  UseMethod("adjustCP", model)
 }
 
 #' Adjusts config based on results if config was initially "Auto"
