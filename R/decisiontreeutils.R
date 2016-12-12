@@ -447,7 +447,7 @@ createReportDT.C5.0 <- function(model, config, names, xdf_path) {
 #' @return graphs
 #' @export
 createTreePlotDT <- function(model, config) {
-  UseMethod("creatTreePlotDT", model)
+  UseMethod("createTreePlotDT", model)
 }
 
 #' Create Tree Plot for rpart model
