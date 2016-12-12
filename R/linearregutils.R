@@ -87,7 +87,7 @@ processElasticNet <- function(inputs, config){
   x <- df2NumericMatrix(inputs$the.data[,var_names$x])
   funParams <- list(x = x,
                     y = inputs$the.data[,var_names$y], family = 'gaussian',
-                    intercept  = !(config$`Omit Constant`), standardize = config$standardize_pred,
+                    intercept  = !(config$`Omit Constant`), standardize = config$standardize_pred, alpha = config$alpha,
                     weights = if (!is.null(var_names$w)) inputs$the.data[,var_names$w] else NULL,
                     nfolds = if (config$internal_cv) config$nfolds else NULL
   )
@@ -153,7 +153,7 @@ createReportLinearXDF <- function(the.model, config){
 #' @family Alteryx.Report
 
 createReportGLMNET <- function(glmnet_obj) {
-  coefs_out <- coef(glmnet_obj, s = glmnet_obj$lambda_pred)
+  coefs_out <- coef(glmnet_obj, s = glmnet_obj$lambda_pred, exact = FALSE)
   #Coerce this result to a vector so we can put it in a data.frame
   #along with the variable names.
   vector_coefs_out <- as(coefs_out, "vector")

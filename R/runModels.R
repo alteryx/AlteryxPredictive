@@ -115,7 +115,6 @@ getResultsLinearRegression <- function(inputs, config){
     results <- list(model = the.model, report = lm.out, plot = plot.out)
     class(results) <- "GLM"
   } else {
-    print("latest version as of noon 12-08")
     the.model <- processElasticNet(inputs, config)
     #We don't need to worry about backwards compatibility in this section.
     #In order to enter this side of the outer if loop, config$regularization
