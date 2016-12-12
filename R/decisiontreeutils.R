@@ -1,4 +1,4 @@
-#' General S3 Method for Validating config
+#' General Method for Validating config
 #' Error checking pre-model
 #' Does not return anything - just throws errror
 #'
@@ -6,7 +6,12 @@
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
 checkValidConfig <- function(config, the.data, names) {
-  UseMethod("checkValidConfig", config)
+  if (config$model.algorithm == "C5.0")
+    checkValidConfigC5.0(config, the.data, names)
+  else if(config$model.algorithm == "rxDTree")
+    checkValidConfigrxDTree(config, the.data, names)
+  else
+    checkValidConfigrpart(config, the.data, names)
 }
 
 #' Error checking pre-model
@@ -15,7 +20,7 @@ checkValidConfig <- function(config, the.data, names) {
 #' @param config list of config options
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
-checkValidConfig.rpart <- function(config, the.data, names) {
+checkValidConfigrpart <- function(config, the.data, names) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   target <- the.data[[names$y]]
@@ -40,7 +45,7 @@ checkValidConfig.rpart <- function(config, the.data, names) {
 #' @param config list of config options
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
-checkValidConfig.XDF <- function(config, the.data, names) {
+checkValidConfigrxDTree <- function(config, the.data, names) {
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   if(cp < 0 || cp > 1) {
@@ -59,7 +64,7 @@ checkValidConfig.XDF <- function(config, the.data, names) {
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
 #' @import assertthat
-checkValidConfig.C5.0 <- function(config, the.data, names) {
+checkValidConfigC5.0 <- function(config, the.data, names) {
   # check on trials
   Alteryx_assert(is.boundedInt(config$trials, min = 1),
                  "trials must be a integer with value at least 1"
@@ -129,16 +134,6 @@ checkValidConfig.C5.0 <- function(config, the.data, names) {
 
 }
 
-#' Error checking pre-model defaults to rpart
-#' Does not return anything - just throws errror
-#'
-#' @param config list of config options
-#' @param the.data incoming data
-#' @param names list of x, y, w names for data
-checkValidConfig.default <- function(config, the.data, names) {
-  checkValidConfig.rpart(config, the.data, names)
-}
-
 #' Creation of components for model object evaluation
 #'
 #' @param config list of config options
@@ -180,8 +175,6 @@ createDTParams <- function(config, names) {
 
   params$surrogatestyle <- if (config$total.correct) 0 else 1
 
-  class(params) <- class(config)
-
   params
 }
 
@@ -189,15 +182,20 @@ createDTParams <- function(config, names) {
 #'
 #' @param params list of decision tree params
 #' @return list with named parameters  for function
-convertDTParamsToArgs <- function(params) {
-  UseMethod("convertDTParamsToArgs", params)
+convertDTParamsToArgs <- function(params, model.algorithm) {
+  if (model.algorithm == "C5.0")
+    convertDTParamsToArgsC5.0(params)
+  else if(model.algorithm == "rxDTree")
+    convertDTParamsToArgsrxDTree(params)
+  else
+    convertDTParamsToArgsrpart(params)
 }
 
 #' Map parameter names to function arg names for rpart
 #'
 #' @inheritParams convertDTParamsToArgs
 #' @return list with named parameters for rpart
-convertDTParamsToArgs.rpart <- function(params) {
+convertDTParamsToArgsrpart <- function(params) {
   params[c("formula", "data", "weights", "method", "parms", "minsplit",
            "minbucket", "cp", "usesurrogate", "maxdepth", "xval",
            "surrogatestyle")]
@@ -207,7 +205,7 @@ convertDTParamsToArgs.rpart <- function(params) {
 #'
 #' @inheritParams convertDTParamsToArgs
 #' @return list with named parameters for rxDTree
-convertDTParamsToArgs.rxDTree <- function(params) {
+convertDTParamsToArgsrxDTree <- function(params) {
   args_rpart <- params[c("formula", "data", "weights", "method", "parms",
                          "minsplit", "minbucket", "cp", "usesurrogate",
                          "maxdepth", "xval", "surrogatestyle", "maxNumBins")]
@@ -226,7 +224,7 @@ convertDTParamsToArgs.rxDTree <- function(params) {
 #'
 #' @inheritParams convertDTParamsToArgs
 #' @return list with named parameters for C5.0
-convertDTParamsToArgs.C5.0 <- function(params) {
+convertDTParamsToArgsC5.0 <- function(params) {
   control <- params[c("subset", "bands", "winnow", "noGlobalPruning", "CF",
                       "minCases", "fuzzyThreshold", "sample", "seed",
                       "earlyStoping")]
@@ -297,16 +295,12 @@ processDT <- function(inputs, config) {
 
   params <- createDTParams(config, var_names)
 
-  f_string <- config$model.algorithm
-  if (inputs$XDFInfo$is_XDF)
-    f_string <- 'rxDTree'
-
   if (inputs$XDFInfo$is_XDF)
     params$data <- inputs$XDFInfo$xdf_path
 
-  args <- convertDTParamsToArgs(params)
+  args <- convertDTParamsToArgs(params, config$model.algorithm)
 
-  model <- do.call(f_string, args)
+  model <- do.call(config$model.algorithm, args)
 
   # Post-model Error checking & cp adjustment if specified to "Auto"
   adjustCP(model, config)

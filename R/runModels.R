@@ -113,6 +113,9 @@ getResultsDecisionTree <- function(inputs, config) {
   # Set the seed to get run-over-run consistency
   set.seed(1)
 
+  if(inputs$XDFInfo$is_XDF)
+    config$model.algorithm == "rxDTree"
+
   # Rename arguments to be consistent with rpart.
   config <- plyr::rename(config, c(
     use.weights = 'used.weights', `Model Name` = 'model.name',
