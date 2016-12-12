@@ -24,11 +24,14 @@ inputs <- list(
   XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
 )
 
-exp_model <- glmnet::glmnet(x = as.matrix((inputs$the.data)[(config$`X Vars`)]), y = 'mpg',
-                            alpha = .5, standardize = TRUE, intercept=TRUE)
+exp_model <- glmnet::glmnet(x = as.matrix((inputs$the.data)[,(config$`X Vars`)]), y = (inputs$the.data)$mpg,
+                            family = 'gaussian', alpha = .5, standardize = TRUE, intercept=TRUE)
 test_that('regularized linear regression works correctly on mtcars', {
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs, config)
-  expect_equal(results$model$Coefficients, coef(exp_model, s = 1))
+  temp_coefs <- coef(exp_model, s = 1, exact = FALSE)
+  vector_coefs_out <- as(temp_coefs, "vector")
+  expect_equal(results$Coefficients,
+               data.frame(Names_of_nonzero_coefficients = rownames(temp_coefs), Coefficient_values = vector_coefs_out))
 })
 
 
@@ -56,9 +59,16 @@ inputs <- list(
   XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
 )
 
-exp_model <- glmnet::cv.glmnet(x = as.matrix((inputs$the.data)[(config$`X Vars`)]), y = 'mpg',
-                            alpha = .5, standardize = TRUE, intercept=TRUE, nfolds = 5)
+#Since the results will depend on the folds used with cross-validation, we need to set the seed
+#before both runs.
+set.seed(1)
+exp_model <- glmnet::cv.glmnet(x = as.matrix((inputs$the.data)[,(config$`X Vars`)]), y = (inputs$the.data)$mpg,
+                               family = 'gaussian', alpha = .5, standardize = TRUE, intercept=TRUE, nfolds = 5)
 test_that('regularized linear regression with internal CV works correctly on mtcars', {
+  set.seed(1)
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs, config2)
-  expect_equal(results$model$Coefficients, coef(exp_model, s = "lambda_1se"))
+  temp_coefs <- coef(exp_model, s = "lambda.1se", exact = FALSE)
+  vector_coefs_out <- as(temp_coefs, "vector")
+  expect_equal(results$Coefficients,
+               data.frame(Names_of_nonzero_coefficients = rownames(temp_coefs), Coefficient_values = vector_coefs_out))
 })
