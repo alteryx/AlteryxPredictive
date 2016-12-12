@@ -181,6 +181,7 @@ createDTParams <- function(config, names) {
 #' Map parameter names to function argument names
 #'
 #' @param params list of decision tree params
+#' @param model.algorithm model function to call
 #' @return list with named parameters  for function
 convertDTParamsToArgs <- function(params, model.algorithm) {
   if (model.algorithm == "C5.0")
@@ -193,7 +194,7 @@ convertDTParamsToArgs <- function(params, model.algorithm) {
 
 #' Map parameter names to function arg names for rpart
 #'
-#' @inheritParams convertDTParamsToArgs
+#' @param params list of decision tree params
 #' @return list with named parameters for rpart
 convertDTParamsToArgsrpart <- function(params) {
   params[c("formula", "data", "weights", "method", "parms", "minsplit",
@@ -203,7 +204,7 @@ convertDTParamsToArgsrpart <- function(params) {
 
 #' Map parameter names to function arg names for rxDTree
 #'
-#' @inheritParams convertDTParamsToArgs
+#' @param params list of decision tree params
 #' @return list with named parameters for rxDTree
 convertDTParamsToArgsrxDTree <- function(params) {
   args_rpart <- params[c("formula", "data", "weights", "method", "parms",
@@ -222,7 +223,7 @@ convertDTParamsToArgsrxDTree <- function(params) {
 
 #' Map parameter names to function arg names for C5.0
 #'
-#' @inheritParams convertDTParamsToArgs
+#' @param params list of decision tree params
 #' @return list with named parameters for C5.0
 convertDTParamsToArgsC5.0 <- function(params) {
   control <- params[c("subset", "bands", "winnow", "noGlobalPruning", "CF",
