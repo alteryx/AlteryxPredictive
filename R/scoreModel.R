@@ -222,7 +222,8 @@ scoreModel.elnet <- function(mod.obj, new.data) {
     }
   }
   used_data <- new.data[,used_x_vars]
-  score <- glmnet::predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred)
+  library(glmnet)
+  score <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred)
   return(score)
 }
 scoreModel.cv.glmnet <- scoreModel.elnet
