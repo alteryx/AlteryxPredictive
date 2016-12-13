@@ -130,6 +130,33 @@ getResultsLinearRegression <- function(inputs, config){
 }
 
 runLinearRegression <- function(inputs, config){
+  if (config$regularization) {
+    if (sum(is.na(inputs$the.data[[config$`Y Var`]])) > 0) {
+      stop.Alteryx2("The response variable contains missing values. Clean your data and try again.")
+    } else if ((config$`Use Weights`) && (sum(is.na((inputs$the.data)[[config$`Weight Vec`]])) > 0)) {
+      stop.Alteryx2("The weight variable contains missing values. Either clean your data or do not use weights and try again.")
+    } else if (sum(is.na(inputs$the.data) > 0)) {
+      if (sum(colSums(is.na(inputs$the.data)) > 0) == 1) {
+        AlteryxMessage2(paste0("The column ", colnames(inputs$the.data)[which(colSums(is.na(inputs$the.data)) > 0)],
+                               " contains missing values. Thus, this column is being removed."),
+                        iType = 2, iPriority = 3)
+      } else {
+        #We need to iterate through all the columns of inputs$the.data with NA's and
+        #paste their names together.
+        ayx_message_out <- "The columns "
+        missing_column_names <- colnames(inputs$the.data)[which(colSums(is.na(inputs$the.data)) > 0)]
+        for (i in 1:(sum(colSums(inputs$the.data) > 0))) {
+          ayx_message_out <- paste0(ayx_message_out, " ", missing_column_names[i])
+        }
+        ayx_message_out <- paste0(ayx_message_out, " are missing data. Thus, they are being removed.")
+        AlteryxMessage2(ayx_message_out, iType = 2, iPriority = 3)
+      }
+      inputs$the.data <- (inputs$the.data)[,which(colSums(is.na(inputs$the.data)) == 0)]
+      if (NCOL(inputs$the.data) == 0) {
+        stop.Alteryx2("After removing columns with NA values, there are no remaining columns. Please clean your data and try again.")
+      }
+    }
+  }
   results <- getResultsLinearRegression(inputs, config)
   writeOutputs(results, config)
 }
