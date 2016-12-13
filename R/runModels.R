@@ -131,30 +131,17 @@ getResultsLinearRegression <- function(inputs, config){
 
 runLinearRegression <- function(inputs, config){
   if (config$regularization) {
-    if (sum(is.na(inputs$the.data[[config$`Y Var`]])) > 0) {
-      stop.Alteryx2("The response variable contains missing values. Clean your data and try again.")
-    } else if ((config$`Use Weights`) && (sum(is.na((inputs$the.data)[[config$`Weight Vec`]])) > 0)) {
-      stop.Alteryx2("The weight variable contains missing values. Either clean your data or do not use weights and try again.")
-    } else if (sum(is.na(inputs$the.data) > 0)) {
-      if (sum(colSums(is.na(inputs$the.data)) > 0) == 1) {
-        AlteryxMessage2(paste0("The column ", colnames(inputs$the.data)[which(colSums(is.na(inputs$the.data)) > 0)],
-                               " contains missing values. Thus, this column is being removed."),
-                        iType = 2, iPriority = 3)
-      } else {
-        #We need to iterate through all the columns of inputs$the.data with NA's and
-        #paste their names together.
-        ayx_message_out <- "The columns "
-        missing_column_names <- colnames(inputs$the.data)[which(colSums(is.na(inputs$the.data)) > 0)]
-        for (i in 1:(sum(colSums(inputs$the.data) > 0))) {
-          ayx_message_out <- paste0(ayx_message_out, " ", missing_column_names[i])
-        }
-        ayx_message_out <- paste0(ayx_message_out, " are missing data. Thus, they are being removed.")
-        AlteryxMessage2(ayx_message_out, iType = 2, iPriority = 3)
+    if (sum(complete.cases(inputs$the.data)) < NROW(inputs$the.data)) {
+      AlteryxMessage2("The data contains missing values. Rows with missing data are being removed.", iType = 1, iPriority = 3)
+      inputs$the.data <- (inputs$the.data)[complete.cases(inputs$the.data),]
+      if (NROW(inputs$the.data) == 0) {
+        stop.Alteryx2("Every row had at least one missing value. Clean your data and try again.")
       }
-      inputs$the.data <- (inputs$the.data)[,which(colSums(is.na(inputs$the.data)) == 0)]
-      if (NCOL(inputs$the.data) == 0) {
-        stop.Alteryx2("After removing columns with NA values, there are no remaining columns. Please clean your data and try again.")
-      }
+    }
+    if ((config$internal_cv) && (config$nfolds > NROW(inputs$the.data))) {
+      AlteryxMessage2("You chose more folds for internal cross-validation than the number of valid rows in your data.", iType = 2, iPriority = 3)
+      AlteryxMessage2("The number of folds used is being re-set to the number of valid rows in your data.", iType = 2, iPriority = 3)
+      config$nfolds <- NROW(inputs$the.data)
     }
   }
   results <- getResultsLinearRegression(inputs, config)
