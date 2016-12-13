@@ -21,7 +21,8 @@ writeOutputs.GLM <- function(results, config){
 
 writeOutputs.GLMNET <- function(results, config) {
   write.Alteryx2(results$coefficients, nOutput = 1)
-  results$model$coefficients <- results$coefficients
+  results$model$coefficients <- (results$coefficients)[,2]
+  names(results$model$coefficients) <- (results$coefficients)[,1]
   if (config$display_graphs) {
     list_obj_to_plot <- c('norm', 'lambda', 'dev')
     plot_obj <- results$model
