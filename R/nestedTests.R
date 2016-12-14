@@ -121,9 +121,8 @@ unserializeInputs <- function(inputs){
 
 #Check to see if the model is an appropriate type for the Nested Test tool
 checkModelType <- function(model){
-  if ((!(inherits(model, "lm"))) && (!inherits(model, "glm"))) {
-    stop.Alteryx2(paste0("Models of class ", class(model), " are not supported in the Nested Test tool.
-                         Only non-regularized Linear Regression and non-regularized Logistic Regression models are supported at this time."))
+  if (inherits(model, "glmnet") || inherits(model, "cv.glmnet")) {
+    stop.Alteryx2("Regularized models are not supported in the Nested Test tool at this time. Use a non-regularized model and try again.")
   }
 }
 
