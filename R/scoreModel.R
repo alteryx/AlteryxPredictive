@@ -212,7 +212,7 @@ scoreModel.elnet <- function(mod.obj, new.data) {
   #However, we need to perform the subsetting and column ordering in case of future tools
   #that might use scoreModel. Unfortunately, glmnet isn't smart enough to order the columns
   #correctly in the predict function if they're provided in the wrong order.
-  used_x_vars <- AlteryxPredictive::getXVars(mod.obj)
+  used_x_vars <- getXVars(mod.obj)
   if (!all(used_x_vars %in% colnames(new.data))) {
     missing_x_vars <- used_x_vars[!(used_x_vars %in% colnames(new.data))]
     if (length(missing_x_vars) == 1) {
