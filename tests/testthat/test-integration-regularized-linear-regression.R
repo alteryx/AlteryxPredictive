@@ -29,7 +29,7 @@ exp_model <- glmnet::glmnet(x = as.matrix((inputs$the.data)[,(config$`X Vars`)])
 test_that('regularized linear regression works correctly on mtcars', {
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs, config)
   temp_coefs <- coef(exp_model, s = 1, exact = FALSE)
-  vector_coefs_out <- as(temp_coefs, "vector")
+  vector_coefs_out <- as.vector(temp_coefs)
   expect_equal(results$coefficients,
                data.frame(Coefficients = rownames(temp_coefs), Values = vector_coefs_out))
 })
@@ -68,7 +68,7 @@ test_that('regularized linear regression with internal CV works correctly on mtc
   set.seed(1)
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs2, config2)
   temp_coefs <- coef(exp_model, s = "lambda.1se", exact = FALSE)
-  vector_coefs_out <- as(temp_coefs, "vector")
+  vector_coefs_out <- as.vector(temp_coefs)
   expect_equal(results$coefficients,
                data.frame(Coefficients = rownames(temp_coefs), Values = vector_coefs_out))
 })
@@ -108,7 +108,7 @@ test_that('regularized linear regression with internal CV and weights works corr
   set.seed(1)
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs3, config3)
   temp_coefs <- coef(exp_model, s = "lambda.min", exact = FALSE)
-  vector_coefs_out <- as(temp_coefs, "vector")
+  vector_coefs_out <- as.vector(temp_coefs)
   expect_equal(results$coefficients,
                data.frame(Coefficients = rownames(temp_coefs), Values = vector_coefs_out))
 })

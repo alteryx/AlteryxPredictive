@@ -57,17 +57,9 @@ processLinearXDF <- function(inputs, config){
   return(the.model)
 }
 
-#' Process Elastic Net Inputs
-#'
-#' This function takes `inputs` and `config` and returns the model object
-#' along with other elements essential to create the reports and plots
-#'
-#' @param inputs input data streams to the tool
-#' @param config configuration passed to the tool
-#' @rdname processElasticNet
-#' @export
-#' @import glmnet
 #' Convert data frame into a numeric matrix, filtering out non-numeric columns
+#'
+#' @param x data frame to coerce to a numeric matrix
 df2NumericMatrix <- function(x){
   numNonNumericCols <- NCOL(Filter(Negate(is.numeric), x))
   if (numNonNumericCols == NCOL(x)){
@@ -81,6 +73,16 @@ df2NumericMatrix <- function(x){
   return(x)
 }
 
+#' Process Elastic Net Inputs
+#'
+#' This function takes `inputs` and `config` and returns the model object
+#' along with other elements essential to create the reports and plots
+#'
+#' @param inputs input data streams to the tool
+#' @param config configuration passed to the tool
+#' @rdname processElasticNet
+#' @export
+#' @import glmnet
 processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weights`)
   glmFun <- if (config$internal_cv) glmnet::cv.glmnet else glmnet::glmnet
@@ -156,7 +158,7 @@ createReportGLMNET <- function(glmnet_obj) {
   coefs_out <- coef(glmnet_obj, s = glmnet_obj$lambda_pred, exact = FALSE)
   #Coerce this result to a vector so we can put it in a data.frame
   #along with the variable names.
-  vector_coefs_out <- as(coefs_out, "vector")
+  vector_coefs_out <- as.vector(coefs_out)
   return(data.frame(Coefficients = rownames(coefs_out), Values = vector_coefs_out))
 }
 
