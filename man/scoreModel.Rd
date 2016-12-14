@@ -52,6 +52,6 @@ scoreModel(mod.obj, new.data, score.field = "Score", ...)
 Score function
 }
 \author{
-Ramnath Vaidyanathan, Dan Putler
+Ramnath Vaidyanathan, Dan Putler, Bridget Toomey
 }
 
