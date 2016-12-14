@@ -17,6 +17,7 @@ performNestedTest <- function(inputs){
   modelObjects <- Filter(hasModel, inputs)
   the.data <- Filter(Negate(hasModel), inputs)[[1]]
   models <- lapply(modelObjects, '[[', 'Object')
+  plyr::l_ply(.data = models, .fun = checkModelType)
   modelNames <- as.character(sapply(modelObjects, '[[', 'Name'))
   modelClasses <- sapply(models, function(d){class(d)[1]})
   yVars <- sapply(models, getYVar)
@@ -116,6 +117,14 @@ unserializeInputs <- function(inputs){
       input
     }
   })
+}
+
+#Check to see if the model is an appropriate type for the Nested Test tool
+checkModelType <- function(model){
+  if ((!(inherits(model, "lm"))) && (!inherits(model, "glm"))) {
+    stop.Alteryx2(paste0("Models of class ", class(model), " are not supported in the Nested Test tool.
+                         Only non-regularized Linear Regression and non-regularized Logistic Regression models are supported at this time."))
+  }
 }
 
 # Get y variable from model object
