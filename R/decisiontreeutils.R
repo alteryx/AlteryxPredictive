@@ -437,16 +437,19 @@ createReportDT.rxDTree <- function(model, config, names, xdf_path) {
 #' @inheritParams createReportDT
 #' @return dataframe of piped results
 createReportDT.C5.0 <- function(model, config, names, xdf_path) {
-  list(out = capture.output(summary(model)), model = model, model_rpart = NULL)
+  list(out = data.frame(grp = "summary", out = capture.output(summary(model))),
+         model = model, model_rpart = model
+  )
 }
 
 #' Create Tree Plot
 #'
 #' @param model model object
 #' @param config configuration object
+#' @param inputs input list
 #' @return graphs
 #' @export
-createTreePlotDT <- function(model, config) {
+createTreePlotDT <- function(model, config, inputs) {
   UseMethod("createTreePlotDT", model)
 }
 
@@ -455,7 +458,7 @@ createTreePlotDT <- function(model, config) {
 #' @inheritParams createTreePlotDT
 #' @return graphs
 #' @export
-createTreePlotDT.rpart <- function(model, config) {
+createTreePlotDT.rpart <- function(model, config, inputs) {
   leaf_sum <- if (model$method != "class") 0 else if (config$do.counts == TRUE) 2 else 4
   uniform <- config$b.dist
   fallen <- !uniform
@@ -471,8 +474,8 @@ createTreePlotDT.rpart <- function(model, config) {
 #' @inheritParams createTreePlotDT
 #' @return graphs
 #' @export
-createTreePlotDT.rxDTree <- function(model, config) {
-  createTreePlotDT.rpart(model, config)
+createTreePlotDT.rxDTree <- function(model, config, inputs) {
+  createTreePlotDT.rpart(model, config, inputs)
 }
 
 #' Create Tree Plot for C5.0 model
@@ -480,9 +483,10 @@ createTreePlotDT.rxDTree <- function(model, config) {
 #' @inheritParams createTreePlotDT
 #' @return graphs
 #' @export
-createTreePlotDT.C5.0 <- function(model, config) {
+createTreePlotDT.C5.0 <- function(model, config, inputs) {
+  the.data <<- inputs$the.data
   par(mar = c(5, 4, 6, 2) + 0.1)
-  plot(model, trials = config$trials)
+  plot(model, trial = config$trials - 1)
 }
 
 #' Create Tree Plot for C5.0 model
@@ -490,7 +494,7 @@ createTreePlotDT.C5.0 <- function(model, config) {
 #' @inheritParams createTreePlotDT
 #' @return graphs
 #' @export
-createTreePlotDT.default <- function(model, config) {
+createTreePlotDT.default <- function(model, config, inputs) {
   par(mar = c(5, 4, 6, 2) + 0.1)
   plot(model)
 }
