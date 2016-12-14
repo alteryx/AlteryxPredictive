@@ -4,12 +4,14 @@
 \alias{createTreePlotDT.C5.0}
 \title{Create Tree Plot for C5.0 model}
 \usage{
-\method{createTreePlotDT}{C5.0}(model, config)
+\method{createTreePlotDT}{C5.0}(model, config, inputs)
 }
 \arguments{
 \item{model}{model object}
 
 \item{config}{configuration object}
+
+\item{inputs}{input list}
 }
 \value{
 graphs

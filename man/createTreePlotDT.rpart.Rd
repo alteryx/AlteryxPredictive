@@ -4,12 +4,14 @@
 \alias{createTreePlotDT.rpart}
 \title{Create Tree Plot for rpart model}
 \usage{
-\method{createTreePlotDT}{rpart}(model, config)
+\method{createTreePlotDT}{rpart}(model, config, inputs)
 }
 \arguments{
 \item{model}{model object}
 
 \item{config}{configuration object}
+
+\item{inputs}{input list}
 }
 \value{
 graphs

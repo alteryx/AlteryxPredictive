@@ -4,12 +4,14 @@
 \alias{createTreePlotDT.rxDTree}
 \title{Create Tree Plot for rxDTree model}
 \usage{
-\method{createTreePlotDT}{rxDTree}(model, config)
+\method{createTreePlotDT}{rxDTree}(model, config, inputs)
 }
 \arguments{
 \item{model}{model object}
 
 \item{config}{configuration object}
+
+\item{inputs}{input list}
 }
 \value{
 graphs
