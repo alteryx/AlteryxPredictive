@@ -17,6 +17,7 @@ performNestedTest <- function(inputs){
   modelObjects <- Filter(hasModel, inputs)
   the.data <- Filter(Negate(hasModel), inputs)[[1]]
   models <- lapply(modelObjects, '[[', 'Object')
+  plyr::l_ply(.data = models, .fun = checkModelType)
   modelNames <- as.character(sapply(modelObjects, '[[', 'Name'))
   modelClasses <- sapply(models, function(d){class(d)[1]})
   yVars <- sapply(models, getYVar)
@@ -116,6 +117,13 @@ unserializeInputs <- function(inputs){
       input
     }
   })
+}
+
+#Check to see if the model is an appropriate type for the Nested Test tool
+checkModelType <- function(model){
+  if (inherits(model, "glmnet") || inherits(model, "cv.glmnet")) {
+    stop.Alteryx2("Regularized models are not supported in the Nested Test tool at this time. Use a non-regularized model and try again.")
+  }
 }
 
 # Get y variable from model object
