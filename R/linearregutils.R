@@ -93,6 +93,10 @@ processElasticNet <- function(inputs, config){
                     weights = if (!is.null(var_names$w)) inputs$the.data[,var_names$w] else NULL,
                     nfolds = if (config$internal_cv) config$nfolds else NULL
   )
+  #Set the seed for reproducibility (if the user chose to do so) in the internal-cv case
+  if ((config$internal_cv) && (config$set_seed_internal_cv)) {
+    set.seed(config$seed_internal_cv)
+  }
   the.model <- do.call(glmFun, Filter(Negate(is.null), funParams))
   if (config$internal_cv) {
     #The predict function used with objects of class cv.glmnet can be
