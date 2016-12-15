@@ -16,7 +16,8 @@ config <- list(
   internal_cv = checkboxInput('%Question.internal_cv%', FALSE),
   nfolds = numericInput('%Question.nfolds%', 5),
   lambda_no_cv = numericInput('%Question.lambda_no_cv%', 1),
-  display_graphs = checkboxInput('%Question.display_graphs%', TRUE)
+  display_graphs = checkboxInput('%Question.display_graphs%', TRUE),
+  external_cv = checkboxInput('%Question.external_cv%', FALSE)
 )
 
 inputs <- list(
@@ -51,7 +52,8 @@ config2 <- list(
   internal_cv = checkboxInput('%Question.internal_cv%', TRUE),
   nfolds = numericInput('%Question.nfolds%', 5),
   lambda_no_cv = numericInput('%Question.lambda_no_cv%', 1),
-  display_graphs = checkboxInput('%Question.display_graphs%', TRUE)
+  display_graphs = checkboxInput('%Question.display_graphs%', TRUE),
+  external_cv = checkboxInput('%Question.external_cv%', FALSE)
 )
 
 inputs2 <- list(
@@ -90,7 +92,8 @@ config3 <- list(
   internal_cv = checkboxInput('%Question.internal_cv%', TRUE),
   nfolds = numericInput('%Question.nfolds%', 5),
   lambda_no_cv = numericInput('%Question.lambda_no_cv%', 1),
-  display_graphs = checkboxInput('%Question.display_graphs%', TRUE)
+  display_graphs = checkboxInput('%Question.display_graphs%', TRUE),
+  external_cv = checkboxInput('%Question.external_cv%', FALSE)
 )
 
 inputs3 <- list(
