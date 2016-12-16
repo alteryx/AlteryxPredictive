@@ -126,10 +126,6 @@ checkModelType <- function(model){
   }
 }
 
-# Get y variable from model object
-getYVar <- function(mod){
-  as.character(formula(mod))[2]
-}
 
 # Get significance stars from p value
 getStars <- function(p_val){
