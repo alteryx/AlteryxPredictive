@@ -213,7 +213,7 @@ scoreModel.rxDForest <- scoreModel.rxDTree
 
 #' @export
 #' @rdname scoreModel
-scoreModel.elnet <- function(mod.obj, new.data) {
+scoreModel.elnet <- function(mod.obj, new.data, score.field, ...) {
   print("in scoreModel.elnet")
   #The code in the score tool has already subsetted the columns of the original
   #data to be scored, so there's no need to subset in that case.
@@ -221,6 +221,7 @@ scoreModel.elnet <- function(mod.obj, new.data) {
   #that might use scoreModel. Unfortunately, glmnet isn't smart enough to order the columns
   #correctly in the predict function if they're provided in the wrong order.
   used_x_vars <- getXVars(mod.obj)
+  new.data <- df2NumericMatrix(new.data)
   if (!all(used_x_vars %in% colnames(new.data))) {
     missing_x_vars <- used_x_vars[!(used_x_vars %in% colnames(new.data))]
     if (length(missing_x_vars) == 1) {
@@ -234,6 +235,7 @@ scoreModel.elnet <- function(mod.obj, new.data) {
   print("head of used_data")
   print(head(used_data))
   score <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred)
+  names(score) <- score.field
   return(score)
 }
 
