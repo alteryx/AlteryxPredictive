@@ -107,9 +107,20 @@ set.seed(1)
 exp_model <- glmnet::cv.glmnet(x = as.matrix((inputs3$the.data)[,(config3$`X Vars`)]), y = (inputs3$the.data)$mpg,
                                family = 'gaussian', alpha = .5, standardize = TRUE, intercept=TRUE,
                                nfolds = 5, weights = inputs3$the.data$weight_vec)
+print("head of first y with internal cv and weights")
+print(head((inputs3$the.data)$mpg))
 test_that('regularized linear regression with internal CV and weights works correctly on mtcars', {
+  print("head of second inputs3$the.data")
+  print(head(inputs3$the.data))
+  print("head of y")
+  var_names <- getNamesFromOrdered(names(inputs3$the.data), config3$`Use Weights`)
+  y <- inputs3$the.data[,var_names$y]
+  print(head(y))
+  print("type of y")
+  print(typeof(y))
   set.seed(1)
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs3, config3)
+
   temp_coefs <- coef(exp_model, s = "lambda.min", exact = FALSE)
   vector_coefs_out <- as.vector(temp_coefs)
   expect_equal(results$coefficients,
