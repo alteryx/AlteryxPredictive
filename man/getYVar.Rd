@@ -2,9 +2,21 @@
 % Please edit documentation in R/getYVar.R
 \name{getYVar}
 \alias{getYVar}
+\alias{getYVar.cv.glmnet}
+\alias{getYVar.default}
+\alias{getYVar.elnet}
+\alias{getYVar.naiveBayes}
 \title{getYVar function}
 \usage{
 getYVar(mod)
+
+\method{getYVar}{default}(mod)
+
+\method{getYVar}{elnet}(mod)
+
+\method{getYVar}{cv.glmnet}(mod)
+
+\method{getYVar}{naiveBayes}(mod)
 }
 \arguments{
 \item{mod}{model object}
