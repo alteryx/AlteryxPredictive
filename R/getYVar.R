@@ -10,14 +10,14 @@ getYVar <- function(mod) {
 
 # Get y variable from model object
 #' @export
-#' @rdname scoreModel
+#' @rdname getYVar
 getYVar.default <- function(mod){
   as.character(formula(mod))[2]
 }
 
 
 #' @export
-#' @rdname scoreModel
+#' @rdname getYVar
 getYVar.elnet <- function(mod) {
   mod$yvar
 }
@@ -26,13 +26,13 @@ getYVar.elnet <- function(mod) {
 #is finished. We can put an if statement to check if mod$glmnet.fit is elnet
 #or lognet and proceed accordingly.
 #' @export
-#' @rdname scoreModel
+#' @rdname getYVar
 getYVar.cv.glmnet <- function(mod) {
   mod$yvar
 }
 
 #' @export
-#' @rdname scoreModel
+#' @rdname getYVar
 getYVar.naiveBayes <- function(mod) {
   mod$yvars
 }
