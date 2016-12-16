@@ -21,6 +21,9 @@ scoreModel <- function(mod.obj, new.data, score.field = "Score", ...) {
 #' @rdname scoreModel
 scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
     os.value = NULL, os.pct = NULL, ...){
+  print("in the default case")
+  print("class of mod.obj is:")
+  print(class(mod.obj))
   target.value <- os.value
   new.data <- matchLevels(new.data, getXlevels(mod.obj))
   y.levels <- getYlevels(mod.obj, new.data)
@@ -204,9 +207,14 @@ scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL,
   scores
 }
 
+#' @export
+#' @rdname scoreModel
 scoreModel.rxDForest <- scoreModel.rxDTree
 
+#' @export
+#' @rdname scoreModel
 scoreModel.elnet <- function(mod.obj, new.data) {
+  print("in scoreModel.elnet")
   #The code in the score tool has already subsetted the columns of the original
   #data to be scored, so there's no need to subset in that case.
   #However, we need to perform the subsetting and column ordering in case of future tools
@@ -216,16 +224,21 @@ scoreModel.elnet <- function(mod.obj, new.data) {
   if (!all(used_x_vars %in% colnames(new.data))) {
     missing_x_vars <- used_x_vars[!(used_x_vars %in% colnames(new.data))]
     if (length(missing_x_vars) == 1) {
-      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing the variable ", missing_x_vars, ". Please make sure you provide this variable and try again"))
+      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing the variable ", missing_x_vars, ". Please make sure you provide this variable and try again."))
     } else {
-      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing the variables ", missing_x_vars, ". Please make sure you provide these variables and try again"))
+      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing the variables ", missing_x_vars, ". Please make sure you provide these variables and try again."))
     }
   }
   used_data <- new.data[,used_x_vars]
   requireNamespace('glmnet')
+  print("head of used_data")
+  print(head(used_data))
   score <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred)
   return(score)
 }
+
+#' @export
+#' @rdname scoreModel
 scoreModel.cv.glmnet <- scoreModel.elnet
 
 #Note: When doing this for logistic regression, I'll need to update to differentiate between

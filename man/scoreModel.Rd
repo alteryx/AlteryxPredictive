@@ -2,8 +2,11 @@
 % Please edit documentation in R/scoreModel.R
 \name{scoreModel}
 \alias{scoreModel}
+\alias{scoreModel.cv.glmnet}
 \alias{scoreModel.default}
+\alias{scoreModel.elnet}
 \alias{scoreModel.lm}
+\alias{scoreModel.rxDForest}
 \alias{scoreModel.rxDTree}
 \alias{scoreModel.rxGlm}
 \alias{scoreModel.rxLinMod}
@@ -28,6 +31,13 @@ scoreModel(mod.obj, new.data, score.field = "Score", ...)
 
 \method{scoreModel}{rxDTree}(mod.obj, new.data, score.field, os.value = NULL,
   os.pct = NULL, ...)
+
+\method{scoreModel}{rxDForest}(mod.obj, new.data, score.field,
+  os.value = NULL, os.pct = NULL, ...)
+
+\method{scoreModel}{elnet}(mod.obj, new.data)
+
+\method{scoreModel}{cv.glmnet}(mod.obj, new.data)
 }
 \arguments{
 \item{mod.obj}{model object}
