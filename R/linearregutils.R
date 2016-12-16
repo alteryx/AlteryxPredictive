@@ -116,6 +116,7 @@ processElasticNet <- function(inputs, config){
   #of the predictor variables in order to use getXvars downstream, which is required by
   #scoreModel.
   the.model$xvars <- colnames(x)
+  the.model$yvar <- var_names$y
   return(the.model)
 }
 
