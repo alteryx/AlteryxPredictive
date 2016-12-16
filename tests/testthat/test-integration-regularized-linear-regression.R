@@ -16,7 +16,8 @@ config <- list(
   internal_cv = checkboxInput('%Question.internal_cv%', FALSE),
   nfolds = numericInput('%Question.nfolds%', 5),
   lambda_no_cv = numericInput('%Question.lambda_no_cv%', 1),
-  display_graphs = checkboxInput('%Question.display_graphs%', TRUE)
+  display_graphs = checkboxInput('%Question.display_graphs%', TRUE),
+  external_cv = checkboxInput('%Question.external_cv%', FALSE)
 )
 
 inputs <- list(
@@ -51,7 +52,9 @@ config2 <- list(
   internal_cv = checkboxInput('%Question.internal_cv%', TRUE),
   nfolds = numericInput('%Question.nfolds%', 5),
   lambda_no_cv = numericInput('%Question.lambda_no_cv%', 1),
-  display_graphs = checkboxInput('%Question.display_graphs%', TRUE)
+  display_graphs = checkboxInput('%Question.display_graphs%', TRUE),
+  external_cv = checkboxInput('%Question.external_cv%', FALSE),
+  set_seed_internal_cv = FALSE
 )
 
 inputs2 <- list(
@@ -90,7 +93,9 @@ config3 <- list(
   internal_cv = checkboxInput('%Question.internal_cv%', TRUE),
   nfolds = numericInput('%Question.nfolds%', 5),
   lambda_no_cv = numericInput('%Question.lambda_no_cv%', 1),
-  display_graphs = checkboxInput('%Question.display_graphs%', TRUE)
+  display_graphs = checkboxInput('%Question.display_graphs%', TRUE),
+  external_cv = checkboxInput('%Question.external_cv%', FALSE),
+  set_seed_internal_cv = FALSE
 )
 
 inputs3 <- list(
@@ -105,8 +110,11 @@ exp_model <- glmnet::cv.glmnet(x = as.matrix((inputs3$the.data)[,(config3$`X Var
                                family = 'gaussian', alpha = .5, standardize = TRUE, intercept=TRUE,
                                nfolds = 5, weights = inputs3$the.data$weight_vec)
 test_that('regularized linear regression with internal CV and weights works correctly on mtcars', {
+  var_names <- getNamesFromOrdered(names(inputs3$the.data), config3$`Use Weights`)
+  y <- inputs3$the.data[,var_names$y]
   set.seed(1)
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs3, config3)
+
   temp_coefs <- coef(exp_model, s = "lambda.min", exact = FALSE)
   vector_coefs_out <- as.vector(temp_coefs)
   expect_equal(results$coefficients,
