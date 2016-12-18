@@ -148,6 +148,18 @@ getResultsDecisionTree <- function(inputs, config) {
 }
 
 runDecisionTree <- function(inputs, config){
+  # for backwards compatability to pre-C5.0,
+  #   add model.algorithm arg if not there
+  if (!("model.algorithm" %in% names(config))) {
+    config$model.algorithm <- "C5.0"
+    if (class(config) == "OSR")
+      config$model.algorithm <- "rpart"
+    else
+      config$model.algorithm <- "rxDTree"
+    config$bands.check <- FALSE
+    config$GlobalPruning <- FALSE
+  }
+
   results <- getResultsDecisionTree(inputs, config)
   writeOutputs(results, config)
 }
