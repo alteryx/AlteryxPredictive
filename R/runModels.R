@@ -131,13 +131,7 @@ getResultsLinearRegression <- function(inputs, config){
 
 runLinearRegression <- function(inputs, config){
   if (config$regularization) {
-    if (sum(complete.cases(inputs$the.data)) < NROW(inputs$the.data)) {
-      AlteryxMessage2("The data contains missing values. Rows with missing data are being removed.", iType = 1, iPriority = 3)
-      inputs$the.data <- (inputs$the.data)[complete.cases(inputs$the.data),]
-      if (NROW(inputs$the.data) == 0) {
-        stop.Alteryx2("Every row had at least one missing value. Clean your data and try again.")
-      }
-    }
+    inputs$the.data <- checkMissing.omit(inputs$the.data)
     if ((config$internal_cv) && (config$nfolds > NROW(inputs$the.data))) {
       AlteryxMessage2("You chose more folds for internal cross-validation than the number of valid rows in your data.", iType = 2, iPriority = 3)
       AlteryxMessage2("The number of folds used is being re-set to the number of valid rows in your data.", iType = 2, iPriority = 3)
