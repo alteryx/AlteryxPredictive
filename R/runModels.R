@@ -96,6 +96,14 @@ getResultsLogisticRegression <- function(inputs, config){
 }
 
 runLogisticRegression <- function(inputs, config){
+  if (config$regularization) {
+    inputs$the.data <- checkMissing.omit(inputs$the.data)
+    if ((config$internal_cv) && (config$nfolds > NROW(inputs$the.data))) {
+      AlteryxMessage2("You chose more folds for internal cross-validation than the number of valid rows in your data.", iType = 2, iPriority = 3)
+      AlteryxMessage2("The number of folds used is being re-set to the number of valid rows in your data.", iType = 2, iPriority = 3)
+      config$nfolds <- NROW(inputs$the.data)
+    }
+  }
   results <- getResultsLogisticRegression(inputs, config)
   writeOutputs(results, config)
 }
