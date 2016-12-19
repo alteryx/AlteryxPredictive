@@ -27,7 +27,8 @@ Imports:
   htmltools,
   assertthat,
   plyr,
-  glmnet
+  glmnet,
+  C50
 Suggests:
   knitr,
   rmarkdown,

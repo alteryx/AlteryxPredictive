@@ -15,11 +15,12 @@ config <- list(
   use.gini = TRUE, use.information = FALSE, use.weights = FALSE,
   usesurrogate.0 = FALSE, usesurrogate.1 = FALSE, usesurrogate.2 = TRUE,
   `X Vars` = c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
-  xval.folds = 10,
-  `Y Var` = "Species"
+  xval.folds = 10, `Y Var` = "Species", model.algorithm = "rpart",
+  display.static = TRUE, trials = 1, rules = FALSE, subset = TRUE,
+  bands.check = FALSE, bands = 10, winnow = FALSE, GlobalPruning = TRUE,
+  CF = .25, minCases = 2, fuzzyThreshold = FALSE, sample = 0, seed = 1,
+  earlyStopping = TRUE
 )
-
-class(config) <- "OSR"
 
 inputs <- list(
   the.data = iris[, c(config$`Y Var`, config$`X Vars`)],
@@ -41,6 +42,14 @@ test_that("Iris data with vanilla decision tree model", {
   expect_equal(result$model$frame,exp_tree_model$frame)
 })
 
+config$model.algorithm <- "C5.0"
+
+exp_C50_model <- C50::C5.0(formula = Species ~ ., data = iris)
+
+test_that("Iris data with vanilla C5.0 tree model", {
+  result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
+  expect_equal(result$model$tree, exp_C50_model$tree)
+})
 
 testDir = '~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests'
 comment = 'This workflow tests that admission data with logit link returns correct coefficients'

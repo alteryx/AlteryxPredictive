@@ -2,7 +2,7 @@
 % Please edit documentation in R/decisiontreeutils.R
 \name{checkValidConfig}
 \alias{checkValidConfig}
-\title{General S3 Method for Validating config
+\title{General Method for Validating config
 Error checking pre-model
 Does not return anything - just throws errror}
 \usage{
@@ -16,7 +16,7 @@ checkValidConfig(config, the.data, names)
 \item{names}{list of x, y, w names for data}
 }
 \description{
-General S3 Method for Validating config
+General Method for Validating config
 Error checking pre-model
 Does not return anything - just throws errror
 }

@@ -154,6 +154,9 @@ getResultsDecisionTree <- function(inputs, config) {
   # Set the seed to get run-over-run consistency
   set.seed(1)
 
+  if(inputs$XDFInfo$is_XDF)
+    config$model.algorithm == "rxDTree"
+
   # Rename arguments to be consistent with rpart.
   config <- plyr::rename(config, c(
     use.weights = 'used.weights', `Model Name` = 'model.name',
@@ -172,7 +175,7 @@ getResultsDecisionTree <- function(inputs, config) {
   the.model.rpart <- if(inputs$XDFInfo$is_XDF) the.report.list$model_rpart else the.model
   the.report <- the.report.list$out
 
-  makeTreePlot <- function(){createTreePlotDT(the.model.rpart, config)}
+  makeTreePlot <- function(){createTreePlotDT(the.model.rpart, config, inputs)}
   makePrunePlot <- function(){createPrunePlotDT(the.model.rpart)}
   dashboard <- createDashboardDT(the.model)
 
@@ -186,6 +189,18 @@ getResultsDecisionTree <- function(inputs, config) {
 }
 
 runDecisionTree <- function(inputs, config){
+  # for backwards compatability to pre-C5.0,
+  #   add model.algorithm arg if not there
+  if (!("model.algorithm" %in% names(config))) {
+    config$model.algorithm <- "C5.0"
+    if (class(config) == "OSR")
+      config$model.algorithm <- "rpart"
+    else
+      config$model.algorithm <- "rxDTree"
+    config$bands.check <- FALSE
+    config$GlobalPruning <- FALSE
+  }
+
   results <- getResultsDecisionTree(inputs, config)
   writeOutputs(results, config)
 }
