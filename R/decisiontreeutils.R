@@ -320,6 +320,9 @@ processDT <- function(inputs, config) {
 
   model <- do.call(config$model.algorithm, args)
 
+  if(config$model.algorithm == "C5.0")
+    model$y <- the.data[[var_names$y]]
+
   # Post-model Error checking & cp adjustment if specified to "Auto"
   adjustCP(model, config)
 }
