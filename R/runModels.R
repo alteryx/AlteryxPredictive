@@ -73,25 +73,38 @@ writeOutputs.DecisionTree <- function(results, config) {
 
 # Logistic Regression ----
 getResultsLogisticRegression <- function(inputs, config){
-  requireNamespace("car")
-  # Modify the link so that it can be passed on to R.
-  if (config$Link == "complementary log-log"){
-    config$Link <- "cloglog"
-  }
+  config$`Model Name`= validName(config$`Model Name`)
+  if ((is.null(config$regularization))||(!(config$regularization))) {
 
-  if (inputs$XDFInfo$is_XDF){
-    d <- processLogisticXDF(inputs, config)
-    glm.out <- createReportLogisticXDF(d$the.model, config, d$null.model)
-    plot.out <- function(){createPlotOutputsLogisticXDF()}
-  } else {
-    d <- processLogisticOSR(inputs, config)
-    glm.out <- createReportLogisticOSR(d$the.model, config, d$model_type)
-    plot.out <- function(){
-      createPlotOutputsLogisticOSR(d$the.model, FALSE, config)
+    requireNamespace("car")
+    # Modify the link so that it can be passed on to R.
+    if (config$Link == "complementary log-log"){
+      config$Link <- "cloglog"
     }
+
+    if (inputs$XDFInfo$is_XDF){
+      d <- processLogisticXDF(inputs, config)
+      glm.out <- createReportLogisticXDF(d$the.model, config, d$null.model)
+      plot.out <- function(){createPlotOutputsLogisticXDF()}
+    } else {
+      d <- processLogisticOSR(inputs, config)
+      glm.out <- createReportLogisticOSR(d$the.model, config, d$model_type)
+      plot.out <- function(){
+        createPlotOutputsLogisticOSR(d$the.model, FALSE, config)
+      }
+    }
+    results <- list(model = d$the.model, report = glm.out, plot = plot.out)
+    class(results) <- "GLM"
+  } else {
+    the.model <- processElasticNet(inputs, config)
+    #We don't need to worry about backwards compatibility in this section.
+    #In order to enter this side of the outer if loop, config$regularization
+    #must exist and be true. Thus, config$display_graphs must exist as well.
+    results <- list(model = the.model)
+    coefs_out <- createReportGLMNET(the.model)
+    results <- append(results, list(coefficients = coefs_out))
+    class(results) <- "GLMNET"
   }
-  results <- list(model = d$the.model, report = glm.out, plot = plot.out)
-  class(results) <- "GLM"
   results
 }
 
