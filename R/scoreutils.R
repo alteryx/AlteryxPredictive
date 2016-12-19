@@ -44,6 +44,13 @@ getXVars.naiveBayes <- function(x) {
 
 #' @export
 getXVars.svm.formula <- getXVars.naiveBayes
+#The component xvars was added to glmnet model objects
+#in the linearregutils code, so we can also extract it using
+#$xvars.
+#' @export
+getXVars.glmnet <- getXVars.naiveBayes
+#' @export
+getXVars.cv.glmnet <- getXVars.naiveBayes
 
 #' Remove non numeric elements from a list
 #'

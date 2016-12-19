@@ -21,6 +21,7 @@ Dan Putler
 }
 \seealso{
 Other Alteryx.Report: \code{\link{Alteryx.ReportAnova}},
-  \code{\link{Alteryx.ReportGLM}}
+  \code{\link{Alteryx.ReportGLM}},
+  \code{\link{createReportGLMNET}}
 }
 

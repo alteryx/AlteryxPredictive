@@ -18,6 +18,29 @@ writeOutputs.GLM <- function(results, config){
   write.Alteryx2(the.obj, nOutput = 3)
 }
 
+
+writeOutputs.GLMNET <- function(results, config) {
+  write.Alteryx2(results$coefficients, nOutput = 1)
+  results$model$coefficients <- (results$coefficients)[,2]
+  names(results$model$coefficients) <- (results$coefficients)[,1]
+  if (config$display_graphs) {
+    list_obj_to_plot <- c('norm', 'lambda', 'dev')
+    plot_obj <- results$model
+    if (config$internal_cv) {
+      AlteryxGraph2(plot(results$model), nOutput = 5)
+      plot_obj <- plot_obj$glmnet.fit
+    }
+    #Note: We're using different outputs for these because there currently
+    #appears to be a bug. An error frequently occurs when they're all sent
+    #to the same output.
+    AlteryxGraph2(plot(plot_obj, xvar = list_obj_to_plot[1]), nOutput = 2)
+    AlteryxGraph2(plot(plot_obj, xvar = list_obj_to_plot[2]), nOutput = 2)
+    AlteryxGraph2(plot(plot_obj, xvar = list_obj_to_plot[3]), nOutput = 4)
+  }
+  the.obj <- prepModelForOutput(config$`Model Name`, results$model)
+  write.Alteryx2(the.obj, nOutput = 3)
+}
+
 writeOutputs.DecisionTree <- function(results, config) {
   # Report Output
   write.Alteryx2(results$report, nOutput = 1)
@@ -81,7 +104,7 @@ runLogisticRegression <- function(inputs, config){
 getResultsLinearRegression <- function(inputs, config){
   requireNamespace("car")
   config$`Model Name`= validName(config$`Model Name`)
-  if (!(config$regularization)) {
+  if ((is.null(config$regularization))||(!(config$regularization))) {
     if (inputs$XDFInfo$is_XDF){
       the.model <- processLinearXDF(inputs, config)
       lm.out <- createReportLinearXDF(the.model, config)
@@ -95,14 +118,32 @@ getResultsLinearRegression <- function(inputs, config){
     class(results) <- "GLM"
   } else {
     the.model <- processElasticNet(inputs, config)
-    #NOTE: lm.out and plot.out to follow once the model creation portion is finished
-    results <- list(model = the.model, report = NULL, plot = NULL)
+    #We don't need to worry about backwards compatibility in this section.
+    #In order to enter this side of the outer if loop, config$regularization
+    #must exist and be true. Thus, config$display_graphs must exist as well.
+    results <- list(model = the.model)
+    coefs_out <- createReportGLMNET(the.model)
+    results <- append(results, list(coefficients = coefs_out))
     class(results) <- "GLMNET"
   }
   results
 }
 
 runLinearRegression <- function(inputs, config){
+  if (config$regularization) {
+    if (sum(complete.cases(inputs$the.data)) < NROW(inputs$the.data)) {
+      AlteryxMessage2("The data contains missing values. Rows with missing data are being removed.", iType = 1, iPriority = 3)
+      inputs$the.data <- (inputs$the.data)[complete.cases(inputs$the.data),]
+      if (NROW(inputs$the.data) == 0) {
+        stop.Alteryx2("Every row had at least one missing value. Clean your data and try again.")
+      }
+    }
+    if ((config$internal_cv) && (config$nfolds > NROW(inputs$the.data))) {
+      AlteryxMessage2("You chose more folds for internal cross-validation than the number of valid rows in your data.", iType = 2, iPriority = 3)
+      AlteryxMessage2("The number of folds used is being re-set to the number of valid rows in your data.", iType = 2, iPriority = 3)
+      config$nfolds <- NROW(inputs$the.data)
+    }
+  }
   results <- getResultsLinearRegression(inputs, config)
   writeOutputs(results, config)
 }
