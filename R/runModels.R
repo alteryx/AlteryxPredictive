@@ -109,6 +109,11 @@ getResultsLogisticRegression <- function(inputs, config){
 }
 
 runLogisticRegression <- function(inputs, config){
+  # reverse compatability code start
+  if (!("regularization" %in% names(config)))
+    config$regularization <- FALSE
+  # reverse compatability code end
+
   if (config$regularization) {
     inputs$the.data <- checkMissing.omit(inputs$the.data)
     if ((config$internal_cv) && (config$nfolds > NROW(inputs$the.data))) {
