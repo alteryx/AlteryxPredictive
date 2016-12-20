@@ -9,14 +9,25 @@
 #' @export
 processLinearOSR <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
+  print("got the var_names. they are:")
+  print(var_names)
   the.formula <- if (config$`Omit Constant`){
     makeFormula(c("-1", var_names$x), var_names$y)
   } else {
     makeFormula(var_names$x, var_names$y)
   }
+  print('made the formula')
+  print("ls before the if useweights:")
+  print(ls())
   # FIXME: Revisit what we pass to the weights argument.
   if (config$`Use Weight`){
-    lm(the.formula, inputs$the.data, weights = inputs$the.data[[var_names$w]])
+    weight_col <- var_names$w
+    weights_v <- inputs$the.data[[weight_col]]
+    # WORKAROUND
+    # The assign() statement below moves the token ‘weight_vec_processLinearOSR27’ to the global environment, where the lm() function can find it.
+    # Otherwise, something inside lm() isn’t finding ‘weights_v’ on its environment search path.
+    assign(x = 'weight_vec_processLinearOSR27', value = weights_v, envir = globalenv())
+    lm(the.formula, inputs$the.data, weights = weight_vec_processLinearOSR27)
   } else {
     lm(the.formula, inputs$the.data)
   }
