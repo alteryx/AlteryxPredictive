@@ -6,7 +6,7 @@ df2NumericMatrix <- function(x){
   if (numNonNumericCols == NCOL(x)){
     AlteryxMessage2("All of the provided variables were non-numeric. Please provide at least one numeric variable and try again.", iType = 2, iPriority = 3)
     stop.Alteryx2()
-  } else if (numNonNumericCols > 0){
+  } else if ((length(numNonNumericCols) > 0) && (numNonNumericCols > 0)){
     AlteryxMessage2("Non-numeric variables were included to glmnet. They are now being removed.", iType = 1, iPriority = 3)
     x <- Filter(is.numeric, x)
   }
