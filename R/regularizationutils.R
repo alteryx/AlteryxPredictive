@@ -14,6 +14,17 @@ df2NumericMatrix <- function(x){
   return(x)
 }
 
+#' Figure out which family to use
+#'
+#' @param inputs input data streams passed to tool
+#' @param config configuration passed to tool
+#' @return string family
+getFamily <- function(inputs, config){
+  target_data <- inputs[,1]
+  family_levels <- c("gaussian", "binomial", "multinomial")
+  family_levels[max(nlevels(target_data),3)]
+}
+
 #' Process Elastic Net Inputs
 #'
 #' This function takes `inputs` and `config` and returns the model object
@@ -28,8 +39,9 @@ processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weights`)
   glmFun <- if (config$internal_cv) glmnet::cv.glmnet else glmnet::glmnet
   x <- df2NumericMatrix(inputs$the.data[,var_names$x])
+  family <- getFamily(inputs, config)
   funParams <- list(x = x,
-                    y = inputs$the.data[,var_names$y], family = 'gaussian',
+                    y = inputs$the.data[,var_names$y], family = family,
                     intercept  = !(config$`Omit Constant`), standardize = config$standardize_pred, alpha = config$alpha,
                     weights = if (!is.null(var_names$w)) inputs$the.data[,var_names$w] else NULL,
                     nfolds = if (config$internal_cv) config$nfolds else NULL
