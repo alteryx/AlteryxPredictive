@@ -73,29 +73,55 @@ writeOutputs.DecisionTree <- function(results, config) {
 
 # Logistic Regression ----
 getResultsLogisticRegression <- function(inputs, config){
-  requireNamespace("car")
-  # Modify the link so that it can be passed on to R.
-  if (config$Link == "complementary log-log"){
-    config$Link <- "cloglog"
-  }
+  config$`Model Name`= validName(config$`Model Name`)
+  if ((is.null(config$regularization))||(!(config$regularization))) {
 
-  if (inputs$XDFInfo$is_XDF){
-    d <- processLogisticXDF(inputs, config)
-    glm.out <- createReportLogisticXDF(d$the.model, config, d$null.model)
-    plot.out <- function(){createPlotOutputsLogisticXDF()}
-  } else {
-    d <- processLogisticOSR(inputs, config)
-    glm.out <- createReportLogisticOSR(d$the.model, config, d$model_type)
-    plot.out <- function(){
-      createPlotOutputsLogisticOSR(d$the.model, FALSE, config)
+    requireNamespace("car")
+    # Modify the link so that it can be passed on to R.
+    if (config$Link == "complementary log-log"){
+      config$Link <- "cloglog"
     }
+
+    if (inputs$XDFInfo$is_XDF){
+      d <- processLogisticXDF(inputs, config)
+      glm.out <- createReportLogisticXDF(d$the.model, config, d$null.model)
+      plot.out <- function(){createPlotOutputsLogisticXDF()}
+    } else {
+      d <- processLogisticOSR(inputs, config)
+      glm.out <- createReportLogisticOSR(d$the.model, config, d$model_type)
+      plot.out <- function(){
+        createPlotOutputsLogisticOSR(d$the.model, FALSE, config)
+      }
+    }
+    results <- list(model = d$the.model, report = glm.out, plot = plot.out)
+    class(results) <- "GLM"
+  } else {
+    the.model <- processElasticNet(inputs, config)
+    #We don't need to worry about backwards compatibility in this section.
+    #In order to enter this side of the outer if loop, config$regularization
+    #must exist and be true. Thus, config$display_graphs must exist as well.
+    results <- list(model = the.model)
+    coefs_out <- createReportGLMNET(the.model)
+    results <- append(results, list(coefficients = coefs_out))
+    class(results) <- "GLMNET"
   }
-  results <- list(model = d$the.model, report = glm.out, plot = plot.out)
-  class(results) <- "GLM"
   results
 }
 
 runLogisticRegression <- function(inputs, config){
+  # reverse compatability code start
+  if (!("regularization" %in% names(config)))
+    config$regularization <- FALSE
+  # reverse compatability code end
+
+  if (config$regularization) {
+    inputs$the.data <- checkMissing.omit(inputs$the.data)
+    if ((config$internal_cv) && (config$nfolds > NROW(inputs$the.data))) {
+      AlteryxMessage2("You chose more folds for internal cross-validation than the number of valid rows in your data.", iType = 2, iPriority = 3)
+      AlteryxMessage2("The number of folds used is being re-set to the number of valid rows in your data.", iType = 2, iPriority = 3)
+      config$nfolds <- NROW(inputs$the.data)
+    }
+  }
   results <- getResultsLogisticRegression(inputs, config)
   writeOutputs(results, config)
 }
@@ -131,13 +157,7 @@ getResultsLinearRegression <- function(inputs, config){
 
 runLinearRegression <- function(inputs, config){
   if (config$regularization) {
-    if (sum(complete.cases(inputs$the.data)) < NROW(inputs$the.data)) {
-      AlteryxMessage2("The data contains missing values. Rows with missing data are being removed.", iType = 1, iPriority = 3)
-      inputs$the.data <- (inputs$the.data)[complete.cases(inputs$the.data),]
-      if (NROW(inputs$the.data) == 0) {
-        stop.Alteryx2("Every row had at least one missing value. Clean your data and try again.")
-      }
-    }
+    inputs$the.data <- checkMissing.omit(inputs$the.data)
     if ((config$internal_cv) && (config$nfolds > NROW(inputs$the.data))) {
       AlteryxMessage2("You chose more folds for internal cross-validation than the number of valid rows in your data.", iType = 2, iPriority = 3)
       AlteryxMessage2("The number of folds used is being re-set to the number of valid rows in your data.", iType = 2, iPriority = 3)

@@ -487,6 +487,9 @@ createTreePlotDT.rxDTree <- function(model, config, inputs) {
 #' @return graphs
 #' @export
 createTreePlotDT.C5.0 <- function(model, config, inputs) {
+  # WORKAROUND: The global assignment allows access to the.data by plotting
+  #   elements that otherwise cannot find it and error out. This is exlusive
+  #   to C5.0 models.
   the.data <<- inputs$the.data
   par(mar = c(5, 4, 6, 2) + 0.1)
   plot(model, trial = config$trials - 1)
