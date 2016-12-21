@@ -20,9 +20,13 @@ df2NumericMatrix <- function(x){
 #' @param config configuration passed to tool
 #' @return string family
 getFamily <- function(inputs, config){
-  target_data <- inputs$the.data[,1]
-  family_levels <- c("gaussian", "binomial", "multinomial")
-  family_levels[min(nlevels(target_data) + 1, 3)]
+  num_levels <- nlevels(inputs$the.data[,1])
+
+  if (num_levels == 1)
+    stop.Alteryx2("Target variable is a factor with only 1 level.")
+
+  family_levels <- c("gaussian", "", "binomial", "multinomial")
+  family_levels[min(num_levels, 3) + 1]
 }
 
 #' Process Elastic Net Inputs
