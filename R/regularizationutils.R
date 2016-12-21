@@ -20,9 +20,9 @@ df2NumericMatrix <- function(x){
 #' @param config configuration passed to tool
 #' @return string family
 getFamily <- function(inputs, config){
-  target_data <- inputs[,1]
+  target_data <- inputs$the.data[,1]
   family_levels <- c("gaussian", "binomial", "multinomial")
-  family_levels[max(nlevels(target_data),3)]
+  family_levels[min(nlevels(target_data) + 1, 3)]
 }
 
 #' Process Elastic Net Inputs
