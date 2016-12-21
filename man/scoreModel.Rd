@@ -35,9 +35,9 @@ scoreModel(mod.obj, new.data, score.field = "Score", ...)
 \method{scoreModel}{rxDForest}(mod.obj, new.data, score.field,
   os.value = NULL, os.pct = NULL, ...)
 
-\method{scoreModel}{elnet}(mod.obj, new.data, score.field, ...)
+\method{scoreModel}{elnet}(mod.obj, new.data, score.field = "Score", ...)
 
-\method{scoreModel}{cv.glmnet}(mod.obj, new.data, score.field, ...)
+\method{scoreModel}{cv.glmnet}(mod.obj, new.data, score.field = "Score", ...)
 }
 \arguments{
 \item{mod.obj}{model object}
