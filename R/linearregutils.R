@@ -9,25 +9,31 @@
 #' @export
 processLinearOSR <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
-  print("got the var_names. they are:")
-  print(var_names)
   the.formula <- if (config$`Omit Constant`){
     makeFormula(c("-1", var_names$x), var_names$y)
   } else {
     makeFormula(var_names$x, var_names$y)
   }
-  print('made the formula')
-  print("ls before the if useweights:")
-  print(ls())
   # FIXME: Revisit what we pass to the weights argument.
   if (config$`Use Weight`){
     weight_col <- var_names$w
     weights_v <- inputs$the.data[[weight_col]]
     # WORKAROUND
-    # The assign() statement below moves the token ‘weight_vec_processLinearOSR27’ to the global environment, where the lm() function can find it.
-    # Otherwise, something inside lm() isn’t finding ‘weights_v’ on its environment search path.
-    assign(x = 'weight_vec_processLinearOSR27', value = weights_v, envir = globalenv())
-    lm(the.formula, inputs$the.data, weights = weight_vec_processLinearOSR27)
+    # The code below ensures that weights_v gets saved to the execution environment
+    # of lm.
+    my_envir <- environment()
+    lapply(
+      X = 1:ncol(inputs$the.data),
+      FUN = function(i){
+        assign(
+          x = names(inputs$the.data)[i],
+          value = inputs$the.data[,i],
+          envir = my_envir
+        )
+      }
+    )
+
+    lm(formula = the.formula, data = environment(), weights = weights_v)
   } else {
     lm(the.formula, inputs$the.data)
   }
@@ -76,7 +82,7 @@ df2NumericMatrix <- function(x){
   if (numNonNumericCols == NCOL(x)){
     AlteryxMessage2("All of the provided variables were non-numeric. Please provide at least one numeric variable and try again.", iType = 2, iPriority = 3)
     stop.Alteryx2()
-  } else if (numNonNumericCols > 0){
+  } else if ((length(numNonNumericCols) > 0) && (numNonNumericCols > 0)){
     AlteryxMessage2("Non-numeric variables were included to glmnet. They are now being removed.", iType = 1, iPriority = 3)
     x <- Filter(is.numeric, x)
   }
