@@ -210,7 +210,7 @@ scoreModel.rxDForest <- scoreModel.rxDTree
 
 #' @export
 #' @rdname scoreModel
-scoreModel.elnet <- function(mod.obj, new.data, score.field, ...) {
+scoreModel.elnet <- function(mod.obj, new.data, score.field = "Score", ...) {
   #The code in the score tool has already subsetted the columns of the original
   #data to be scored, so there's no need to subset in that case.
   #However, we need to perform the subsetting and column ordering in case of future tools
@@ -229,8 +229,8 @@ scoreModel.elnet <- function(mod.obj, new.data, score.field, ...) {
   used_data <- new.data[,used_x_vars]
   requireNamespace('glmnet')
   score <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred)
-  names(score) <- score.field
   score <- as.data.frame(score)
+  names(score) <- score.field
   return(score)
 }
 

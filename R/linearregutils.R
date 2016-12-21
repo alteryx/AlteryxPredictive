@@ -16,7 +16,24 @@ processLinearOSR <- function(inputs, config){
   }
   # FIXME: Revisit what we pass to the weights argument.
   if (config$`Use Weight`){
-    lm(the.formula, inputs$the.data, weights = inputs$the.data[[var_names$w]])
+    weight_col <- var_names$w
+    weights_v <- inputs$the.data[[weight_col]]
+    # WORKAROUND
+    # The code below ensures that weights_v gets saved to the execution environment
+    # of lm.
+    my_envir <- environment()
+    lapply(
+      X = 1:ncol(inputs$the.data),
+      FUN = function(i){
+        assign(
+          x = names(inputs$the.data)[i],
+          value = inputs$the.data[,i],
+          envir = my_envir
+        )
+      }
+    )
+
+    lm(formula = the.formula, data = environment(), weights = weights_v)
   } else {
     lm(the.formula, inputs$the.data)
   }
@@ -65,7 +82,7 @@ df2NumericMatrix <- function(x){
   if (numNonNumericCols == NCOL(x)){
     AlteryxMessage2("All of the provided variables were non-numeric. Please provide at least one numeric variable and try again.", iType = 2, iPriority = 3)
     stop.Alteryx2()
-  } else if (numNonNumericCols > 0){
+  } else if ((length(numNonNumericCols) > 0) && (numNonNumericCols > 0)){
     AlteryxMessage2("Non-numeric variables were included to glmnet. They are now being removed.", iType = 1, iPriority = 3)
     x <- Filter(is.numeric, x)
   }
