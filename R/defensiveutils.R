@@ -10,4 +10,5 @@ checkMissing.omit <- function(data) {
       stop.Alteryx2("Every row had at least one missing value. Clean your data and try again.")
     }
   }
+  data
 }
