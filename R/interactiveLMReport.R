@@ -40,6 +40,17 @@ interactive_lm_report <- function(
 
   # model-summary numbers
 
+  if(lm_b){
+    the_fitted_values <- unname(the_model$fitted.values)
+  } else{
+    the_fitted_values <- unname(
+      predict(
+        object = the_model,
+        newx = as.matrix(the_data[, -which(names(the_data) == config$`Y Var`)]),
+        s = lambda
+      )
+    )
+  }
   the_residuals <- unname(the_actual_values - the_fitted_values)
   n <- nrow(the_data)
   p <- ncol(the_data) - 1 - as.numeric(config$`Use Weights`)
