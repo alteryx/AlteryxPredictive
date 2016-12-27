@@ -31,8 +31,9 @@ interactive_lm_report <- function(
   } else{
     stop.Alteryx2('An invalid model type was passed to interactive_lm.  Please contact Alteryx support!')
   }
+  the_model <- model
   the_data <- data
-  the_actual_values <- the_data[, config$`Y Var`]
+  the_actual_values <- the_data[, 1]
   fitted_intercept <- !config$`Omit Constant`
   alpha <- config$alpha
   use_cv_lambda_1se <- config$lambda_1se
@@ -40,6 +41,17 @@ interactive_lm_report <- function(
 
   # model-summary numbers
 
+  if(lm_b){
+    the_fitted_values <- unname(the_model$fitted.values)
+  } else{
+    the_fitted_values <- unname(
+      predict(
+        object = the_model,
+        newx = as.matrix(the_data[, -1]),
+        s = lambda
+      )
+    )
+  }
   the_residuals <- unname(the_actual_values - the_fitted_values)
   n <- nrow(the_data)
   p <- ncol(the_data) - 1 - as.numeric(config$`Use Weights`)
