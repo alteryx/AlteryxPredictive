@@ -5,12 +5,12 @@
 \title{linear-model interactive-report function
 This function generates the interactive report for the Linear Model tool.}
 \usage{
-interactive_lm_report(config, inputs, model)
+interactive_lm_report(config, data, model)
 }
 \arguments{
 \item{config}{config}
 
-\item{inputs}{inputs}
+\item{data}{data (breaking the usual mold a little)}
 
 \item{model}{model}
 }

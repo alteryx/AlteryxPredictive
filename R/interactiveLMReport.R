@@ -1,14 +1,14 @@
 #' linear-model interactive-report function
 #' This function generates the interactive report for the Linear Model tool.
 #' @param config config
-#' @param inputs inputs
+#' @param data data (breaking the usual mold a little)
 #' @param model model
 #' @import MLmetrics DT flightdeck
 #' @export
 #' @author Todd Morley, Dylan Blanchard
 interactive_lm_report <- function(
   config,
-  inputs,
+  data,
   model
 ){
   # UI layout constants
@@ -31,7 +31,7 @@ interactive_lm_report <- function(
   } else{
     stop.Alteryx2('An invalid model type was passed to interactive_lm.  Please contact Alteryx support!')
   }
-  the_data <- inputs$the.data
+  the_data <- data
   the_actual_values <- the_data[, config$`Y Var`]
   fitted_intercept <- !config$`Omit Constant`
   alpha <- config$alpha
