@@ -3,7 +3,7 @@
 #' @param config config
 #' @param data data (breaking the usual mold a little)
 #' @param model model
-#' @import MLmetrics DT
+#' @import MLmetrics DT flightdeck
 #' @export
 #' @author Todd Morley, Dylan Blanchard
 interactive_lm_report <- function(

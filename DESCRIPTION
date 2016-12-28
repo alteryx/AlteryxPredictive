@@ -36,7 +36,8 @@ Imports:
   ggplot2,
   TunePareto,
   reshape2,
-  stats
+  stats,
+  flightdeck
 Suggests:
   knitr,
   rmarkdown,
@@ -44,8 +45,7 @@ Suggests:
   testthat,
   XML,
   survey,
-  AlteryxRviz,  
-  flightdeck
+  AlteryxRviz
 Enhances:
   AlteryxRDataX,
   RevoScaleR
