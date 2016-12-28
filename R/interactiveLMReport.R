@@ -63,15 +63,15 @@ interactive_lm_report <- function(
       } else{
         lambda <- the_model$lambda.min
       }
-      the_fitted_values <- unname(
-        predict(
-          object = the_model,
-          newx = independent_variable_m,
-          s = lambda,
-          type = 'response'
-        )
-      )
     }
+    the_fitted_values <- unname(
+      predict(
+        object = the_model,
+        newx = independent_variable_m,
+        s = lambda,
+        type = 'response'
+      )
+    )
   }
   the_residuals <- unname(the_actual_values - the_fitted_values)
   if(fitted_intercept){
