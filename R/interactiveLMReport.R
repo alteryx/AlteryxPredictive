@@ -12,7 +12,6 @@ interactive_lm_report <- function(
   model
 ){
   # UI layout constants
-  require('flightdeck')
   totalWidth <- 12
   infoBoxWidth <- 6
   digits <- 3
