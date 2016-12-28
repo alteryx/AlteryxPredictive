@@ -250,7 +250,7 @@ getActualandResponse <- function(model, data, testIndices, extras, mid){
   }
 }
 
-safeGetActualAndResponse <- failwith(NULL, getActualandResponse, quiet = FALSE)
+safeGetActualAndResponse <- plyr::failwith(NULL, getActualandResponse, quiet = FALSE)
 
 #'
 getCrossValidatedResults <- function(inputs, allFolds, extras, config){
@@ -376,7 +376,7 @@ generateConfusionMatrices <- function(outData, extras) {
 }
 
 generateOutput3 <- function(data, extras, modelNames) {
-  d <- ddply(data, .(trial, fold, mid, response), generateConfusionMatrices,
+  d <- plyr::ddply(data, .(trial, fold, mid, response), generateConfusionMatrices,
              extras = extras
   )
   d$Model <- modelNames[as.numeric(d$mid)]
@@ -393,7 +393,7 @@ generateOutput2 <- function(data, extras, modelNames) {
   } else {
     getMeasuresClassification
   }
-  d <- ddply(data, .(trial, fold, mid), fun, extras = extras)
+  d <- plyr::ddply(data, .(trial, fold, mid), fun, extras = extras)
   d$Model <- modelNames[as.numeric(d$mid)]
   d <- subset(d, select = -c(mid))
   return(d)
@@ -408,7 +408,7 @@ generateOutput1 <- function(inputs, config, extras){
     trial = seq_along(allFolds),
     fold = seq_along(allFolds[[1]])
   )
-  return(mdply(g, getCrossValidatedResults(inputs, allFolds, extras, config)))
+  return(plyr::mdply(g, getCrossValidatedResults(inputs, allFolds, extras, config)))
 }
 
 computeBinaryMetrics <- function(pred_prob, actual, threshold){
@@ -442,7 +442,7 @@ generateDataForPlots <- function(d, extras, config){
   if (config$classification) {
     if (length(extras$levels) == 2) {
       thresholds <- seq(0, 1, 0.05)
-      ldply(thresholds, computeBinaryMetrics,
+      plyr::ldply(thresholds, computeBinaryMetrics,
             actual = ifelse(d$actual == extras$posClass, TRUE, FALSE),
             pred_prob = d[[paste0('Score_', extras$posClass)]]
       )
@@ -561,7 +561,7 @@ getResultsCrossValidation <- function(inputs, config){
                Predicted_class = 'no', Variable = "Classno", Value = 50
     )
   }
-  plotData <- ddply(dataOutput1, .(trial, fold, mid), generateDataForPlots,
+  plotData <- plyr::ddply(dataOutput1, .(trial, fold, mid), generateDataForPlots,
                     extras = extras, config = config
   )
   outputPlot <- if (config$classification) {
