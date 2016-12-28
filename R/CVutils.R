@@ -171,7 +171,7 @@ getPosClass <- function(yVar, order) {
 #' @import C50 rpart glmnet
 #' @importFrom stats update
 getActualandResponse <- function(model, data, testIndices, extras, mid, config){
-  if(class(model) == "rpart" || class(model) == "C5.0" || class(model) == "glm") {
+  if(class(model) == "rpart" || class(model) == "C5.0" || any(class(model) == "glm")) {
     trainingData <- data[-testIndices,]
     testData <- data[testIndices,]
     testData <- matchLevels(testData, getXlevels(model))
@@ -232,11 +232,7 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
     # if (inherits(currentModel, 'gbm')){
     #   currentModel <- adjustGbmModel(currentModel)
     # }
-    pred <- if (packageVersion('AlteryxPredictive') <= '0.3.2') {
-      scoreModel2(currentModel, new.data = testData)
-    } else {
-      scoreModel(currentModel, new.data = testData)
-    }
+    scoreModel(currentModel, new.data = testData)
     actual <- (extras$yVar)[testIndices]
     recordID <- (data[testIndices,])$recordID
     response <- pred$Score

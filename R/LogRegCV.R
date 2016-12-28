@@ -14,6 +14,16 @@ genearateDataForPlotLogReg <- function(d, extras, config) {
 #' @return list of results for outputting
 #' @export
 getResultsCrossValidationLogReg <- function(inputs, config) {
+  ###### WORKAROUND #########################################
+  # Namespace issues require redefining the call and family
+  # Time is not permitting me to go make proper changes
+  model <- inputs$models[[1]]
+  model$call$formula <- makeFormula(config$`X Vars`, config$`Y Var`)
+  model$call$family <- binomial(config$Link)
+  inputs$models[[1]] <- model
+  ### END WORKAROUND
+
+
   inputs$data$recordID <- 1:NROW(inputs$data)
   yVarList <- getYvars(inputs$data, inputs$models)
   y_name <- yVarList$y_name
