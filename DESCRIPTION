@@ -8,6 +8,7 @@ Authors@R: c(
     person("Chris", "Freeman", role = "aut"),
     person("Dan", "Putler", role = "aut"),
     person("Bridget", "Toomey", role = "aut"),
+    person("Todd", "Morley", role = "aut"),
     person(family = "Alteryx", role = "cph")
   )
 Description: This package contains utility functions used by the
@@ -28,7 +29,10 @@ Imports:
   assertthat,
   plyr,
   glmnet,
-  C50
+  C50,
+  DT,
+  MLmetrics,
+  flightdeck
 Suggests:
   knitr,
   rmarkdown,
