@@ -171,7 +171,7 @@ getPosClass <- function(yVar, order) {
 #' @import C50 rpart glmnet
 #' @importFrom stats update
 getActualandResponse <- function(model, data, testIndices, extras, mid, config){
-  if(class(model) == "rpart" || class(model) == "C5.0") {
+  if(class(model) == "rpart" || class(model) == "C5.0" || class(model) == "glm") {
     trainingData <- data[-testIndices,]
     testData <- data[testIndices,]
     testData <- matchLevels(testData, getXlevels(model))
@@ -207,7 +207,7 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
       trainingData <- df2NumericMatrix(trainingData)
       #No need to call df2NmericMatrix on testData, since scoreModel calls df2NumericMatrix with glmnet models.
       currentModel <- glmnetUpdate(model, trainingData, currentYvar, config, weight_vec = weights_v)
-    } else {
+    } else if (inherits(model, "lm")){
       if (config$`Use Weights`) {
         # WORKAROUND
         # The assign() statement below moves the token ‘getActualandResponse’ to the global environment, where the update() function can find it.
@@ -229,9 +229,9 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
         currentModel <- update(model, formula. = makeFormula(getXVars(model), currentYvar), data = trainingData)
       }
     }
-    if (inherits(currentModel, 'gbm')){
-      currentModel <- adjustGbmModel(currentModel)
-    }
+    # if (inherits(currentModel, 'gbm')){
+    #   currentModel <- adjustGbmModel(currentModel)
+    # }
     pred <- if (packageVersion('AlteryxPredictive') <= '0.3.2') {
       scoreModel2(currentModel, new.data = testData)
     } else {

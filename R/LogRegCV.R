@@ -16,8 +16,8 @@ genearateDataForPlotLogReg <- function(d, extras, config) {
 getResultsCrossValidationLogReg <- function(inputs, config) {
   inputs$data$recordID <- 1:NROW(inputs$data)
   yVarList <- getYvars(inputs$data, inputs$models)
-  y_name <- yVarList$y_col
-  yVar <- inputs$data[[y_name]]
+  y_name <- yVarList$y_name
+  yVar <- yVarList$y_col
   inputs$modelNames <- modelNames <- names(inputs$models)
 
   checkXVars(inputs)
@@ -45,7 +45,6 @@ getResultsCrossValidationLogReg <- function(inputs, config) {
     Response = dataOutput1$response,
     Actual = dataOutput1$actual
   )
-
   dataOutput2 <- generateOutput2(dataOutput1, extras, modelNames)
   preppedOutput2 <- reshape2::melt(dataOutput2, id = c('trial', 'fold', 'Model'))
 
@@ -78,6 +77,6 @@ getResultsCrossValidationLogReg <- function(inputs, config) {
 runCrossValidationLogReg <- function(inputs, config) {
   results <- getResultsCrossValidationLogReg(inputs, config)
   write.Alteryx2(results$data, 2)
-  write.Alteryx(results$fitMeasures, 3)
+  write.Alteryx2(results$fitMeasures, 3)
   AlteryxGraph2(results$outputPlot, 4)
 }
