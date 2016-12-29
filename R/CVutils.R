@@ -232,7 +232,7 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
     # if (inherits(currentModel, 'gbm')){
     #   currentModel <- adjustGbmModel(currentModel)
     # }
-    scoreModel(currentModel, new.data = testData)
+    pred <- scoreModel(currentModel, new.data = testData)
     actual <- (extras$yVar)[testIndices]
     recordID <- (data[testIndices,])$recordID
     response <- pred$Score
