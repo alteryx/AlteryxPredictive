@@ -1,0 +1,71 @@
+genearateDataForPlotLogReg <- function(d, extras, config) {
+  thresholds <- seq(0, 1, .05)
+  plyr::ldply(thresholds,
+              computeBinaryMetrics,
+              actual = ifelse(d$actual == extras$posClass, TRUE, FALSE),
+              pred_prob = d[[paste0('Score_', extras$posClass)]]
+  )
+}
+
+getResultsCrossValidationLogReg <- function(inputs, config) {
+  inputs$data$recordID <- 1:NROW(inputs$data)
+  yVarList <- getYvars(inputs$data, inputs$models)
+  y_name <- yVarList$y_col
+  yVar <- inputs$data[[y_name]]
+  inputs$modelNames <- modelNames <- names(inputs$models)
+
+  checkXVars(inputs)
+
+  if ((config$classification) && (length(unique(yVar)) == 2)) {
+    if ((is.null(config$posClass)) || (config$posClass == "")) {
+      config$posClass <- as.character(getPosClass(levels(yVar), order = "common"))
+    }
+  }
+
+  extras <- list(
+    yVar = yVar,
+    y_name = yVar,
+    posClass = config$posClass,
+    allFolds = createFolds(data = inputs$data, config = config, seed = config$seed),
+    levels = levels(yVar)
+  )
+
+  dataOutput1 <- generateOutput1(inputs, config, extras)
+  preppedOutput1 <- data.frame(
+    RecordID = dataOutput1$recordID,
+    Trial = dataOutput1$trial,
+    Fold = dataOutput1$fold,
+    Model = modelNames[dataOutput1$mid],
+    Response = dataOutput1$response,
+    Actual = dataOutput1$actual
+  )
+
+  dataOutput2 <- generateOutput2(dataOutput1, extras, modelNames)
+  preppedOutput2 <- reshape2::melt(dataOutput2, id = c('trial', 'fold', 'Model'))
+
+  confMats <- generateOutput3(dataOutput1, extras, modelNames)
+
+  plotData <- plyr::ddply(
+    dataOutput1,
+    c("trial", "fold", "mid"),
+    genearateDataForPlotLogReg,
+    extras = extras,
+    config = config
+  )
+
+  outputPlot <- plotBinaryData(plotData, config, modelNames)
+
+  list(
+    data = preppedOutput1,
+    fitMeasures = preppedOutput2,
+    confMats = confMats,
+    outputPlot = outputPlot
+  )
+}
+
+runCrossValidationLogReg <- function(inputs, config) {
+  results <- getResultsCrossValidationLogReg(inputs, config)
+  write.Alteryx2(results$data, 2)
+  write.Alteryx(results$fitMeasures, 3)
+  AlteryxGraph2(results$outputPlot, 4)
+}
