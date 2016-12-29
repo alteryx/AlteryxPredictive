@@ -556,7 +556,6 @@ checkXVars <- function(inputs){
 glmnetUpdate <- function(model, trainingData, currentYvar, config, weight_vec = NULL) {
   predictors <- trainingData[,AlteryxPredictive:::getXVars(model)]
   response <- trainingData[,(which(colnames(trainingData) == currentYvar))]
-  library(glmnet)
   model_w_call <- if (config$internal_cv) {
     model$glmnet.fit
   } else {
