@@ -10,7 +10,7 @@ getYvars(data, models)
 \arguments{
 \item{data}{incoming data}
 
-\item{model(s)}{to extract Y vars from}
+\item{models}{model(s) to extract Y vars from}
 }
 \value{
 y variable
