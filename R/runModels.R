@@ -195,6 +195,11 @@ getResultsDecisionTree <- function(inputs, config) {
   the.model.rpart <- if(inputs$XDFInfo$is_XDF) the.report.list$model_rpart else the.model
   the.report <- the.report.list$out
 
+  if(config$model.algorithm == "C5.0" && config$rules){
+    config$tree.plot <- FALSE
+    AlteryxMessage2("Tree Plot not available for C5.0 when rules-based model is chosen")
+  }
+
   makeTreePlot <- NULL
   makePrunePlot <- NULL
 
