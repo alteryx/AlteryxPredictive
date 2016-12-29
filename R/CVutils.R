@@ -168,8 +168,7 @@ getPosClass <- function(yVar, order) {
 
 
 # Given a model, a dataset and index of test cases, return actual and response
-#' @import C50 rpart
-#' @import glm glmnet cv.glmnet
+#' @import C50 rpart glmnet
 #' @importFrom stats update
 getActualandResponse <- function(model, data, testIndices, extras, mid, config){
   if(class(model) == "rpart" || class(model) == "C5.0") {
@@ -392,8 +391,7 @@ generateOutput2 <- function(data, extras, modelNames) {
 }
 
 #' @import plyr
-#' @import rpart C50
-#' @import glm glmnet cv.glmnet
+#' @import rpart C50 glmnet
 generateOutput1 <- function(inputs, config, extras){
   allFolds <- extras$allFolds
   g <- expand.grid(
@@ -517,7 +515,7 @@ plotRegressionData <- function(plotData, config, modelNames) {
 checkXVars <- function(inputs){
   numModels <- length(inputs$models)
   modelNames <- names(inputs$models)
-  modelXVars <-  lapply(inputs$models, getXVars2)
+  modelXVars <-  lapply(inputs$models, getXVars)
   dataXVars <- names(inputs$data)[which(names(inputs$data) %in% unlist(modelXVars))]
   errorMsg <- NULL
   if (numModels > 1) {

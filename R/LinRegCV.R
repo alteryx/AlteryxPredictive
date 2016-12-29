@@ -36,6 +36,11 @@ getResultsCrossValidationLinReg <- function(inputs, config){
   )
 }
 
+#' process for Linear Regression with Cross Validation
+#'
+#' @param inputs list of inputs
+#' @param config list of config elements
+#' @export
 runCrossValidationLinReg <- function(inputs, config){
   results <- getResultsCrossValidationLinReg(inputs, config)
   write.Alteryx2(results$data, 2)
