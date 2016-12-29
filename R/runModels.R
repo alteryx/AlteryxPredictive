@@ -212,8 +212,8 @@ getResultsDecisionTree <- function(inputs, config) {
   dashboard <- createDashboardDT(the.model)
 
   results <- list(model = the.model, report = the.report,
-    treePlot = makeTreePlot, prunePlot = makePrunePlot,
-    dashboard = dashboard
+                  treePlot = makeTreePlot, prunePlot = makePrunePlot,
+                  dashboard = dashboard
   )
 
   class(results) <- "DecisionTree"
