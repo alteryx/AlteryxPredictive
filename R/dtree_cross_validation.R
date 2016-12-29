@@ -144,7 +144,8 @@ getPosClass <- function(config, yVar) {
 # Given a model, a dataset and index of test cases, return actual and response
 #' @import C50
 #' @import rpart
-getActualandResponse <- function(model, data, testIndices, extras, mid){
+#' @importFrom stats update
+getActualandResponse <- function(model, data, testIndices, extras, mid, config){
   trainingData <- data[-testIndices,]
   testData <- data[testIndices,]
   testData <- matchLevels(testData, getXlevels(model))
@@ -169,7 +170,7 @@ getCrossValidatedResults <- function(inputs, allFolds, extras, config){
   function(mid, trial, fold){
     model <- inputs$models[[mid]]
     testIndices <- allFolds[[trial]][[fold]]
-    out <- (safeGetActualAndResponse(model, inputs$data, testIndices, extras, mid))
+    out <- (safeGetActualAndResponse(model, inputs$data, testIndices, extras, mid, config))
     if (is.null(out)) {
       AlteryxMessage2(paste0("For model ", mid, " trial ", trial, " fold ", fold, " the data could not be scored."), iType = 2, iPriority = 3)
     } else {
@@ -180,6 +181,7 @@ getCrossValidatedResults <- function(inputs, allFolds, extras, config){
 }
 
 #Get the necessary measures in the regression case
+#' @importFrom stats cor
 getMeasuresRegression <- function(outData, extras) {
   actual <- unlist(outData$actual)
   predicted <- unlist(outData$response)
@@ -210,7 +212,7 @@ getMeasuresRegression <- function(outData, extras) {
 #' @param outData scored data used to obtain the measures
 #' @param extras list of miscellaneous information
 #' @return outvec a vector of results
-#' @import ROCR
+#' @importFrom ROCR prediction
 getMeasuresClassification <- function(outData, extras) {
   actual <- as.character(outData$actual)
   scoredData <- outData[,7:8]
@@ -289,7 +291,8 @@ generateOutput3 <- function(data, extras, modelNames) {
   )
   d$Model <- modelNames[as.numeric(d$mid)]
   d$Type <- rep.int('Classification', times = length(d$Model))
-  d <- subset(d, select = -c(mid, response))
+  d$mid <- NULL
+  d$response <- NULL
   d <- reshape2::melt(d, id = c('trial', 'fold', 'Model', 'Type', 'Predicted_class'))
   colnames(d) <- c('Trial', 'Fold', 'Model', 'Type', 'Predicted_class', 'Variable', 'Value')
   return(d)
@@ -303,7 +306,7 @@ generateOutput2 <- function(data, extras, modelNames) {
   }
   d <- plyr::ddply(data, c("trial", "fold", "mid"), fun, extras = extras)
   d$Model <- modelNames[as.numeric(d$mid)]
-  d <- subset(d, select = -c(mid))
+  d$mid <- NULL
   return(d)
 }
 
@@ -327,7 +330,7 @@ generateOutput1 <- function(inputs, config, extras){
 #' @param actual vector of actual results
 #' @param threshold a double between 0 and 1 (current probability threshold)
 #' @return a data.frame with results
-#' @import ROCR
+#' @importFrom ROCR prediction performance
 computeBinaryMetrics <- function(pred_prob, actual, threshold){
   #Pred_prob gives the predicted probability of belonging to the positive class
   #Actual is true if the record belongs to the positive class and negative if not
@@ -398,14 +401,14 @@ plotBinaryData <- function(plotData, config, modelNames) {
   rocdf <- data.frame(False_Pos_Rate = plotData$False_Pos_Rate, True_Pos_Rate = plotData$True_Pos_Rate, fold = paste0("Fold", plotData$fold),
                       models = plotData$modelVec, trial = plotData$trialVec)
 
-  liftPlotObj <- ggplot2::ggplot(data = liftdf, aes(x = Rate_positive_predictions, y = lift)) +
-    ggplot2::geom_smooth(aes(colour=models)) + ggplot2::ggtitle("Lift curves")
-  gainPlotObj <- ggplot2::ggplot(data = gaindf, aes(x = Rate_positive_predictions, y = True_Pos_Rate)) +
-    ggplot2::geom_smooth(aes(colour=models)) + ggplot2::ggtitle('Gain Charts')
-  PrecRecallPlotObj <- ggplot2::ggplot(data = prec_recalldf, aes(x = recall, y = precision)) +
-    ggplot2::geom_smooth(aes(colour=models)) + ggplot2::ggtitle('Precision and Recall Curves')
-  ROCPlotObj <- ggplot2::ggplot(data = rocdf, aes(x = False_Pos_Rate, y = True_Pos_Rate)) +
-    ggplot2::geom_smooth(aes(colour=models)) + ggplot2::ggtitle('ROC Curves')
+  liftPlotObj <- ggplot2::ggplot(data = liftdf, aes_string(x = "Rate_positive_predictions", y = "lift")) +
+    ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle("Lift curves")
+  gainPlotObj <- ggplot2::ggplot(data = gaindf, aes_string(x = "Rate_positive_predictions", y = "True_Pos_Rate")) +
+    ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle('Gain Charts')
+  PrecRecallPlotObj <- ggplot2::ggplot(data = prec_recalldf, aes_string(x = "recall", y = "precision")) +
+    ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle('Precision and Recall Curves')
+  ROCPlotObj <- ggplot2::ggplot(data = rocdf, aes_string(x = "False_Pos_Rate", y = "True_Pos_Rate")) +
+    ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle('ROC Curves')
   AlteryxGraph2(liftPlotObj, nOutput = 4)
   AlteryxGraph2(gainPlotObj, nOutput = 4)
   AlteryxGraph2(PrecRecallPlotObj, nOutput = 4)
@@ -418,8 +421,8 @@ plotRegressionData <- function(plotData, config, modelNames) {
   plotData <- cbind(plotData, modelVec, trialVec)
   plotdf <- data.frame(Actual = plotData$actual, Predicted = plotData$response, fold = paste0("Fold", plotData$fold),
                        models = plotData$modelVec, trial = plotData$trialVec)
-  plotObj <- ggplot2::ggplot(data = plotdf, aes(x = Actual, y = Predicted)) +
-    ggplot2::geom_smooth(aes(colour=models)) + ggplot2::ggtitle("Predicted value vs actual values")
+  plotObj <- ggplot2::ggplot(data = plotdf, aes_string(x = "Actual", y = "Predicted")) +
+    ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle("Predicted value vs actual values")
   AlteryxGraph2(plotObj, nOutput = 4)
 }
 
