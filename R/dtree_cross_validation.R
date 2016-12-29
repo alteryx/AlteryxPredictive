@@ -233,7 +233,7 @@ getMeasuresRegression <- function(outData, extras) {
 }
 
 #Get the necessary measures in the classification case
-#' @import ROCR
+# @import ROCR
 getMeasuresClassification <- function(outData, extras) {
   actual <- as.character(outData$actual)
   scoredData <- outData[,7:8]
@@ -398,7 +398,7 @@ generateLabels <- function(plotData, config) {
   list(trials = trials, models = models)
 }
 
-#' @import ggplot2
+# @import ggplot2
 plotBinaryData <- function(plotData, config, modelNames) {
   labels <- generateLabels(plotData, config)
   modelVec <- modelNames[plotData$mid]
@@ -426,7 +426,7 @@ plotBinaryData <- function(plotData, config, modelNames) {
   AlteryxGraph2(PrecRecallPlotObj, nOutput = 4)
   AlteryxGraph2(ROCPlotObj, nOutput = 4)
 }
-#' @import ggplot2
+# @import ggplot2
 plotRegressionData <- function(plotData, config, modelNames) {
   modelVec <- modelNames[plotData$mid]
   trialVec <- paste0('Trial ', plotData$trial)
@@ -439,8 +439,8 @@ plotRegressionData <- function(plotData, config, modelNames) {
 }
 
 # Helper Functions End ----
-#' @import ggplot2
-#' @import reshape2
+# @import ggplot2
+# @import reshape2
 getResultsCrossValidation <- function(inputs, config){
   inputs$data$recordID <- 1:NROW(inputs$data)
   yVarName <- getYVar(inputs$models$Decision_tree)
