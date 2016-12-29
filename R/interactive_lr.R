@@ -307,6 +307,4 @@ interactive_lr <- function(
     fixed = TRUE
   )
 
-} # end interactive_lr
-
-interactive_lr(config, data, model)
+}
