@@ -158,6 +158,11 @@ createDTParams <- function(config, names) {
     formula = makeFormula(names$x, names$y),
     weights = names$w
   ))
+  if (params$cp == 1) {
+    params$cp <- .999
+    AlteryxMessage2("Control Parameter of 1 is not permitted.")
+    AlteryxMessage2("Control Parameter was converted to .999")
+  }
 
   if (!config$bands.check)
     params$bands <- 0
