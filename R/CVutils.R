@@ -509,9 +509,9 @@ plotRegressionData <- function(plotData, config, modelNames) {
   AlteryxGraph2(plotObj, nOutput = 4)
 }
 
-#' ## Check predictor variables
-#'
+#' Check predictor variables
 #' Check if predictor variables in the models and input data are identical.
+#' @param inputs list of inputs
 checkXVars <- function(inputs){
   numModels <- length(inputs$models)
   modelNames <- names(inputs$models)
