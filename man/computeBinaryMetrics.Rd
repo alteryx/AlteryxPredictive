@@ -10,6 +10,8 @@ computeBinaryMetrics(pred_prob, actual, threshold)
 \item{pred_prob}{vector of predicted probabilities}
 
 \item{actual}{vector of actual results}
+
+\item{threshold}{a double between 0 and 1 (current probability threshold)}
 }
 \value{
 a data.frame with results

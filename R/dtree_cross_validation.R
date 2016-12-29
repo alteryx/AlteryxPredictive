@@ -1,9 +1,5 @@
 #' Cross-validation for Decision Tree
 #'
-#' @param config list of config options
-#' @param the.data incoming data
-#' @return list of results or results
-#'
 
 
 #Helper Functions
@@ -329,6 +325,7 @@ generateOutput1 <- function(inputs, config, extras){
 #'
 #' @param pred_prob vector of predicted probabilities
 #' @param actual vector of actual results
+#' @param threshold a double between 0 and 1 (current probability threshold)
 #' @return a data.frame with results
 #' @import ROCR
 computeBinaryMetrics <- function(pred_prob, actual, threshold){

@@ -10,14 +10,8 @@ areIdentical(v1, v2)
 \item{v1}{a vector}
 
 \item{v2}{a vector}
-
-\item{config}{list of config options}
-
-\item{the.data}{incoming data}
 }
 \value{
-list of results or results
-
 Boolean indicating whether the two vectors are equal
 }
 \description{
