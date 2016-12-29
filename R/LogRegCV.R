@@ -7,6 +7,12 @@ genearateDataForPlotLogReg <- function(d, extras, config) {
   )
 }
 
+#' get results from running cross validation for logistic regression model
+#'
+#' @param inputs inputs list with data and models
+#' @param config list of configuration options
+#' @return list of results for outputting
+#' @export
 getResultsCrossValidationLogReg <- function(inputs, config) {
   inputs$data$recordID <- 1:NROW(inputs$data)
   yVarList <- getYvars(inputs$data, inputs$models)
@@ -63,6 +69,12 @@ getResultsCrossValidationLogReg <- function(inputs, config) {
   )
 }
 
+#' Run CV and output results for logistic CV model
+#'
+#' @param inputs inputs list with data and models
+#' @param config list of configuration options
+#' @return list of results for outputting
+#' @export
 runCrossValidationLogReg <- function(inputs, config) {
   results <- getResultsCrossValidationLogReg(inputs, config)
   write.Alteryx2(results$data, 2)
