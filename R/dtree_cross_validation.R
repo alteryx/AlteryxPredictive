@@ -92,7 +92,7 @@ checkFactorVars <- function(data, folds, config) {
 #' @param data the data.frame used to create the models
 #' @param config a list of configuration information
 #' @return list of record ID's. Each element is the record ID's of the folds for a given trial.
-#' @import TunePareto
+# @import TunePareto
 createFolds <- function(data, config) {
   target <- data[, 1]
   if (config$set_seed_cv) {
