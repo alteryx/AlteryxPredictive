@@ -59,7 +59,7 @@ getResultsCrossValidation <- function(inputs, config){
                Predicted_class = 'no', Variable = "Classno", Value = 50
     )
   }
-  plotData <- plyr::ddply(dataOutput1, c("trial", "fold", "mid"), generateDataForPlots,
+  plotData <- plyr::ddply(dataOutput1, c("trial", "fold", "mid"), generateDataForPlotsDTree,
                     extras = extras, config = config
   )
   outputPlot <- if (config$classification) {

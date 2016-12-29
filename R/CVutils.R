@@ -439,7 +439,7 @@ computeBinaryMetrics <- function(pred_prob, actual, threshold){
   data.frame(threshold = threshold, recall = recall, F1 = F1, lift = lift, Rate_Pos_Predictions = rpp, True_Pos_Rate = tpr, False_Pos_Rate = fpr, Precision = precision)
 }
 
-generateDataForPlots <- function(d, extras, config){
+generateDataForPlotsDTree <- function(d, extras, config){
   if (config$classification) {
     if (length(extras$levels) == 2) {
       thresholds <- seq(0, 1, 0.05)
