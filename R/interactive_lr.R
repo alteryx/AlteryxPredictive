@@ -14,7 +14,7 @@ interactive_lr <- function(
   data,
   model
 ){
-
+  requireNamespace("flightdeck")
   # optimal cutoff probability from ROC analysis,
   # weighing sensitivity and specificity equally;
   # returns a named vector:  sensitivity, specificity,
