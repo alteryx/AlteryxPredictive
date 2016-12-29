@@ -92,3 +92,12 @@ test_that("Iris data with rpart weighted model", {
   expect_equal(getCall(result$model)[[2]], getCall(exp_tree_model)[[2]])
   expect_equal(result$model$frame,exp_tree_model$frame)
 })
+
+exp_C50_model <- C50::C5.0(formula = Species ~ ., data = iris, weights = weights)
+
+config$model.algorithm <- "C5.0"
+
+test_that("Iris data with C5.0 rules model", {
+  result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
+  expect_equal(result$model$tree, exp_C50_model$tree)
+})
