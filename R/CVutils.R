@@ -105,7 +105,7 @@ createFolds <- function(data, config, set_seed = TRUE, seed = NULL) {
 #' If so, output this variable.
 #'
 #' @param data incoming data
-#' @param model(s) to extract Y vars from
+#' @param models model(s) to extract Y vars from
 #' @return y variable
 #' @export
 getYvars <- function(data, models) {
