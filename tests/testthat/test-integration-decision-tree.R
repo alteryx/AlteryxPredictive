@@ -75,7 +75,15 @@ test_that("Iris data with C5.0 rules model", {
 })
 
 set.seed(1)
-weights <- runif(nrow(iris))
+weights_vec <- runif(nrow(iris))
+
+iris_weights <- rev(iris)
+iris_weights$weights <- weights_vec
+
+inputs <- list(
+  the.data = iris_weights,
+  XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
+)
 
 config$rules <- FALSE
 
@@ -84,7 +92,7 @@ config$select.weights <- "weights"
 
 config$model.algorithm <- "rpart"
 
-exp_tree_model <- rpart::rpart(formula = Species ~ ., data = iris, weights = weights)
+exp_tree_model <- rpart::rpart(formula = Species ~ ., data = iris, weights = weights_vec)
 
 
 test_that("Iris data with rpart weighted model", {
