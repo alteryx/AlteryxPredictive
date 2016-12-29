@@ -172,19 +172,74 @@ getPosClass <- function(yVar, order) {
 #' @import rpart
 #' @importFrom stats update
 getActualandResponse <- function(model, data, testIndices, extras, mid, config){
-  trainingData <- data[-testIndices,]
-  testData <- data[testIndices,]
-  testData <- matchLevels(testData, getXlevels(model))
-  currentYvar <- getYVar(model)
-  currentModel <- update(model, data = trainingData)
-  pred <- AlteryxPredictive::scoreModel(currentModel, new.data = testData)
-  actual <- (extras$yVar)[testIndices]
-  recordID <- (data[testIndices,])$recordID
-  if (config$classification) {
-    response <- gsub("Score_", "", names(pred)[max.col(pred)])
-    d <- data.frame(recordID = recordID, response = response, actual = actual)
-    return(cbind(d, pred))
+  if(class(model) == "rpart" || class(model) == "C5.0") {
+    trainingData <- data[-testIndices,]
+    testData <- data[testIndices,]
+    testData <- matchLevels(testData, getXlevels(model))
+    currentYvar <- getYVar(model)
+    currentModel <- update(model, data = trainingData)
+    pred <- AlteryxPredictive::scoreModel(currentModel, new.data = testData)
+    actual <- (extras$yVar)[testIndices]
+    recordID <- (data[testIndices,])$recordID
+    if (config$classification) {
+      response <- gsub("Score_", "", names(pred)[max.col(pred)])
+      d <- data.frame(recordID = recordID, response = response, actual = actual)
+      return(cbind(d, pred))
+    } else {
+      response <- pred$Score
+      return(data.frame(recordID = recordID, response = response, actual = actual))
+    }
   } else {
+    trainingData <- data[-testIndices,]
+    testData <- data[testIndices,]
+    testData <- matchLevels(testData, getXlevels(model))
+    currentYvar <- extras$y_name
+    #Check if the model is Naive Bayes and lacking a Laplace parameter.
+    #If so, set the Laplace parameter to 0 and warn the user.
+    #     if (inherits(model, "naiveBayes")) {
+    #       currentModel <- naiveBayesUpdate(model, trainingData, currentYvar)
+    #     } else
+    if ((inherits(model, "cv.glmnet")) || (inherits(model, "glmnet"))) {
+      #Ideally, it would be more efficient to convert the x df to a matrix earlier so that
+      #this conversion wouldn't be necessary with every trial/fold. However, the code assumes
+      #that we're dealing with a df in many other places. This are could be ripe for refactoring
+      #in the future.
+      weights_v <- trainingData[[config$`Weight Vec`]]
+      trainingData <- AlteryxPredictive:::df2NumericMatrix(trainingData)
+      #No need to call df2NmericMatrix on testData, since scoreModel calls df2NumericMatrix with glmnet models.
+      currentModel <- glmnetUpdate(model, trainingData, currentYvar, config, weight_vec = weights_v)
+    } else {
+      if (config$`Use Weights`) {
+        # WORKAROUND
+        # The assign() statement below moves the token ‘getActualandResponse’ to the global environment, where the update() function can find it.
+        # Otherwise, something inside update() isn’t finding ‘getActualandResponse’ on its environment search path.
+        #assign(x = 'trainingDatagetActualandResponse403', value = trainingData, envir = globalenv())
+        my_envir <- environment()
+        lapply(
+          X = 1:ncol(trainingData),
+          FUN = function(i){
+            assign(
+              x = names(trainingData)[i],
+              value = trainingData[,i],
+              envir = my_envir
+            )
+          }
+        )
+        currentModel <- update(model, formula. = makeFormula(AlteryxPredictive:::getXVars(model), currentYvar), data = environment(), weights = trainingData$`Weight Vec`)
+      } else {
+        currentModel <- update(model, formula. = makeFormula(AlteryxPredictive:::getXVars(model), currentYvar), data = trainingData)
+      }
+    }
+    if (inherits(currentModel, 'gbm')){
+      currentModel <- adjustGbmModel(currentModel)
+    }
+    pred <- if (packageVersion('AlteryxPredictive') <= '0.3.2') {
+      AlteryxPredictive::scoreModel2(currentModel, new.data = testData)
+    } else {
+      AlteryxPredictive::scoreModel(currentModel, new.data = testData)
+    }
+    actual <- (extras$yVar)[testIndices]
+    recordID <- (data[testIndices,])$recordID
     response <- pred$Score
     return(data.frame(recordID = recordID, response = response, actual = actual))
   }
