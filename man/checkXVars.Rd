@@ -2,11 +2,16 @@
 % Please edit documentation in R/CVutils.R
 \name{checkXVars}
 \alias{checkXVars}
-\title{## Check predictor variables}
+\title{Check predictor variables
+Check if predictor variables in the models and input data are identical.}
 \usage{
 checkXVars(inputs)
 }
+\arguments{
+\item{inputs}{list of inputs}
+}
 \description{
+Check predictor variables
 Check if predictor variables in the models and input data are identical.
 }
 
