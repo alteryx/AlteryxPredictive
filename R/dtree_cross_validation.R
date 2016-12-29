@@ -1,6 +1,6 @@
 #' @import ggplot2
 #' @import reshape2
-getResultsCrossValidation <- function(inputs, config){
+getResultsCrossValidationDTree <- function(inputs, config){
   inputs$data$recordID <- 1:NROW(inputs$data)
   yVarName <- getYVar(inputs$models$Decision_tree)
   yVar <- inputs$data[[yVarName]]
@@ -101,7 +101,7 @@ runCrossValidationDTree <- function(inputs, config){
     config$regression <- TRUE
   }
   inputs$data <- inputs$the.data
-  cv_results <- getResultsCrossValidation(inputs, config)
+  cv_results <- getResultsCrossValidationDTree(inputs, config)
 #   write.Alteryx2(results$data, 1)
 #   write.Alteryx2(results$fitMeasures, 2)
 #   write.Alteryx2(results$confMats, 3)
