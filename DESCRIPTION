@@ -32,7 +32,11 @@ Imports:
   C50,
   DT,
   MLmetrics,
-  flightdeck
+  flightdeck,
+  ROCR,
+  ggplot2,
+  TunePareto,
+  reshape2
 Suggests:
   knitr,
   rmarkdown,

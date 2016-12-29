@@ -92,7 +92,7 @@ checkFactorVars <- function(data, folds, config) {
 #' @param data the data.frame used to create the models
 #' @param config a list of configuration information
 #' @return list of record ID's. Each element is the record ID's of the folds for a given trial.
-# @import TunePareto
+#' @import TunePareto
 createFolds <- function(data, config) {
   target <- data[, 1]
   if (config$set_seed_cv) {
@@ -144,30 +144,6 @@ getPosClass <- function(config, yVar) {
   return(setPositiveClass(yVar))
 }
 
-adjustGbmModel <- function(model){
-  method <- if (model$cv.folds > 1){
-    "cv"
-  } else if (model$train.function < 1){
-    "test"
-  } else {
-    "OOB"
-  }
-  model$best.trees <- gbm.perf(model, method = method)
-  return(model)
-}
-
-naiveBayesUpdate <- function(model, trainingData, currentYvar) {
-  if (is.null(model$laplace)) {
-    model$laplace <- 0
-    AlteryxMessage2("The Laplace smoothing parameter was not saved in the model object.", iType = 2, iPriority = 3)
-    AlteryxMessage2("Hence, we are using a smoothing parameter of 0 for Cross-Validation.", iType = 2, iPriority = 3)
-  }
-  predictors <- trainingData[,-(which(colnames(trainingData) == currentYvar))]
-  response <- trainingData[,(which(colnames(trainingData) == currentYvar))]
-  naiveBayes.default <- getS3method("naiveBayes", "default")
-  currentModel <- update(model, x = predictors, y = response, laplace = model$laplace)
-  return(currentModel)
-}
 
 # Given a model, a dataset and index of test cases, return actual and response
 #' @import C50
@@ -220,7 +196,7 @@ getMeasuresRegression <- function(outData, extras) {
   # When there are values near 0 in the target variable, it can lead to an attempt to divide by 0
   # In this case, use the weighted version.
   if (any(abs(actual) < 0.001)) {
-    AlteryxMessage("The target variable contains values very close to 0 (-0.001, 0.001). WPE and WAPE are being used instead of MPE and MAPE.", iType = 2, iPriority = 3)
+    AlteryxMessage2("The target variable contains values very close to 0 (-0.001, 0.001). WPE and WAPE are being used instead of MPE and MAPE.", iType = 2, iPriority = 3)
     mpe <- 100 * sum(err) / sum(actual)
     mape <- 100 * sum(abs(err)) / sum(actual)
   } else {
@@ -232,8 +208,13 @@ getMeasuresRegression <- function(outData, extras) {
   )
 }
 
-#Get the necessary measures in the classification case
-# @import ROCR
+
+#' Get the necessary measures in the classification case
+#'
+#' @param outData scored data used to obtain the measures
+#' @param extras list of miscellaneous information
+#' @return outvec a vector of results
+#' @import ROCR
 getMeasuresClassification <- function(outData, extras) {
   actual <- as.character(outData$actual)
   scoredData <- outData[,7:8]
@@ -293,7 +274,7 @@ getMeasuresClassification <- function(outData, extras) {
 }
 
 # Functions to Generate Output
-
+#' @import reshape2
 generateConfusionMatrices <- function(outData, extras) {
   outvec <- vector(length = length(extras$levels))
   pasteClass <- function(nameOfClass) {
@@ -307,7 +288,7 @@ generateConfusionMatrices <- function(outData, extras) {
 }
 
 generateOutput3 <- function(data, extras, modelNames) {
-  d <- plyr::ddply(data, .(trial, fold, mid, response), generateConfusionMatrices,
+  d <- plyr::ddply(data, c("trial", "fold", "mid", "response"), generateConfusionMatrices,
              extras = extras
   )
   d$Model <- modelNames[as.numeric(d$mid)]
@@ -324,7 +305,7 @@ generateOutput2 <- function(data, extras, modelNames) {
   } else {
     getMeasuresClassification
   }
-  d <- plyr::ddply(data, .(trial, fold, mid), fun, extras = extras)
+  d <- plyr::ddply(data, c("trial", "fold", "mid"), fun, extras = extras)
   d$Model <- modelNames[as.numeric(d$mid)]
   d <- subset(d, select = -c(mid))
   return(d)
@@ -343,6 +324,13 @@ generateOutput1 <- function(inputs, config, extras){
   return(mdply(g, getCrossValidatedResults(inputs, allFolds, extras, config)))
 }
 
+
+#' Get the necessary measures in the binary classification case
+#'
+#' @param pred_prob vector of predicted probabilities
+#' @param actual vector of actual results
+#' @return a data.frame with results
+#' @import ROCR
 computeBinaryMetrics <- function(pred_prob, actual, threshold){
   #Pred_prob gives the predicted probability of belonging to the positive class
   #Actual is true if the record belongs to the positive class and negative if not
@@ -364,8 +352,8 @@ computeBinaryMetrics <- function(pred_prob, actual, threshold){
   rpp <- nPredPos/length(pred_prob)
   lift <- tpr/rpp
   fpr <- (nPredPos - nCorrectPos)/length(actualNegIndic)
-  pred <- prediction(predictions = pred_prob, labels = actual)
-  auc <- performance(pred, "auc")
+  pred <- ROCR::prediction(predictions = pred_prob, labels = actual)
+  auc <- ROCR::performance(pred, "auc")
   auc <- unlist(auc@y.values)
   data.frame(threshold = threshold, recall = recall, F1 = F1, lift = lift, Rate_Pos_Predictions = rpp, True_Pos_Rate = tpr, False_Pos_Rate = fpr, Precision = precision)
 }
@@ -398,7 +386,7 @@ generateLabels <- function(plotData, config) {
   list(trials = trials, models = models)
 }
 
-# @import ggplot2
+#' @import ggplot2
 plotBinaryData <- function(plotData, config, modelNames) {
   labels <- generateLabels(plotData, config)
   modelVec <- modelNames[plotData$mid]
@@ -414,19 +402,19 @@ plotBinaryData <- function(plotData, config, modelNames) {
                       models = plotData$modelVec, trial = plotData$trialVec)
 
   liftPlotObj <- ggplot2::ggplot(data = liftdf, aes(x = Rate_positive_predictions, y = lift)) +
-    geom_smooth(aes(colour=models)) + ggtitle("Lift curves")
+    ggplot2::geom_smooth(aes(colour=models)) + ggplot2::ggtitle("Lift curves")
   gainPlotObj <- ggplot2::ggplot(data = gaindf, aes(x = Rate_positive_predictions, y = True_Pos_Rate)) +
-    geom_smooth(aes(colour=models)) + ggtitle('Gain Charts')
+    ggplot2::geom_smooth(aes(colour=models)) + ggplot2::ggtitle('Gain Charts')
   PrecRecallPlotObj <- ggplot2::ggplot(data = prec_recalldf, aes(x = recall, y = precision)) +
-    geom_smooth(aes(colour=models)) + ggtitle('Precision and Recall Curves')
+    ggplot2::geom_smooth(aes(colour=models)) + ggplot2::ggtitle('Precision and Recall Curves')
   ROCPlotObj <- ggplot2::ggplot(data = rocdf, aes(x = False_Pos_Rate, y = True_Pos_Rate)) +
-    geom_smooth(aes(colour=models)) + ggtitle('ROC Curves')
+    ggplot2::geom_smooth(aes(colour=models)) + ggplot2::ggtitle('ROC Curves')
   AlteryxGraph2(liftPlotObj, nOutput = 4)
   AlteryxGraph2(gainPlotObj, nOutput = 4)
   AlteryxGraph2(PrecRecallPlotObj, nOutput = 4)
   AlteryxGraph2(ROCPlotObj, nOutput = 4)
 }
-# @import ggplot2
+#' @import ggplot2
 plotRegressionData <- function(plotData, config, modelNames) {
   modelVec <- modelNames[plotData$mid]
   trialVec <- paste0('Trial ', plotData$trial)
@@ -434,13 +422,13 @@ plotRegressionData <- function(plotData, config, modelNames) {
   plotdf <- data.frame(Actual = plotData$actual, Predicted = plotData$response, fold = paste0("Fold", plotData$fold),
                        models = plotData$modelVec, trial = plotData$trialVec)
   plotObj <- ggplot2::ggplot(data = plotdf, aes(x = Actual, y = Predicted)) +
-    geom_smooth(aes(colour=models)) + ggtitle("Predicted value vs actual values")
+    ggplot2::geom_smooth(aes(colour=models)) + ggplot2::ggtitle("Predicted value vs actual values")
   AlteryxGraph2(plotObj, nOutput = 4)
 }
 
 # Helper Functions End ----
-# @import ggplot2
-# @import reshape2
+#' @import ggplot2
+#' @import reshape2
 getResultsCrossValidation <- function(inputs, config){
   inputs$data$recordID <- 1:NROW(inputs$data)
   yVarName <- getYVar(inputs$models$Decision_tree)
@@ -495,7 +483,7 @@ getResultsCrossValidation <- function(inputs, config){
                Predicted_class = 'no', Variable = "Classno", Value = 50
     )
   }
-  plotData <- plyr::ddply(dataOutput1, .(trial, fold, mid), generateDataForPlots,
+  plotData <- plyr::ddply(dataOutput1, c("trial", "fold", "mid"), generateDataForPlots,
                     extras = extras, config = config
   )
   outputPlot <- if (config$classification) {
@@ -504,8 +492,8 @@ getResultsCrossValidation <- function(inputs, config){
     } else {
       # Generate an empty plot
       empty_df <- data.frame()
-      emptyPlot <- ggplot2::ggplot(empty_df) + geom_point() + xlim(0, 1) + ylim(0, 1) +
-        ggtitle("No plots available for >2 class classification")
+      emptyPlot <- ggplot2::ggplot(empty_df) + ggplot2::geom_point() + ggplot2::xlim(0, 1) + ggplot2::ylim(0, 1) +
+        ggplot2::ggtitle("No plots available for >2 class classification")
     }
   } else {
     plotRegressionData(plotData, config, modelNames)
