@@ -3,71 +3,29 @@
 #' @param config list of config options
 #' @param the.data incoming data
 #' @return list of results or results
-#' @import ROCR
-#' @import TunePareto
-#' @import sm
-#' @import vioplot
-#' @import ggplot2
-#' @import plyr
-#' @export
+# @import sm
+# @import vioplot
+# @import ggplot2
+# @import plyr
 #'
 
 
-#' ### Helper Functions
+#Helper Functions
+# Checks whether two vectors have the same elements
+#'
+#' @param v1 a vector
+#' @param v2 a vector
+#' @return Boolean indicating whether the two vectors are equal
 areIdentical <- function(v1, v2){
   identical(sort(v1), sort(v2))
 }
 
-#' ## Check predictor variables
-#'
-#' Check if predictor variables in the models and input data are identical.
-checkXVars <- function(inputs){
-  numModels <- length(inputs$models)
-  modelNames <- names(inputs$models)
-  modelXVars <-  if (packageVersion('AlteryxPredictive') <= '0.3.2'){
-    lapply(inputs$models, getXVars2)
-  } else {
-    lapply(inputs$models, getXVars)
-  }
-  dataXVars <- names(inputs$data)[which(names(inputs$data) %in% unlist(modelXVars))]
-  errorMsg <- NULL
-  if (numModels > 1) {
-    for (i in 1:(numModels - 1)){
-      mvars1 <- modelXVars[[i]]
-      mvars2 <- modelXVars[[i + 1]]
-      if (!areIdentical(mvars1, mvars2)){
-        errorMsg <- paste("Models", modelNames[i] , "and", modelNames[i + 1],
-                          "were created using different predictor variables.")
-        stopMsg <- "Please ensure all models were created using the same predictors."
-      }
-      else if (!all(mvars1 %in% dataXVars)){
-        errorMsg <- paste("Model ", modelNames[i],
-                          "used predictor variables which were not contained in the input data.")
-        stopMsg <- paste("Please ensure input data contains all the data",
-                         "used to create the models and try again.")
-      }
-      if (!is.null(errorMsg)){
-        AlteryxMessage2(errorMsg, iType = 2, iPriority = 3)
-        stop.Alteryx2(stopMsg)
-      }
-    }
-  } else {
-    mvars1 <- modelXVars[[1]]
-    if (!all(mvars1 %in% dataXVars)){
-      errorMsg <- paste("Model ", modelNames[1],
-                        "used predictor variables which were not contained in the input data.")
-      stopMsg <- paste("Please ensure input data contains all the data",
-                       "used to create the models and try again.")
-    }
-    if (!is.null(errorMsg)){
-      AlteryxMessage2(errorMsg, iType = 2, iPriority = 3)
-      stop.Alteryx2(stopMsg)
-    }
-  }
-}
-
 #' Given a factor variable and a set of records in a fixed trial and fold,
 #' return the list of classes not present in that trial and fold.
+#'
+#' @param currentClasses a vector of unique class names
+#' @param currentRecords a vector of the classes in the current fold.
+#' @return vector of the classes that are missing from the current fold.
 getMissingClasses <- function(currentClasses, currentRecords) {
   currentClasses[(!(currentClasses %in% currentRecords))]
 }
@@ -75,7 +33,9 @@ getMissingClasses <- function(currentClasses, currentRecords) {
 #' For each factor variable, check to see if all levels are present in each fold.
 #' If not, warn the user.
 #'
-
+#' @param data a data.frame with the data used to generate the models
+#' @param folds a list of record id's in each fold in each trial (list of lists)
+#' @param config a list of configuration information
 checkFactorVars <- function(data, folds, config) {
   #All of the discrete variables will be some type of string in Alteryx. So they'll be read as factors, since stringsAsFactors is TRUE in read.Alteryx.
   factorVars <- data[,sapply(data, FUN = is.factor), drop = FALSE]
@@ -131,7 +91,12 @@ checkFactorVars <- function(data, folds, config) {
 }
 
 
-#Create the list of cross-validation folds and output warnings/errors as appropriate
+#' Create the list of cross-validation folds
+#'
+#' @param data the data.frame used to create the models
+#' @param config a list of configuration information
+#' @return list of record ID's. Each element is the record ID's of the folds for a given trial.
+#' @import TunePareto
 createFolds <- function(data, config) {
   target <- data[, 1]
   if (config$set_seed_cv) {
@@ -143,24 +108,8 @@ createFolds <- function(data, config) {
 }
 
 
-#Check if response variable is the same in the pre-built model(s) and the input data.
-#If so, output this variable.
-getYvars <- function(data, models) {
-  # Get the names of the target fields and make sure they are all same. If not,
-  # throw an error.
-  y_names <- sapply(models, getYVar)
-  if (!all(y_names == y_names[1])) {
-    stop.Alteryx2("More than one target variable are present in the provided models")
-  } else if (!(y_names[1] %in% colnames(data))) {
-    stop.Alteryx2("The target variable from the models is different than the target chosen in the configuration. Please check your configuration settings and try again.")
-  }
-  # get the target variable name
-  y_name <- y_names[1]
-  # Get the target variable
-  return(data[[y_name]])
-}
+# In the 2-class classification case, get the positive class. Otherwise, do nothing.
 
-#In the 2-class classification case, get the positive class. Otherwise, do nothing.
 getPosClass <- function(config, yVar) {
 
   #Use the function from the Model Comparison tool to get/set positive class:
@@ -170,7 +119,7 @@ getPosClass <- function(config, yVar) {
     # question on positive class (target level) blank.
     #   1) if there's "yes/Yes/YES ..." in the target variable, then use "yes/Yes/YES"
     #   2) if there's "true/True/TRUE..." in the target variable, then use "true/True/TRUE"
-    #   3) otherwise: use the first level by alphabetical order.
+    #   3) otherwise: use the less common class
     #
     # Parameters:
     #   tar_lev: a vector of string
@@ -186,7 +135,14 @@ getPosClass <- function(config, yVar) {
     } else if (!is.na(true_id)) {
       return (tar_lev[true_id])
     } else {
-      return (tar_lev[1])
+      first_class <- tar_lev[1]
+      second_class <- tar_lev[which(tar_lev != first_class)[1]]
+      if ((length(which(tar_lev) == first_class)) > (length(which(tar_lev) == second_class))) {
+        #First_class is larger, so second_class is the positive class
+        return (second_class)
+      } else {
+        return (first_class)
+      }
     }
   }
   return(setPositiveClass(yVar))
@@ -217,27 +173,16 @@ naiveBayesUpdate <- function(model, trainingData, currentYvar) {
   return(currentModel)
 }
 
-#' Given a model, a dataset and index of test cases, return actual and response
+# Given a model, a dataset and index of test cases, return actual and response
+#' @import C50
+#' @import rpart
 getActualandResponse <- function(model, data, testIndices, extras, mid){
   trainingData <- data[-testIndices,]
   testData <- data[testIndices,]
   testData <- matchLevels(testData, getXlevels(model))
-  currentYvar <- getOneYVar(model)
-  #Check if the model is Naive Bayes and lacking a Laplace parameter.
-  #If so, set the Laplace parameter to 0 and warn the user.
-  if (inherits(model, "naiveBayes")) {
-    currentModel <- naiveBayesUpdate(model, trainingData, currentYvar)
-  } else {
-    currentModel <- update(model, data = trainingData)
-  }
-  if (inherits(currentModel, 'gbm')){
-    currentModel <- adjustGbmModel(currentModel)
-  }
-  pred <- if (packageVersion('AlteryxPredictive') <= '0.3.2') {
-    AlteryxPredictive::scoreModel2(currentModel, new.data = testData)
-  } else {
-    AlteryxPredictive::scoreModel(currentModel, new.data = testData)
-  }
+  currentYvar <- getYVar(model)
+  currentModel <- update(model, data = trainingData)
+  pred <- AlteryxPredictive::scoreModel(currentModel, new.data = testData)
   actual <- (extras$yVar)[testIndices]
   recordID <- (data[testIndices,])$recordID
   if (config$classification) {
@@ -249,10 +194,9 @@ getActualandResponse <- function(model, data, testIndices, extras, mid){
     return(data.frame(recordID = recordID, response = response, actual = actual))
   }
 }
-
+#' @import plyr
 safeGetActualAndResponse <- plyr::failwith(NULL, getActualandResponse, quiet = FALSE)
 
-#'
 getCrossValidatedResults <- function(inputs, allFolds, extras, config){
   function(mid, trial, fold){
     model <- inputs$models[[mid]]
@@ -265,16 +209,6 @@ getCrossValidatedResults <- function(inputs, allFolds, extras, config){
     }
     return(out)
   }
-}
-
-getPkgListForModels <- function(models){
-  modelClasses <- unlist(lapply(models, class))
-  pkgMap = list(
-    gbm = "gbm", rpart = "rpart", svm.formula = "e1071", svm = "e1071",
-    naiveBayes = "e1071", svyglm = "survey", nnet.formula = "nnet",
-    randomForest.formula = "randomForest", earth = "earth"
-  )
-  unique(unlist(pkgMap[modelClasses]))
 }
 
 #Get the necessary measures in the regression case
@@ -303,6 +237,7 @@ getMeasuresRegression <- function(outData, extras) {
 }
 
 #Get the necessary measures in the classification case
+#' @import ROCR
 getMeasuresClassification <- function(outData, extras) {
   actual <- as.character(outData$actual)
   scoredData <- outData[,7:8]
@@ -361,8 +296,8 @@ getMeasuresClassification <- function(outData, extras) {
   return(outVec)
 }
 
-#' ### Functions to Generate Output
-#'
+# Functions to Generate Output
+
 generateConfusionMatrices <- function(outData, extras) {
   outvec <- vector(length = length(extras$levels))
   pasteClass <- function(nameOfClass) {
@@ -399,16 +334,17 @@ generateOutput2 <- function(data, extras, modelNames) {
   return(d)
 }
 
+#' @import plyr
+#' @import rpart
+#' @import C50
 generateOutput1 <- function(inputs, config, extras){
-  pkgsToLoad <- getPkgListForModels(inputs$models)
-  for (pkg in pkgsToLoad) library(pkg, character.only = TRUE)
   allFolds <- extras$allFolds
   g <- expand.grid(
     mid = seq_along(inputs$models),
     trial = seq_along(allFolds),
     fold = seq_along(allFolds[[1]])
   )
-  return(plyr::mdply(g, getCrossValidatedResults(inputs, allFolds, extras, config)))
+  return(mdply(g, getCrossValidatedResults(inputs, allFolds, extras, config)))
 }
 
 computeBinaryMetrics <- function(pred_prob, actual, threshold){
@@ -466,6 +402,7 @@ generateLabels <- function(plotData, config) {
   list(trials = trials, models = models)
 }
 
+#' @import ggplot2
 plotBinaryData <- function(plotData, config, modelNames) {
   labels <- generateLabels(plotData, config)
   modelVec <- modelNames[plotData$mid]
@@ -493,7 +430,7 @@ plotBinaryData <- function(plotData, config, modelNames) {
   AlteryxGraph2(PrecRecallPlotObj, nOutput = 4)
   AlteryxGraph2(ROCPlotObj, nOutput = 4)
 }
-
+#' @import ggplot2
 plotRegressionData <- function(plotData, config, modelNames) {
   modelVec <- modelNames[plotData$mid]
   trialVec <- paste0('Trial ', plotData$trial)
@@ -506,18 +443,19 @@ plotRegressionData <- function(plotData, config, modelNames) {
 }
 
 # Helper Functions End ----
+#' @import ggplot2
 getResultsCrossValidation <- function(inputs, config){
   inputs$data$recordID <- 1:NROW(inputs$data)
-  yVar <- getYvars(inputs$data, inputs$models)
+  yVarName <- getYVar(inputs$models$Decision_tree)
+  yVar <- inputs$data[[yVarName]]
   if ((config$classification) && (length(unique(yVar)) == 2)) {
-    if (config$posClass == "") {
+    if ((is.null(config$posClass)) || (config$posClass == "")) {
       config$posClass <- as.character(getPosClass(config, levels(yVar)))
     }
   }
 
   inputs$modelNames <- names(inputs$models)
   modelNames <- names(inputs$models)
-  checkXVars(inputs)
 
   extras <- list(
     yVar = yVar,
@@ -547,7 +485,6 @@ getResultsCrossValidation <- function(inputs, config){
     )
   }
   #write.Alteryx2(preppedOutput1, nOutput = 1)
-
   dataOutput2 <- generateOutput2(dataOutput1, extras, modelNames)
   preppedOutput2 <- reshape2::melt(dataOutput2, id = c('trial', 'fold', 'Model'))
   #write.Alteryx2(preppedOutput2, nOutput = 2)
@@ -582,27 +519,31 @@ getResultsCrossValidation <- function(inputs, config){
   )
 }
 
+
+#' Wrapper function for performing cross-validation on DTree models.
+#'
+#' @param config list of config options
+#' @param inputs list containing a Dtree model and the data used to generate it
+#' @return list with components measuring model fit obtained via CV
 runCrossValidationDTree <- function(inputs, config){
   #Ensure that config$regression and config$classification are both set properly.
   #Note that with an || in R, the LHS is evaluated first. The RSH is only evaluated
   #if the LHS is false. We're relying on that property of R here. Only rpart objects
   #have a method component, so we only want to look at the RHS if we're in the rpart
   #(ie not C5.0) case.
-  if (((config$`model.algorithm`) == 'C5.0') || ((inputs$models$method) == "class")) {
+  mod_obj <- inputs$models$Decision_tree
+  if (((config$`model.algorithm`) == 'C5.0') || ((mod_obj$method) == "class")) {
     config$classification <- TRUE
     config$regression <- FALSE
   } else {
     config$classification <- FALSE
     config$regression <- TRUE
   }
+  inputs$data <- inputs$the.data
   cv_results <- getResultsCrossValidation(inputs, config)
 #   write.Alteryx2(results$data, 1)
 #   write.Alteryx2(results$fitMeasures, 2)
 #   write.Alteryx2(results$confMats, 3)
 #   AlteryxGraph2(results$outputPlot, 4)
   return(cv_results)
-}
-
-if (is.null(getOption("testscript"))){
-  runCrossValidation(inputs, config)
 }
