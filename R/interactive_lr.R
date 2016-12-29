@@ -117,9 +117,12 @@ interactive_lr <- function(
     predict(
       object = model,
       type = 'response',
-      newx = df2NumericMatrix(data)
+      newx = df2NumericMatrix(data[,1]),
+      s = model$lambda
     )
   }
+  saveRDS(list(predictions = probability_v, labels = actual_values),
+          "C:\\Users\\dblanchard\\Documents\\playground\\logregdash\\prediction_params.rds")
 
   # ROCR computations
   prediction_object <- prediction(
