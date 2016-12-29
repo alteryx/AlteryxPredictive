@@ -1,3 +1,14 @@
+#' Dashboard generation for logistic regression models
+#'
+#' @param config list of configuration elements
+#' @param data dataframe
+#' @param model model object - should be one of
+#'  glm - with binomial family
+#'  glmnet
+#'  cv.glmnet
+#' @return dashboard object for rendering
+#' @export
+#' @author Todd Morley
 interactive_lr <- function(
   config,
   data,
