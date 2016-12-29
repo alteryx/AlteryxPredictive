@@ -11,6 +11,7 @@ interactive_lm_report <- function(
   data,
   model
 ){
+  requireNamespace("flightdeck")
   # UI layout constants
   totalWidth <- 12
   infoBoxWidth <- 6
