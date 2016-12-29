@@ -168,8 +168,8 @@ getPosClass <- function(yVar, order) {
 
 
 # Given a model, a dataset and index of test cases, return actual and response
-#' @import C50
-#' @import rpart
+#' @import C50 rpart
+#' @import glm glmnet cv.glmnet
 #' @importFrom stats update
 getActualandResponse <- function(model, data, testIndices, extras, mid, config){
   if(class(model) == "rpart" || class(model) == "C5.0") {
@@ -392,8 +392,8 @@ generateOutput2 <- function(data, extras, modelNames) {
 }
 
 #' @import plyr
-#' @import rpart
-#' @import C50
+#' @import rpart C50
+#' @import glm glmnet cv.glmnet
 generateOutput1 <- function(inputs, config, extras){
   allFolds <- extras$allFolds
   g <- expand.grid(
