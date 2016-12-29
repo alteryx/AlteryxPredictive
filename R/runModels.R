@@ -195,8 +195,15 @@ getResultsDecisionTree <- function(inputs, config) {
   the.model.rpart <- if(inputs$XDFInfo$is_XDF) the.report.list$model_rpart else the.model
   the.report <- the.report.list$out
 
-  makeTreePlot <- function(){createTreePlotDT(the.model.rpart, config, inputs)}
-  makePrunePlot <- function(){createPrunePlotDT(the.model.rpart)}
+  makeTreePlot <- NULL
+  makePrunePlot <- NULL
+
+  if(config$tree.plot) {
+    makeTreePlot <- function(){createTreePlotDT(the.model.rpart, config, inputs)}
+  }
+  if(config$prune.plot) {
+    makePrunePlot <- function(){createPrunePlotDT(the.model.rpart)}
+  }
   dashboard <- createDashboardDT(the.model)
 
   results <- list(model = the.model, report = the.report,
