@@ -73,3 +73,22 @@ test_that("Iris data with C5.0 rules model", {
   result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
   expect_equal(result$model$tree, exp_C50_model$tree)
 })
+
+set.seed(1)
+weights <- runif(nrow(iris))
+
+config$rules <- FALSE
+
+config$use.weights <- TRUE
+config$select.weights <- "weights"
+
+config$model.algorithm <- "rpart"
+
+exp_tree_model <- rpart::rpart(formula = Species ~ ., data = iris, weights = weights)
+
+
+test_that("Iris data with rpart weighted model", {
+  result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
+  expect_equal(getCall(result$model)[[2]], getCall(exp_tree_model)[[2]])
+  expect_equal(result$model$frame,exp_tree_model$frame)
+})
