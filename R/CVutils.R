@@ -495,3 +495,31 @@ checkXVars <- function(inputs){
     }
   }
 }
+
+glmnetUpdate <- function(model, trainingData, currentYvar, config, weight_vec = NULL) {
+  predictors <- trainingData[,AlteryxPredictive:::getXVars(model)]
+  response <- trainingData[,(which(colnames(trainingData) == currentYvar))]
+  library(glmnet)
+  model_w_call <- if (config$internal_cv) {
+    model$glmnet.fit
+  } else {
+    model
+  }
+  if (config$`Use Weights`) {
+    currentModel <- update(model_w_call, x = predictors, y = response, weights = weight_vec)
+  } else {
+    #currentModel <- update(model, formula. = makeFormula(AlteryxPredictive:::getXVars(model), currentYvar), data = trainingData)
+    currentModel <- update(model_w_call, x = predictors, y = response)
+  }
+  currentModel$xvars <- colnames(predictors)
+  currentModel$lambda_pred <- if (config$internal_cv) {
+    if (config$lambda_1se) {
+      model$lambda.1se
+    } else {
+      model$lambda.min
+    }
+  } else {
+    config$lambda_no_cv
+  }
+  return(currentModel)
+}
