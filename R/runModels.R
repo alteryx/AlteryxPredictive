@@ -222,5 +222,10 @@ runDecisionTree <- function(inputs, config){
   }
 
   results <- getResultsDecisionTree(inputs, config)
+  if (config$use_cv) {
+    cv_inputs <- inputs
+    cv_inputs$models <- list(Decision_tree = results$model)
+    cv_output <- runCrossValidationDTree(cv_inputs, config)
+  }
   writeOutputs(results, config)
 }
