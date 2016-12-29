@@ -111,7 +111,7 @@ createFolds <- function(data, config, set_seed = TRUE, seed = NULL) {
 getYvars <- function(data, models) {
   # Get the names of the target fields and make sure they are all same. If not,
   # throw an error.
-  y_names <- sapply(models, AlteryxPredictive:::getYVar)
+  y_names <- sapply(models, getYVar)
   if (!all(y_names == y_names[1])) {
     stop.Alteryx2("More than one target variable are present in the provided models")
   } else if (!(y_names[1] %in% colnames(data))) {
@@ -177,7 +177,7 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
     testData <- matchLevels(testData, getXlevels(model))
     currentYvar <- getYVar(model)
     currentModel <- update(model, data = trainingData)
-    pred <- AlteryxPredictive::scoreModel(currentModel, new.data = testData)
+    pred <- scoreModel(currentModel, new.data = testData)
     actual <- (extras$yVar)[testIndices]
     recordID <- (data[testIndices,])$recordID
     if (config$classification) {
@@ -204,7 +204,7 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
       #that we're dealing with a df in many other places. This are could be ripe for refactoring
       #in the future.
       weights_v <- trainingData[[config$`Weight Vec`]]
-      trainingData <- AlteryxPredictive:::df2NumericMatrix(trainingData)
+      trainingData <- df2NumericMatrix(trainingData)
       #No need to call df2NmericMatrix on testData, since scoreModel calls df2NumericMatrix with glmnet models.
       currentModel <- glmnetUpdate(model, trainingData, currentYvar, config, weight_vec = weights_v)
     } else {
@@ -224,18 +224,18 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
             )
           }
         )
-        currentModel <- update(model, formula. = makeFormula(AlteryxPredictive:::getXVars(model), currentYvar), data = environment(), weights = trainingData$`Weight Vec`)
+        currentModel <- update(model, formula. = makeFormula(getXVars(model), currentYvar), data = environment(), weights = trainingData$`Weight Vec`)
       } else {
-        currentModel <- update(model, formula. = makeFormula(AlteryxPredictive:::getXVars(model), currentYvar), data = trainingData)
+        currentModel <- update(model, formula. = makeFormula(getXVars(model), currentYvar), data = trainingData)
       }
     }
     if (inherits(currentModel, 'gbm')){
       currentModel <- adjustGbmModel(currentModel)
     }
     pred <- if (packageVersion('AlteryxPredictive') <= '0.3.2') {
-      AlteryxPredictive::scoreModel2(currentModel, new.data = testData)
+      scoreModel2(currentModel, new.data = testData)
     } else {
-      AlteryxPredictive::scoreModel(currentModel, new.data = testData)
+      scoreModel(currentModel, new.data = testData)
     }
     actual <- (extras$yVar)[testIndices]
     recordID <- (data[testIndices,])$recordID
@@ -554,7 +554,7 @@ checkXVars <- function(inputs){
 }
 
 glmnetUpdate <- function(model, trainingData, currentYvar, config, weight_vec = NULL) {
-  predictors <- trainingData[,AlteryxPredictive:::getXVars(model)]
+  predictors <- trainingData[,getXVars(model)]
   response <- trainingData[,(which(colnames(trainingData) == currentYvar))]
   model_w_call <- if (config$internal_cv) {
     model$glmnet.fit
@@ -564,7 +564,7 @@ glmnetUpdate <- function(model, trainingData, currentYvar, config, weight_vec = 
   if (config$`Use Weights`) {
     currentModel <- update(model_w_call, x = predictors, y = response, weights = weight_vec)
   } else {
-    #currentModel <- update(model, formula. = makeFormula(AlteryxPredictive:::getXVars(model), currentYvar), data = trainingData)
+    #currentModel <- update(model, formula. = makeFormula(getXVars(model), currentYvar), data = trainingData)
     currentModel <- update(model_w_call, x = predictors, y = response)
   }
   currentModel$xvars <- colnames(predictors)
