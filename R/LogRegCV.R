@@ -16,13 +16,18 @@ genearateDataForPlotLogReg <- function(d, extras, config) {
 getResultsCrossValidationLogReg <- function(inputs, config) {
   ###### WORKAROUND #########################################
   # Namespace issues require redefining the call and family
-  # Time is not permitting me to go make proper changes
-  model <- inputs$models[[1]]
-  model$call$formula <- makeFormula(config$`X Vars`, config$`Y Var`)
-  model$call$family <- binomial(config$Link)
-  inputs$models[[1]] <- model
+  # Time is not permitting me to make proper changes
+  if (!config$regularization) {
+    model <- inputs$models[[1]]
+    model$call$formula <- makeFormula(config$`X Vars`, config$`Y Var`)
+    model$call$family <- binomial(config$Link)
+    inputs$models[[1]] <- model
+  } else {
+    model <- inputs$models[[1]]
+    model$yvar <- config$`Y Var`
+    inputs$models[[1]] <- model
+  }
   ### END WORKAROUND
-
 
   inputs$data$recordID <- 1:NROW(inputs$data)
   yVarList <- getYvars(inputs$data, inputs$models)
@@ -40,7 +45,7 @@ getResultsCrossValidationLogReg <- function(inputs, config) {
 
   extras <- list(
     yVar = yVar,
-    y_name = yVar,
+    y_name = y_name,
     posClass = config$posClass,
     allFolds = createFolds(data = inputs$data, config = config, seed = config$seed),
     levels = levels(yVar)

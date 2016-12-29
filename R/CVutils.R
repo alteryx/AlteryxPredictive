@@ -203,7 +203,7 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
       #this conversion wouldn't be necessary with every trial/fold. However, the code assumes
       #that we're dealing with a df in many other places. This are could be ripe for refactoring
       #in the future.
-      weights_v <- trainingData[[config$`Weight Vec`]]
+      weights_v <- if(config$`Use Weights`) trainingData[[config$`Weight Vec`]] else NULL
       trainingData <- df2NumericMatrix(trainingData)
       #No need to call df2NmericMatrix on testData, since scoreModel calls df2NumericMatrix with glmnet models.
       currentModel <- glmnetUpdate(model, trainingData, currentYvar, config, weight_vec = weights_v)
