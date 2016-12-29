@@ -455,6 +455,10 @@ generateDataForPlotsDTree <- function(d, extras, config){
   }
 }
 
+generateDataForPlotsLinReg <- function(d, extras, config){
+  data.frame(response = d$response, actual = d$actual)
+}
+
 generateLabels <- function(plotData, config) {
   trials <- c()
   for (i in 1:length(unique(plotData$trial))) {
