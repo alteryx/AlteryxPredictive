@@ -1,30 +1,3 @@
-library(AlteryxRDataX)
-library(AlteryxRhelper)
-library(AlteryxPredictive)
-library(flightdeck)
-library(MLmetrics)
-library(glmnet)
-library(DT)
-library(htmltools)
-library(ROCR)
-
-# test inputs
-config <- list(
-  `Use Weights` = FALSE,
-  threshold = 0.64
-)
-data <- read.csv(
-  file = 'c:\\temp\\simulated_emr.100.csv',
-  header = TRUE
-)
-model <- glm(
-  formula = gender ~ height_inches + age + weight_lbs + bmi + pbf + iq,
-  family = binomial(link = 'logit'),
-  #  family = binomial(link = 'probit'),
-  #  family = binomial(link = 'cloglog'),
-  data = data
-)
-
 interactive_lr <- function(
   config,
   data,
@@ -324,3 +297,5 @@ interactive_lr <- function(
   )
 
 } # end interactive_lr
+
+interactive_lr(config, data, model)
