@@ -64,3 +64,12 @@ comment = 'This workflow tests that admission data with logit link returns corre
 #   ),
 #   outFile = file.path(testDir, "LogisticTest1.yxmd")
 # )
+
+config$rules <- TRUE
+
+exp_C50_model <- C50::C5.0(formula = Species ~ ., data = iris, rule = TRUE)
+
+test_that("Iris data with C5.0 rules model", {
+  result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
+  expect_equal(result$model$tree, exp_C50_model$tree)
+})
