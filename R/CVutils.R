@@ -578,3 +578,14 @@ glmnetUpdate <- function(model, trainingData, currentYvar, config, weight_vec = 
   }
   return(currentModel)
 }
+
+getPkgListForModels <- function(models){
+  modelClasses <- unlist(lapply(models, class))
+  pkgMap = list(
+    gbm = "gbm", rpart = "rpart", svm.formula = "e1071", svm = "e1071",
+    naiveBayes = "e1071", svyglm = "survey", nnet.formula = "nnet",
+    randomForest.formula = "randomForest", earth = "earth", glmnet = "glmnet",
+    elnet = "glmnet", cv.glmnet = "glmnet", lognet = "glmnet"
+  )
+  unique(unlist(pkgMap[modelClasses]))
+}
