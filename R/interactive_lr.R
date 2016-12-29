@@ -96,6 +96,44 @@ interactive_lr <- function(
       )
     }
   }
+
+  the_actual_values <- data[, 1]
+  fitted_intercept <- !config$`Omit Constant`
+  alpha <- config$alpha
+  use_cv_lambda_1se <- config$lambda_1se
+  lambda <- config$lambda_no_cv
+  n <- nrow(data)
+  p <- ncol(data) - 1 - as.numeric(config$`Use Weights`)
+
+  # model-summary numbers
+
+  if(glm_b){
+    the_fitted_values <- unname(model$fitted.values)
+  } else{
+    independent_variable_m <- sapply(
+      X = unname(data[, -1]),
+      FUN = as.numeric,
+      simplify = 'array'
+    )
+    if(regularized_b){
+      lambda <- config$lambda_no_cv
+    } else{
+      if(use_cv_lambda_1se){
+        lambda <- model$lambda.1se
+      } else{
+        lambda <- model$lambda.min
+      }
+    }
+    the_fitted_values <- unname(
+      predict(
+        object = model,
+        newx = independent_variable_m,
+        s = lambda,
+        type = 'response'
+      )
+    )
+  }
+
   use_sampling_weights_b <- config$`Use Weights`
   n <- nrow(data)
   p <- ncol(data) - 1 - as.numeric(use_sampling_weights_b)
@@ -108,25 +146,31 @@ interactive_lr <- function(
     levels = 0:1,
     labels = c('no', 'yes')
   )
-  probability_v <- if (glm_b) {
-    predict(
-      object = model,
-      type = 'response'
-    )
-  } else {
-    predict(
-      object = model,
-      type = 'response',
-      newx = df2NumericMatrix(data)
-    )
-  }
+  # probability_v <- if (glm_b) {
+  #   predict(
+  #     object = model,
+  #     type = 'response'
+  #   )
+  # } else {
+  #   predict(
+  #     object = model,
+  #     type = 'response',
+  #     newx = df2NumericMatrix(data[,1]),
+  #     s = model$lambda
+  #   )
+  # }
+  # saveRDS(list(predictions = probability_v, labels = actual_values),
+  #         "C:\\Users\\dblanchard\\Documents\\playground\\logregdash\\prediction_params.rds")
+  #
+
+  probability_v <- the_fitted_values
 
   # ROCR computations
-  prediction_object <- prediction(
+  prediction_object <- ROCR:::prediction(
     predictions = probability_v,
     labels = actual_values
   )
-  roc_performance = performance(
+  roc_performance = ROCR:::performance(
     prediction.obj = prediction_object,
     measure = 'tpr',
     x.measure = 'fpr'
