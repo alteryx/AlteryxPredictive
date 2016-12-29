@@ -3,10 +3,6 @@
 #' @param config list of config options
 #' @param the.data incoming data
 #' @return list of results or results
-# @import sm
-# @import vioplot
-# @import ggplot2
-# @import plyr
 #'
 
 
@@ -102,7 +98,7 @@ createFolds <- function(data, config) {
   if (config$set_seed_cv) {
     set.seed(config$cv_seed)
   }
-  foldList <- generateCVRuns(labels = target, ntimes = config$numberTrials, nfold = config$numberFolds, stratified = config$stratified)
+  foldList <- TunePareto::generateCVRuns(labels = target, ntimes = config$numberTrials, nfold = config$numberFolds, stratified = config$stratified)
   checkFactorVars(data = data, folds = foldList, config = config)
   return(foldList)
 }
@@ -253,7 +249,7 @@ getMeasuresClassification <- function(outData, extras) {
     posClassCol <- which((extras$levels) == posClass)
     negClassCol <- which((extras$levels) != posClass)
     predictions <- scoredData[,posClassCol]
-    predictionObj <- prediction(predictions = predictions, labels = actual)
+    predictionObj <- ROCR::prediction(predictions = predictions, labels = actual)
 
     # =================================================================
     # Quick Reference:
@@ -417,13 +413,13 @@ plotBinaryData <- function(plotData, config, modelNames) {
   rocdf <- data.frame(False_Pos_Rate = plotData$False_Pos_Rate, True_Pos_Rate = plotData$True_Pos_Rate, fold = paste0("Fold", plotData$fold),
                       models = plotData$modelVec, trial = plotData$trialVec)
 
-  liftPlotObj <- ggplot(data = liftdf, aes(x = Rate_positive_predictions, y = lift)) +
+  liftPlotObj <- ggplot2::ggplot(data = liftdf, aes(x = Rate_positive_predictions, y = lift)) +
     geom_smooth(aes(colour=models)) + ggtitle("Lift curves")
-  gainPlotObj <- ggplot(data = gaindf, aes(x = Rate_positive_predictions, y = True_Pos_Rate)) +
+  gainPlotObj <- ggplot2::ggplot(data = gaindf, aes(x = Rate_positive_predictions, y = True_Pos_Rate)) +
     geom_smooth(aes(colour=models)) + ggtitle('Gain Charts')
-  PrecRecallPlotObj <- ggplot(data = prec_recalldf, aes(x = recall, y = precision)) +
+  PrecRecallPlotObj <- ggplot2::ggplot(data = prec_recalldf, aes(x = recall, y = precision)) +
     geom_smooth(aes(colour=models)) + ggtitle('Precision and Recall Curves')
-  ROCPlotObj <- ggplot(data = rocdf, aes(x = False_Pos_Rate, y = True_Pos_Rate)) +
+  ROCPlotObj <- ggplot2::ggplot(data = rocdf, aes(x = False_Pos_Rate, y = True_Pos_Rate)) +
     geom_smooth(aes(colour=models)) + ggtitle('ROC Curves')
   AlteryxGraph2(liftPlotObj, nOutput = 4)
   AlteryxGraph2(gainPlotObj, nOutput = 4)
@@ -437,13 +433,14 @@ plotRegressionData <- function(plotData, config, modelNames) {
   plotData <- cbind(plotData, modelVec, trialVec)
   plotdf <- data.frame(Actual = plotData$actual, Predicted = plotData$response, fold = paste0("Fold", plotData$fold),
                        models = plotData$modelVec, trial = plotData$trialVec)
-  plotObj <- ggplot(data = plotdf, aes(x = Actual, y = Predicted)) +
+  plotObj <- ggplot2::ggplot(data = plotdf, aes(x = Actual, y = Predicted)) +
     geom_smooth(aes(colour=models)) + ggtitle("Predicted value vs actual values")
   AlteryxGraph2(plotObj, nOutput = 4)
 }
 
 # Helper Functions End ----
 #' @import ggplot2
+#' @import reshape2
 getResultsCrossValidation <- function(inputs, config){
   inputs$data$recordID <- 1:NROW(inputs$data)
   yVarName <- getYVar(inputs$models$Decision_tree)
@@ -507,7 +504,7 @@ getResultsCrossValidation <- function(inputs, config){
     } else {
       # Generate an empty plot
       empty_df <- data.frame()
-      emptyPlot <- ggplot(empty_df) + geom_point() + xlim(0, 1) + ylim(0, 1) +
+      emptyPlot <- ggplot2::ggplot(empty_df) + geom_point() + xlim(0, 1) + ylim(0, 1) +
         ggtitle("No plots available for >2 class classification")
     }
   } else {
