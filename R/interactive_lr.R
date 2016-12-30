@@ -105,16 +105,10 @@ interactive_lr <- function(
   p <- ncol(data) - 1 - as.numeric(config$`Use Weights`)
 
   # model-summary numbers
-  saveRDS(list(model = model, data = data, config = config),
-          "C:\\Users\\dblanchard\\Documents\\playground\\logregdash\\godhelpus.rds")
   if(glm_b){
     the_fitted_values <- unname(model$fitted.values)
   } else{
-    independent_variable_m <- sapply(
-      X = unname(data[, -1]),
-      FUN = as.numeric,
-      simplify = 'array'
-    )
+    independent_variable_m <- df2NumericMatrix(data[,-1])
     if(regularized_b){
       lambda <- config$lambda_no_cv
     } else{
@@ -159,9 +153,6 @@ interactive_lr <- function(
   #     s = model$lambda
   #   )
   # }
-  # saveRDS(list(predictions = probability_v, labels = actual_values),
-  #         "C:\\Users\\dblanchard\\Documents\\playground\\logregdash\\prediction_params.rds")
-  #
 
   probability_v <- the_fitted_values
 
