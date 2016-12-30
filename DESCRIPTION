@@ -1,6 +1,6 @@
 Package: AlteryxPredictive
 Title: Utility functions used by the predictive tools in Alteryx
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: c(
     person("Ramnath", "Vaidyanathan", role = c("aut", "cre"), email = "ramnath@alteryx.com"),
     person("Kuo", "Liu", role = "aut"),
