@@ -293,9 +293,12 @@ interactive_dt <- function(
     # page 2:  performance
     row_2_1 <- fdRow(
       fdBox(
-        fdPanelRegressionScatterplot(
-          actual = actual_values,
-          predicted  = fitted_values
+        #      fdTable(
+        #        x = mismatch_df
+        #      ),
+        fdPlotMismatchMatrix(
+          x = mismatch_df,
+          digits = digits
         ),
         width = totalWidth
       )
