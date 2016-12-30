@@ -1,6 +1,9 @@
 #' Create a dashboard outputting a single message
 #'
-#' @param msg message to output
+#' @param messageIn message to output
+#' @param titleIn title of dash
+#' @param colorIn color in dash
+#' @param widthIn width
 #' @return dashboard object for rendering
 #' @author Todd Morley
 badDash <- function(
