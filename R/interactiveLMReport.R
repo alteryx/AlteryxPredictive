@@ -33,7 +33,13 @@ interactive_lm_report <- function(
     data <- data[,c(model$yvar, model$xvars)]
     cv_b <- TRUE
   } else{
-    stop.Alteryx2('An invalid model type was passed to interactive_lm.  Please contact Alteryx support!')
+    return(badDash(
+      paste0(
+        'Interactive visualization not available for models of class ',
+        class(model),
+        '.'
+      )
+    ))
   }
   the_model <- model
   the_data <- data

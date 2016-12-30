@@ -56,12 +56,13 @@ interactive_lr <- function(
     cv_b <- TRUE
     title <- 'Cross-Validated Logistic Regression'
   } else{
-    stop.Alteryx2(
-      paste(
-        'An invalid model type was passed to interactive_lm. ',
-        'Please contact Alteryx support!'
+    return(badDash(
+      paste0(
+        'Interactive visualization not available for models of class ',
+        class(model),
+        '.'
       )
-    )
+    ))
   }
   logistic_b <- FALSE
   probit_b <- FALSE
@@ -80,19 +81,19 @@ interactive_lr <- function(
         log_log_b <- TRUE
         link_function <- 'complementary log log'
       } else{
-        stop.Alteryx2(
+        return(badDash(
           paste(
             'An invalid link function was passed to interactive_lr. ',
             'Please contact Alteryx support!')
-        )
+        ))
       }
     } else{
-      stop.Alteryx2(
+      return(badDash(
         paste(
           'An invalid model family was passed to interactive_lr. ',
           'Please contact Alteryx support!'
         )
-      )
+      ))
     }
   }
 
@@ -174,15 +175,15 @@ interactive_lr <- function(
                                                          digits = digits)))
   fitted_values <- as.integer(probability_v >= optimal_cutoff_nv[3])
   if(length(unique(fitted_values)) == 1) {
-    print("All values are being fitted to the same class.")
+    msg1 <- "All values are being fitted to the same class. "
     if(regularized_b) {
-      print("Consider using a smaller value of lambda.")
+      msg2 <- "Consider using a smaller value of lambda. "
     }
     else if(cv_b) {
-      print("Consider using a different value of lambda.")
+      msg2 <- "Consider using a different value of lambda. "
     }
-    print("Interactive report cannot be generated.")
-    return()
+    msg3 <- "Interactive dashboard could not be generated."
+    return(badDash(paste0(msg1,msg2,msg3)))
   }
 
   true_positive_count <- length(
