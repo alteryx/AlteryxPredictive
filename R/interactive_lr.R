@@ -38,7 +38,6 @@ interactive_lr <- function(
   }
 
   # UI layout constants
-
   totalWidth <- 12
   halfWidth <- 6
   digits <- 3
@@ -179,7 +178,8 @@ interactive_lr <- function(
     perf = roc_performance,
     pred = prediction_object
   )
-  fitted_values <- as.integer(probability_v >= config$threshold)
+  print(paste0("Optimal cutoff determined to be ", optimal_cutoff_nv[3]))
+  fitted_values <- as.integer(probability_v >= optimal_cutoff_nv[3])
   true_positive_count <- length(
     intersect(
       which(fitted_values == 1),
@@ -224,7 +224,6 @@ interactive_lr <- function(
   colnames(confusion_matrix_m) <- c('Actual Positive', 'Actual Negative')
 
   # Prepare UI elements.
-
   # page 1:  model summary
   row_1_1 <- fdRow(
     fdBox(
