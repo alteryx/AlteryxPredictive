@@ -218,7 +218,7 @@ getResultsDecisionTree <- function(inputs, config) {
   if(config$prune.plot) {
     makePrunePlot <- function(){createPrunePlotDT(the.model.rpart)}
   }
-  dashboard <- interactive_dt(the.model)
+  dashboard <- interactive_dt(config, inputs$the.data, the.model)
 
   results <- list(model = the.model, report = the.report,
                   treePlot = makeTreePlot, prunePlot = makePrunePlot,
