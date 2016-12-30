@@ -3,7 +3,7 @@
 #' @param config config
 #' @param data data (breaking the usual mold a little)
 #' @param model model
-#' @import MLmetrics DT flightdeck
+#' @import MLmetrics DT
 #' @export
 #' @author Todd Morley, Dylan Blanchard
 interactive_lm_report <- function(
@@ -12,7 +12,7 @@ interactive_lm_report <- function(
   model
 ){
   # UI layout constants
-
+  require('flightdeck')
   totalWidth <- 12
   infoBoxWidth <- 6
   digits <- 3

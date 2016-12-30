@@ -32,7 +32,6 @@ Imports:
   C50,
   DT,
   MLmetrics,
-  flightdeck,
   ROCR,
   ggplot2,
   TunePareto,
@@ -45,7 +44,8 @@ Suggests:
   testthat,
   XML,
   survey,
-  AlteryxRviz
+  AlteryxRviz,  
+  flightdeck
 Enhances:
   AlteryxRDataX,
   RevoScaleR
