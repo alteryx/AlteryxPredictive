@@ -1,5 +1,5 @@
 context("Decision Tree: smoke test with admission data")
-
+library(flightdeck)
 config <- list(
   `Branch Dist` = TRUE, classification = TRUE, Counts = FALSE,
   cp = 0.01, max.bins = "Default", max.depth = 20, min.bucket = 7,
@@ -104,7 +104,7 @@ exp_C50_model <- C50::C5.0(formula = Species ~ ., data = iris, weights = weights
 
 config$model.algorithm <- "C5.0"
 
-test_that("Iris data with C5.0 rules model", {
-  result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
-  expect_equal(result$model$tree, exp_C50_model$tree)
-})
+# test_that("Iris data with C5.0 weighted model", {
+#   result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
+#   expect_equal(result$model$tree, exp_C50_model$tree)
+# })
