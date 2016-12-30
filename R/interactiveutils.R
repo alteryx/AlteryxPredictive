@@ -4,8 +4,8 @@
 #' @return dashboard object for rendering
 #' @author Todd Morley
 badDash <- function(
-  titleIn = "Error",
   messageIn,
+  titleIn = "Error",
   colorIn = 'aqua',
   widthIn = 12
 ){
