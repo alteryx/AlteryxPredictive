@@ -63,7 +63,7 @@ test_that("non XDF results give expected param list", {
       cp = .01,
       data = quote(the.data),
       formula = formula("y ~ a + b + c"),
-      weights = c("w"),
+      weights = as.symbol("w"),
       method = "class",
       parms = list(split = "gini"),
       usesurrogate = 1,

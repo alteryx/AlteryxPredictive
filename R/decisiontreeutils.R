@@ -156,7 +156,7 @@ createDTParams <- function(config, names) {
     cp = if (config$cp %in% c("Auto", "")) 1e-5 else as.numeric(config$cp),
     data = quote(the.data),
     formula = makeFormula(names$x, names$y),
-    weights = names$w
+    weights = if (is.null(names$w)) NULL else as.symbol(names$w)
   ))
   if (params$cp == 1) {
     params$cp <- .999
