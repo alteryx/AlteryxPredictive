@@ -105,7 +105,8 @@ interactive_lr <- function(
   p <- ncol(data) - 1 - as.numeric(config$`Use Weights`)
 
   # model-summary numbers
-
+  saveRDS(list(model = model, data = data, config = config),
+          "C:\\Users\\dblanchard\\Documents\\playground\\logregdash\\godhelpus.rds")
   if(glm_b){
     the_fitted_values <- unname(model$fitted.values)
   } else{
@@ -178,8 +179,21 @@ interactive_lr <- function(
     perf = roc_performance,
     pred = prediction_object
   )
-  print(paste0("Optimal cutoff determined to be ", optimal_cutoff_nv[3]))
+  print(paste0("Optimal cutoff determined to be ", round(optimal_cutoff_nv[3],
+                                                         digits = digits)))
   fitted_values <- as.integer(probability_v >= optimal_cutoff_nv[3])
+  if(length(unique(fitted_values)) == 1) {
+    print("All values are being fitted to the same class.")
+    if(regularized_b) {
+      print("Consider using a smaller value of lambda.")
+    }
+    else if(cv_b) {
+      print("Consider using a different value of lambda.")
+    }
+    print("Interactive report cannot be generated.")
+    return()
+  }
+
   true_positive_count <- length(
     intersect(
       which(fitted_values == 1),
@@ -249,21 +263,30 @@ interactive_lr <- function(
   )
 
   # page 2:  conditional-density plots
-
   independent_variables <- names(data[, -1])
   cd_plots <- lapply(
     independent_variables,
     function(x){
-      plt <- fdPlotConditionalDensity(
-        x = data[[x]],
-        y = actual_values_f,
-        xlab = x,
-        showlegend = F
-      )
-      fdColumn(
-        plt,
-        width = halfWidth
-      )
+      if(is.numeric(data[[x]])){
+        plt <- fdPlotConditionalDensity(
+          x = data[[x]],
+          y = actual_values_f,
+          xlab = x,
+          showlegend = F
+        )
+        fdColumn(
+          plt,
+          width = halfWidth
+        )
+      } else {
+        print(
+          paste0(
+            "Conditional-density plot not generated for variable '",
+            x,
+            "' because it was categorical."
+            )
+          )
+      }
     }
   )
   row_2_1 <- fdRow(
