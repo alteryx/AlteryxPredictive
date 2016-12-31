@@ -18,7 +18,7 @@ checkMissing.omit <- function(data) {
 #' @param data dataframe
 #' @param threshold minimum number of records needed to not give warning
 #' @param mult multiplier portion of data used for model training
-#' @param msg
+#' @param msg output message (warning)
 #' @return no return - only throws warning
 checkLowN <- function(data,
                       threshold = 25,
