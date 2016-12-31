@@ -100,6 +100,11 @@ runCrossValidationDTree <- function(inputs, config){
   cv_results <- getResultsCrossValidationDTree(inputs, config)
   if (config$`display.static`) {
     write.Alteryx2(cv_results$fitMeasures, 1)
+    maxLevels <- 2
+    if(length(unique(cv_results$confMats$Variable)) > maxLevels) {
+      ### Trick alteryx with data that will be thrown away
+      cv_results$confMats$Type <- "Throw-away"
+    }
     write.Alteryx2(cv_results$confMats, 2)
   }
    #AlteryxGraph2(cv_results$outputPlot, 3)
