@@ -113,6 +113,7 @@ getResultsLogisticRegression <- function(inputs, config){
     results <- list(model = d$the.model, report = glm.out, plot = plot.out)
     class(results) <- "GLM"
   } else {
+    config$posClass <- verifyClass(inputs$the.data[,1], config$posClass)
     the.model <- processElasticNet(inputs, config)
     the.model$config <- config
     #We don't need to worry about backwards compatibility in this section.
