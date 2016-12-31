@@ -38,23 +38,38 @@ interactive_lm_report <- function(
   alpha <- config$alpha
   use_cv_lambda_1se <- config$lambda_1se
   lambda <- config$lambda_no_cv
+  n <- nrow(the_data)
+  p <- ncol(the_data) - 1 - as.numeric(config$`Use Weights`)
 
   # model-summary numbers
 
   if(lm_b){
     the_fitted_values <- unname(the_model$fitted.values)
   } else{
-    the_fitted_values <- unname(
-      predict(
-        object = the_model,
-        newx = as.matrix(the_data[, -1]),
-        s = lambda
-      )
+    independent_variable_m <- sapply(
+      X = unname(the_data[, -1]),
+      FUN = as.numeric,
+      simplify = 'array'
     )
+    if(regularized_b){
+      lambda <- config$lambda_no_cv
+    } else{
+      if(use_cv_lambda_1se){
+        lambda <- the_model$lambda.1se
+      } else{
+        lambda <- the_model$lambda.min
+      }
+      the_fitted_values <- unname(
+        predict(
+          object = the_model,
+          newx = independent_variable_m,
+          s = lambda,
+          type = 'response'
+        )
+      )
+    }
   }
   the_residuals <- unname(the_actual_values - the_fitted_values)
-  n <- nrow(the_data)
-  p <- ncol(the_data) - 1 - as.numeric(config$`Use Weights`)
   if(fitted_intercept){
     intercept_degrees_freedom <- 1
   } else{
@@ -286,7 +301,8 @@ interactive_lm_report <- function(
     fdBox(
       fdPanelRegressionMetrics(
         actual = the_actual_values,
-        predicted  = the_fitted_values
+        predicted  = the_fitted_values,
+        metrics = c("MAE", "MAPE", "MedianAPE", "RMSE", "RAE", "R2_Score") # not "RMSLE"
       ),
       width = totalWidth
     )
