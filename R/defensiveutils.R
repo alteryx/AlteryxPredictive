@@ -62,7 +62,7 @@ verifyClass <- function(v, lvl){
       if(length(matches) == 1) {
         AlteryxMessage2(
           paste(
-            "The provided positive class was coerced by ",
+            "The provided positive class was coerced by",
             "trimming and/or case-change to match the target variable."
           ),
           2,
