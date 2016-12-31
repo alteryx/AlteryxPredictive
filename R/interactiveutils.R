@@ -45,3 +45,48 @@ badDash <- function(
     fixed = TRUE
   )
 }
+
+#' Helpful wrapper around fitted and actual values for generating confusion matrix
+#'
+#' @param fitted_values fitted values
+#' @param actual_values actual values
+#' @return confusion matrix
+getBinaryConfusionMatrix <- function(
+  fitted_values,
+  actual_values
+){
+  if(is.factor(fitted_values)){
+    fitted_values <- as.numeric(fitted_values) - 1
+  }
+  if(is.factor(actual_values)){
+    actual_values <- as.numeric(actual_values) - 1
+  }
+  true_positive_count <- length(
+    intersect(
+      which(fitted_values == 1),
+      which(actual_values == 1)
+    )
+  )
+  false_positive_count <- length(which(fitted_values > actual_values))
+  true_negative_count <- length(
+    intersect(
+      which(fitted_values == 0),
+      which(actual_values == 0)
+    )
+  )
+  false_negative_count <- length(which(fitted_values < actual_values))
+  confusion_matrix_m <- matrix(
+    data = c(
+      true_positive_count,
+      false_positive_count,
+      false_negative_count,
+      true_negative_count
+    ),
+    nrow = 2,
+    ncol = 2
+  )
+  rownames(confusion_matrix_m) <- c('Predicted Positive', 'Predicted Negative')
+  colnames(confusion_matrix_m) <- c('Actual Positive', 'Actual Negative')
+
+  confusion_matrix_m
+}
