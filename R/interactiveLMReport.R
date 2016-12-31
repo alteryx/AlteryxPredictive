@@ -301,7 +301,8 @@ interactive_lm_report <- function(
     fdBox(
       fdPanelRegressionMetrics(
         actual = the_actual_values,
-        predicted  = the_fitted_values
+        predicted  = the_fitted_values,
+        metrics = c("MAE", "MAPE", "MedianAPE", "RMSE", "RAE", "R2_Score") # not "RMSLE"
       ),
       width = totalWidth
     )
