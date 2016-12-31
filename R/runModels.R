@@ -204,6 +204,7 @@ getResultsDecisionTree <- function(inputs, config) {
     `Branch Dist` = 'b.dist'
   ))
 
+  config$posClass <- verifyClass(inputs$the.data[,1], config$posClass)
   config$model.name <- validName(config$model.name)
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
 
