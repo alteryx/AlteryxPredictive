@@ -14,6 +14,9 @@ interactive_lr <- function(
   data,
   model
 ){
+  if(all(model$coefficients[-1] == 0)){
+    badDash("All model coefficients were zero. Cannot generate dashboard.")
+  }
   requireNamespace("flightdeck")
   # optimal cutoff probability from ROC analysis,
   # weighing sensitivity and specificity equally;
@@ -162,7 +165,7 @@ interactive_lr <- function(
     predictions = probability_v,
     labels = actual_values
   )
-  roc_performance = ROCR::performance(
+  roc_performance <- ROCR::performance(
     prediction.obj = prediction_object,
     measure = 'tpr',
     x.measure = 'fpr'
