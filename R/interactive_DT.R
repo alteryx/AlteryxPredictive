@@ -14,7 +14,8 @@ interactive_dt <- function(
   data,
   model
 ) {
-  if(config$use.weights) {
+  print(names(config))
+  if(config$used.weights) {
     data <- data[,-NCOL(data)]
   }
   requireNamespace("flightdeck")
@@ -35,7 +36,7 @@ interactive_dt <- function(
   rpart_regression_b <- FALSE
   rpart_classification_b <- FALSE
   c50_b <- FALSE
-  use_sampling_weights_b <- config$use.weights
+  use_sampling_weights_b <- config$used.weights
   n <- nrow(data)
   p <- ncol(data) - 1
   actual_values <- data[, 1]
