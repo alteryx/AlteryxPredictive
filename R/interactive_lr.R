@@ -14,9 +14,6 @@ interactive_lr <- function(
   data,
   model
 ){
-  if(all(model$coefficients[-1] == 0)){
-    badDash("All model coefficients were zero. Cannot generate dashboard.")
-  }
   requireNamespace("flightdeck")
   # optimal cutoff probability from ROC analysis,
   # weighing sensitivity and specificity equally;
@@ -99,7 +96,6 @@ interactive_lr <- function(
       ))
     }
   }
-
   the_actual_values <- data[, 1]
   fitted_intercept <- !config$`Omit Constant`
   alpha <- config$alpha
@@ -121,6 +117,19 @@ interactive_lr <- function(
       } else{
         lambda <- model$lambda.min
       }
+    }
+    if(all(unlist(model$coefficients[-1] == 0))){
+      msg1 <- "All model coefficients were zero. Cannot generate dashboard. "
+      if(regularized_b) {
+        msg2 <- "Consider using a smaller value of lambda."
+      } else { # cv_b is true
+        if (config$lambda_1se) {
+          msg2 <- "Consider using lambda.min instead of lambda for simple model."
+        } else {
+          msg2 <- ""
+        }
+      }
+      return(badDash(paste0(msg1,msg2)))
     }
     the_fitted_values <- unname(
       predict(
