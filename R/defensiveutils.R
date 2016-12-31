@@ -39,6 +39,9 @@ checkLowN <- function(data,
 #' @param lvl level of class to check for presence of
 #' @return positive class
 verifyClass <- function(v, lvl){
+  if(lvl == ""){
+    return(lvl)
+  }
   v_levels <- levels(v)
   if(is.null(v_levels)){
     # numeric v
