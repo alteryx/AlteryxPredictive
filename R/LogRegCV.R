@@ -14,6 +14,7 @@ genearateDataForPlotLogReg <- function(d, extras, config) {
 #' @return list of results for outputting
 #' @export
 getResultsCrossValidationLogReg <- function(inputs, config) {
+  config$posClass <- verifyClass(inputs$the.data[,1], config$posClass)
   ###### WORKAROUND #########################################
   # Namespace issues require redefining the call and family
   # Time is not permitting me to make proper changes
