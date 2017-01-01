@@ -131,14 +131,16 @@ getYvars <- function(data, models) {
 #'  For "common", use less common class.
 #' @return string - name of positive class
 #' @export
-setPositiveClass <- function(tar_lev) {
+setPositiveClass <- function(tar_lev, order) {
   yes_id <- match("yes", tolower(tar_lev))
   true_id <- match("true", tolower(tar_lev))
   if (!is.na(yes_id)) {
     return (tar_lev[yes_id])
   } else if (!is.na(true_id)) {
     return (tar_lev[true_id])
-  } else {
+  } else if(order == "alpha") {
+    return (tar_lev[1])
+  } else if (order == "common") {
     first_class <- tar_lev[1]
     second_class <- tar_lev[which(tar_lev != first_class)[1]]
     if ((length(which(tar_lev) == first_class)) > (length(which(tar_lev) == second_class))) {
@@ -147,12 +149,15 @@ setPositiveClass <- function(tar_lev) {
     } else {
       return (first_class)
     }
+  } else {
+    AlteryxMessage2("Invalid order parameter. Changing order to 'alpha' and re-running")
+    setPositiveClass(tar_lev, "alpha")
   }
 }
 
 #' In the 2-class classification case, get the positive class. Otherwise, do nothing.
-getPosClass <- function(config, yVar) {
-  return(setPositiveClass(yVar))
+getPosClass <- function(config, yVar, order) {
+  return(setPositiveClass(tar_lev = yVar, order = order))
 }
 
 
