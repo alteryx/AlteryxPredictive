@@ -123,43 +123,35 @@ getYvars <- function(data, models) {
   return(list(y_col = data[[y_name]], y_name = y_name))
 }
 
-# In the 2-class classification case, get the positive class. Otherwise, do nothing.
-
-getPosClass <- function(config, yVar) {
-
-  #Use the function from the Model Comparison tool to get/set positive class:
-  setPositiveClass <- function(tar_lev) {
-    # Set the postive class for two-class classification.
-    # The setPositiveClass function is only triggered if the user leaves the
-    # question on positive class (target level) blank.
-    #   1) if there's "yes/Yes/YES ..." in the target variable, then use "yes/Yes/YES"
-    #   2) if there's "true/True/TRUE..." in the target variable, then use "true/True/TRUE"
-    #   3) otherwise: use the less common class
-    #
-    # Parameters:
-    #   tar_lev: a vector of string
-    #            the levels of the target variable.
-    #
-    # Returns:
-    #   no_name: a string, the name of the positive class.
-
-    yes_id <- match("yes", tolower(tar_lev))
-    true_id <- match("true", tolower(tar_lev))
-    if (!is.na(yes_id)) {
-      return (tar_lev[yes_id])
-    } else if (!is.na(true_id)) {
-      return (tar_lev[true_id])
+#' Set the postive class for two-class classification.
+#'
+#' @param tar_lev a vector of string with the levels of target variable
+#' @param order string - choices are "alpha" and "common".
+#'  For "alpha", use first by alphabetical order.
+#'  For "common", use less common class.
+#' @return string - name of positive class
+#' @export
+setPositiveClass <- function(tar_lev) {
+  yes_id <- match("yes", tolower(tar_lev))
+  true_id <- match("true", tolower(tar_lev))
+  if (!is.na(yes_id)) {
+    return (tar_lev[yes_id])
+  } else if (!is.na(true_id)) {
+    return (tar_lev[true_id])
+  } else {
+    first_class <- tar_lev[1]
+    second_class <- tar_lev[which(tar_lev != first_class)[1]]
+    if ((length(which(tar_lev) == first_class)) > (length(which(tar_lev) == second_class))) {
+      #First_class is larger, so second_class is the positive class
+      return (second_class)
     } else {
-      first_class <- tar_lev[1]
-      second_class <- tar_lev[which(tar_lev != first_class)[1]]
-      if ((length(which(tar_lev) == first_class)) > (length(which(tar_lev) == second_class))) {
-        #First_class is larger, so second_class is the positive class
-        return (second_class)
-      } else {
-        return (first_class)
-      }
+      return (first_class)
     }
   }
+}
+
+#' In the 2-class classification case, get the positive class. Otherwise, do nothing.
+getPosClass <- function(config, yVar) {
   return(setPositiveClass(yVar))
 }
 
