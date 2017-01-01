@@ -425,3 +425,47 @@ plotRegressionData <- function(plotData, config, modelNames) {
     ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle("Predicted value vs actual values")
   AlteryxGraph2(plotObj, nOutput = 4)
 }
+
+#' ## Check predictor variables
+#'
+#' Check if predictor variables in the models and input data are identical.
+checkXVars <- function(inputs){
+  numModels <- length(inputs$models)
+  modelNames <- names(inputs$models)
+  modelXVars <-  lapply(inputs$models, getXVars2)
+  dataXVars <- names(inputs$data)[which(names(inputs$data) %in% unlist(modelXVars))]
+  errorMsg <- NULL
+  if (numModels > 1) {
+    for (i in 1:(numModels - 1)){
+      mvars1 <- modelXVars[[i]]
+      mvars2 <- modelXVars[[i + 1]]
+      if (!areIdentical(mvars1, mvars2)){
+        errorMsg <- paste("Models", modelNames[i] , "and", modelNames[i + 1],
+                          "were created using different predictor variables.")
+        stopMsg <- "Please ensure all models were created using the same predictors."
+      }
+      else if (!all(mvars1 %in% dataXVars)){
+        errorMsg <- paste("Model ", modelNames[i],
+                          "used predictor variables which were not contained in the input data.")
+        stopMsg <- paste("Please ensure input data contains all the data",
+                         "used to create the models and try again.")
+      }
+      if (!is.null(errorMsg)){
+        AlteryxMessage2(errorMsg, iType = 2, iPriority = 3)
+        stop.Alteryx2(stopMsg)
+      }
+    }
+  } else {
+    mvars1 <- modelXVars[[1]]
+    if (!all(mvars1 %in% dataXVars)){
+      errorMsg <- paste("Model ", modelNames[1],
+                        "used predictor variables which were not contained in the input data.")
+      stopMsg <- paste("Please ensure input data contains all the data",
+                       "used to create the models and try again.")
+    }
+    if (!is.null(errorMsg)){
+      AlteryxMessage2(errorMsg, iType = 2, iPriority = 3)
+      stop.Alteryx2(stopMsg)
+    }
+  }
+}
