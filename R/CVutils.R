@@ -101,6 +101,27 @@ createFolds <- function(data, config, set_seed = TRUE, seed = NULL) {
   return(foldList)
 }
 
+#' Check if response variable is the same in the pre-built model(s) and the input data.
+#' If so, output this variable.
+#'
+#' @param data incoming data
+#' @param model(s) to extract Y vars from
+#' @return y variable
+#' @export
+getYvars <- function(data, models) {
+  # Get the names of the target fields and make sure they are all same. If not,
+  # throw an error.
+  y_names <- sapply(models, AlteryxPredictive:::getYVar)
+  if (!all(y_names == y_names[1])) {
+    stop.Alteryx2("More than one target variable are present in the provided models")
+  } else if (!(y_names[1] %in% colnames(data))) {
+    stop.Alteryx2("The target variable from the models is different than the target chosen in the configuration. Please check your configuration settings and try again.")
+  }
+  # get the target variable name
+  y_name <- y_names[1]
+  # Get the target variable
+  return(list(y_col = data[[y_name]], y_name = y_name))
+}
 
 # In the 2-class classification case, get the positive class. Otherwise, do nothing.
 
