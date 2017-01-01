@@ -87,12 +87,14 @@ checkFactorVars <- function(data, folds, config) {
 #'
 #' @param data the data.frame used to create the models
 #' @param config a list of configuration information
+#' @param set_seed boolean of whether to (re)set seed
+#' @param seed integer value of random seed
 #' @return list of record ID's. Each element is the record ID's of the folds for a given trial.
 #' @import TunePareto
-createFolds <- function(data, config) {
+createFolds <- function(data, config, set_seed = TRUE, seed = NULL) {
   target <- data[, 1]
-  if (config$set_seed_cv) {
-    set.seed(config$cv_seed)
+  if (set_seed) {
+    set.seed(seed)
   }
   foldList <- TunePareto::generateCVRuns(labels = target, ntimes = config$numberTrials, nfold = config$numberFolds, stratified = config$stratified)
   checkFactorVars(data = data, folds = foldList, config = config)

@@ -16,7 +16,12 @@ getResultsCrossValidation <- function(inputs, config){
   extras <- list(
     yVar = yVar,
     posClass = config$posClass,
-    allFolds = createFolds(data = inputs$data, config = config),
+    allFolds = createFolds(
+      data = inputs$data,
+      config = config,
+      set_seed = config$set_seed_cv,
+      seed = config$cv_seed
+      ),
     levels = if (config$classification) levels(yVar) else NULL
   )
 
