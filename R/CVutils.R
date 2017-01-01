@@ -156,7 +156,13 @@ setPositiveClass <- function(tar_lev, order) {
 }
 
 #' In the 2-class classification case, get the positive class. Otherwise, do nothing.
-getPosClass <- function(config, yVar, order) {
+#'
+#' @param yVar to set Positive class for
+#' @param order string - choices are "alpha" and "common".
+#'  For "alpha", use first by alphabetical order.
+#'  For "common", use less common class.
+#' @return string - name of positive class
+getPosClass <- function(yVar, order) {
   return(setPositiveClass(tar_lev = yVar, order = order))
 }
 
