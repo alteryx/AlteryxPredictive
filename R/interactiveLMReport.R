@@ -25,8 +25,12 @@ interactive_lm_report <- function(
   if('lm' %in% class(model)){
     lm_b <- TRUE
   } else if('glmnet' %in% class(model)){
+    # remove extra column in data not trained on
+    data <- data[,c(model$yvar, model$xvars)]
     regularized_b <- TRUE
   } else if('cv.glmnet' %in% class(model) ){
+    # remove extra column in data not trained on
+    data <- data[,c(model$yvar, model$xvars)]
     cv_b <- TRUE
   } else{
     stop.Alteryx2('An invalid model type was passed to interactive_lm.  Please contact Alteryx support!')
