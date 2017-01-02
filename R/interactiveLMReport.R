@@ -3,7 +3,7 @@
 #' @param config config
 #' @param data data (breaking the usual mold a little)
 #' @param model model
-#' @import MLmetrics DT
+#' @import MLmetrics DT flightdeck
 #' @export
 #' @author Todd Morley, Dylan Blanchard
 interactive_lm_report <- function(
@@ -12,7 +12,6 @@ interactive_lm_report <- function(
   model
 ){
   # UI layout constants
-  require('flightdeck')
   totalWidth <- 12
   infoBoxWidth <- 6
   digits <- 3
@@ -25,8 +24,12 @@ interactive_lm_report <- function(
   if('lm' %in% class(model)){
     lm_b <- TRUE
   } else if('glmnet' %in% class(model)){
+    # remove extra column in data not trained on
+    data <- data[,c(model$yvar, model$xvars)]
     regularized_b <- TRUE
   } else if('cv.glmnet' %in% class(model) ){
+    # remove extra column in data not trained on
+    data <- data[,c(model$yvar, model$xvars)]
     cv_b <- TRUE
   } else{
     stop.Alteryx2('An invalid model type was passed to interactive_lm.  Please contact Alteryx support!')
@@ -59,15 +62,15 @@ interactive_lm_report <- function(
       } else{
         lambda <- the_model$lambda.min
       }
-      the_fitted_values <- unname(
-        predict(
-          object = the_model,
-          newx = independent_variable_m,
-          s = lambda,
-          type = 'response'
-        )
-      )
     }
+    the_fitted_values <- unname(
+      predict(
+        object = the_model,
+        newx = independent_variable_m,
+        s = lambda,
+        type = 'response'
+      )
+    )
   }
   the_residuals <- unname(the_actual_values - the_fitted_values)
   if(fitted_intercept){
