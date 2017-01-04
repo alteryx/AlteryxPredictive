@@ -56,7 +56,7 @@ writeOutputs.DecisionTree <- function(results, config) {
     )
   } else if (!(config$`display.static`)) {
     #Write out garbage data that will get filtered out on the Alteryx side
-    write.Alteryx2(data.frame(one = 1), nOutput = 2)
+    AlteryxGraph2(plot(x = 1, y = 1), nOutput = 2)
   }
 
   # Model Object
@@ -74,7 +74,7 @@ writeOutputs.DecisionTree <- function(results, config) {
     )
   } else if (!(config$`display.static`)) {
     #Write out garbage data that will get filtered out on the Alteryx side
-    write.Alteryx2(data.frame(one = 1), nOutput = 2)
+    AlteryxGraph2(plot(x = 1, y = 1), nOutput = 4)
   }
   # Interactive Dashboard
   AlteryxRviz::renderInComposer(results$dashboard, nOutput = 5)
