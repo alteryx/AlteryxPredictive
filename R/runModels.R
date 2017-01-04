@@ -50,9 +50,11 @@ writeOutputs.DecisionTree <- function(results, config) {
     in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h,
     graph.resolution = config$tree.graph.resolution, print.high = TRUE
   )
-  AlteryxGraph2(results$treePlot(), nOutput = 2, width = whr[1], height = whr[2],
-    res = whr[3], pointsize = config$tree.pointsize
-  )
+  if (config$tree.plot) {
+    AlteryxGraph2(results$treePlot(), nOutput = 2, width = whr[1], height = whr[2],
+                  res = whr[3], pointsize = config$tree.pointsize
+    )
+  }
 
   # Model Object
   the.obj <- prepModelForOutput(config$`Model Name`, results$model)
@@ -63,10 +65,11 @@ writeOutputs.DecisionTree <- function(results, config) {
     in.h = config$prune.in.h, cm.w = config$prune.cm.w, cm.h = config$prune.cm.h,
     graph.resolution = config$prune.graph.resolution, print.high = FALSE
   )
-  AlteryxGraph2(results$prunePlot(), nOutput = 4, width = whr[1], height = whr[2],
-    res = whr[3], pointsize = config$prune.pointsize
-  )
-
+  if (config$prune.plot) {
+    AlteryxGraph2(results$prunePlot(), nOutput = 4, width = whr[1], height = whr[2],
+                  res = whr[3], pointsize = config$prune.pointsize
+    )
+  }
   # Interactive Dashboard
   AlteryxRviz::renderInComposer(results$dashboard, nOutput = 5)
 }
