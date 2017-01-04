@@ -54,6 +54,9 @@ writeOutputs.DecisionTree <- function(results, config) {
     AlteryxGraph2(results$treePlot(), nOutput = 2, width = whr[1], height = whr[2],
                   res = whr[3], pointsize = config$tree.pointsize
     )
+  } else if (!(config$`display.static`)) {
+    #Write out garbage data that will get filtered out on the Alteryx side
+    write.Alteryx2(data.frame(one = 1), nOutput = 2)
   }
 
   # Model Object
@@ -69,6 +72,9 @@ writeOutputs.DecisionTree <- function(results, config) {
     AlteryxGraph2(results$prunePlot(), nOutput = 4, width = whr[1], height = whr[2],
                   res = whr[3], pointsize = config$prune.pointsize
     )
+  } else if (!(config$`display.static`)) {
+    #Write out garbage data that will get filtered out on the Alteryx side
+    write.Alteryx2(data.frame(one = 1), nOutput = 2)
   }
   # Interactive Dashboard
   AlteryxRviz::renderInComposer(results$dashboard, nOutput = 5)
