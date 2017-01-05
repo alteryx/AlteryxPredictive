@@ -209,9 +209,11 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
       #that we're dealing with a df in many other places. This are could be ripe for refactoring
       #in the future.
       weights_v <- if(config$`Use Weights`) trainingData[[config$`Weight Vec`]] else NULL
-      trainingData <- df2NumericMatrix(trainingData)
+      y_vec <- trainingData[[currentYvar]]
+      trainingData_noyvar <- trainingData[!(colnames(trainingData) %in% currentYvar)]
+      trainingData <- df2NumericMatrix(trainingData_noyvar)
       #No need to call df2NmericMatrix on testData, since scoreModel calls df2NumericMatrix with glmnet models.
-      currentModel <- glmnetUpdate(model, trainingData, currentYvar, config, weight_vec = weights_v)
+      currentModel <- glmnetUpdate(model, trainingData_noyvar, y_vec, config, weight_vec = weights_v)
     } else if (inherits(model, "lm")){
       if (config$`Use Weights`) {
         # WORKAROUND
@@ -554,9 +556,9 @@ checkXVars <- function(inputs){
   }
 }
 
-glmnetUpdate <- function(model, trainingData, currentYvar, config, weight_vec = NULL) {
-  predictors <- trainingData[,getXVars(model)]
-  response <- trainingData[,(which(colnames(trainingData) == currentYvar))]
+glmnetUpdate <- function(model, trainingData_noyvar, y_vec, config, weight_vec = NULL) {
+  predictors <- trainingData_noyvar[,getXVars(model)]
+  response <- y_vec
   model_w_call <- if (config$internal_cv) {
     model$glmnet.fit
   } else {
