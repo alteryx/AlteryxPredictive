@@ -51,10 +51,10 @@ interactive_lr <- function(
   if('glm' %in% class(model)){
     glm_b <- TRUE
     title <- 'Classical Logistic Regression'
-  } else if('reg_glm' %in% class(model)){
+  } else if(any(c('reg_glm', 'glmnet')) %in% class(model)){
     regularized_b <- TRUE
     title <- 'Regularized Logistic Regression'
-  } else if('cv.glmt' %in% class(model) ){
+  } else if(any(c('cv.glmt', 'cv.glmnet')) %in% class(model) ){
     cv_b <- TRUE
     title <- 'Cross-Validated Logistic Regression'
   } else{
