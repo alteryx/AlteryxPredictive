@@ -108,10 +108,19 @@ interactive_lr <- function(
     levels = 0:1,
     labels = c('no', 'yes')
   )
-  probability_v <- predict(
-    object = model,
-    type = 'response'
-  )
+  probability_v <- if (glm_b) {
+    predict(
+      object = model,
+      type = 'response'
+    )
+  } else {
+    predict(
+      object = model,
+      type = 'response',
+      newx = df2NumericMatrix(data)
+    )
+  }
+
   # ROCR computations
   prediction_object <- prediction(
     predictions = probability_v,
