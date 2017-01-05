@@ -166,11 +166,11 @@ interactive_lr <- function(
   probability_v <- the_fitted_values
 
   # ROCR computations
-  prediction_object <- ROCR:::prediction(
+  prediction_object <- ROCR::prediction(
     predictions = probability_v,
     labels = actual_values
   )
-  roc_performance = ROCR:::performance(
+  roc_performance = ROCR::performance(
     prediction.obj = prediction_object,
     measure = 'tpr',
     x.measure = 'fpr'
