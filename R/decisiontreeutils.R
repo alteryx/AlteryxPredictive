@@ -328,6 +328,8 @@ processDT <- function(inputs, config) {
   if(config$model.algorithm == "C5.0") {
     model$y <- the.data[[var_names$y]]
     model$yvar <- var_names$y
+    model$xlevels <- lapply(X = the.data[var_names$x], FUN = levels)
+    model$ylevels <- levels(the.data[[var_names$y]])
   }
 
 
