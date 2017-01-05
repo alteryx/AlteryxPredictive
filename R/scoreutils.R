@@ -148,6 +148,10 @@ getXlevels.gbm <- function(x){
   noZeroLevels(xlevels)
 }
 
+#' @export
+getXlevels.C5.0 <- function(x){
+  noNullLevels(x$xlevels)
+}
 
 #' Get Y levels from model object
 #'
@@ -219,6 +223,11 @@ getYlevels.svm <- function(x, ...){
   } else {
     NULL
   }
+}
+
+#' @export
+getYlevels.C5.0 <- function(x, ...){
+  x$ylevels
 }
 
 ## Predict probabilities ----

@@ -2,7 +2,7 @@
 #' @import reshape2
 getResultsCrossValidationDTree <- function(inputs, config){
   inputs$data$recordID <- 1:NROW(inputs$data)
-  yVarName <- getYVar(inputs$models$Decision_tree)
+  yVarName <- getYVar(inputs$models$Decision_Tree)
   yVar <- inputs$data[[yVarName]]
   if ((config$classification) && (length(unique(yVar)) == 2)) {
     if ((is.null(config$posClass)) || (config$posClass == "")) {
@@ -12,7 +12,6 @@ getResultsCrossValidationDTree <- function(inputs, config){
 
   inputs$modelNames <- names(inputs$models)
   modelNames <- names(inputs$models)
-
   extras <- list(
     yVar = yVar,
     posClass = config$posClass,
@@ -32,20 +31,7 @@ getResultsCrossValidationDTree <- function(inputs, config){
                               response = dataOutput1$Score, actual = dataOutput1$actual)
   }
 
-  preppedOutput1 <- if (config$regression) {
-    data.frame(RecordID = dataOutput1$recordID,
-               Trial = dataOutput1$trial, Fold = dataOutput1$fold,
-               Model = modelNames[dataOutput1$mid], Response = dataOutput1$response,
-               Actual = dataOutput1$actual
-    )
-  } else {
-    data.frame(RecordID = dataOutput1$recordID,
-               Trial = dataOutput1$trial, Fold = dataOutput1$fold,
-               Model = modelNames[dataOutput1$mid], Response = dataOutput1$response,
-               Actual = dataOutput1$actual
-    )
-  }
-  #write.Alteryx2(preppedOutput1, nOutput = 1)
+
   dataOutput2 <- generateOutput2(dataOutput1, extras, modelNames)
   preppedOutput2 <- reshape2::melt(dataOutput2, id = c('trial', 'fold', 'Model'))
   #write.Alteryx2(preppedOutput2, nOutput = 2)
@@ -62,21 +48,27 @@ getResultsCrossValidationDTree <- function(inputs, config){
   plotData <- plyr::ddply(dataOutput1, c("trial", "fold", "mid"), generateDataForPlotsDTree,
                     extras = extras, config = config
   )
-  outputPlot <- if (config$classification) {
-    if (length(extras$levels) == 2) {
-      plotBinaryData(plotData, config, modelNames)
+  if (config$`display.static`) {
+    if (config$classification) {
+      if (length(extras$levels) == 2) {
+        plotBinaryData(plotData, config, modelNames)
+      } else {
+        # Generate an empty plot
+        empty_df <- data.frame()
+        emptyPlot <- ggplot2::ggplot(empty_df) + ggplot2::geom_point() + ggplot2::xlim(0, 1) + ggplot2::ylim(0, 1) +
+          ggplot2::ggtitle("No plots available for >2 class classification")
+        AlteryxGraph2(emptyPlot, nOutput = 4)
+      }
     } else {
-      # Generate an empty plot
-      empty_df <- data.frame()
-      emptyPlot <- ggplot2::ggplot(empty_df) + ggplot2::geom_point() + ggplot2::xlim(0, 1) + ggplot2::ylim(0, 1) +
-        ggplot2::ggtitle("No plots available for >2 class classification")
+      plotRegressionData(plotData, config, modelNames)
     }
   } else {
-    plotRegressionData(plotData, config, modelNames)
+    emptyPlot <- ggplot2::ggplot(empty_df) + ggplot2::geom_point() + ggplot2::xlim(0, 1) + ggplot2::ylim(0, 1)
+    AlteryxGraph2(emptyPlot, nOutput = 4)
   }
   list(
-    data = preppedOutput1, fitMeasures = preppedOutput2,
-    confMats = confMats, outputPlot = outputPlot
+    fitMeasures = preppedOutput2,
+    confMats = confMats
   )
 }
 
@@ -88,11 +80,11 @@ getResultsCrossValidationDTree <- function(inputs, config){
 #' @return list with components measuring model fit obtained via CV
 runCrossValidationDTree <- function(inputs, config){
   #Ensure that config$regression and config$classification are both set properly.
-  #Note that with an || in R, the LHS is evaluated first. The RSH is only evaluated
+  #Note that with an || in R, the LHS is evaluated first. The RHS is only evaluated
   #if the LHS is false. We're relying on that property of R here. Only rpart objects
   #have a method component, so we only want to look at the RHS if we're in the rpart
   #(ie not C5.0) case.
-  mod_obj <- inputs$models$Decision_tree
+  mod_obj <- inputs$models$Decision_Tree
   if (((config$`model.algorithm`) == 'C5.0') || ((mod_obj$method) == "class")) {
     config$classification <- TRUE
     config$regression <- FALSE
@@ -102,9 +94,11 @@ runCrossValidationDTree <- function(inputs, config){
   }
   inputs$data <- inputs$the.data
   cv_results <- getResultsCrossValidationDTree(inputs, config)
-#   write.Alteryx2(results$data, 1)
-#   write.Alteryx2(results$fitMeasures, 2)
-#   write.Alteryx2(results$confMats, 3)
-#   AlteryxGraph2(results$outputPlot, 4)
+  if (config$`display.static`) {
+    write.Alteryx2(cv_results$fitMeasures, 1)
+    write.Alteryx2(cv_results$confMats, 2)
+  }
+   #AlteryxGraph2(cv_results$outputPlot, 3)
+   #Graphing is done in plotBinaryData/plotRegressionData
   return(cv_results)
 }

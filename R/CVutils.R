@@ -176,7 +176,12 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
     testData <- data[testIndices,]
     testData <- matchLevels(testData, getXlevels(model))
     currentYvar <- getYVar(model)
-    currentModel <- update(model, data = trainingData)
+    if (inherits(model, "C5.0")) {
+      weights_v <- trainingData[[config$`select.weights`]]
+      currentModel <- C50Update(model, trainingData, currentYvar, config, weight_vec = weights_v)
+    } else {
+      currentModel <- update(model, data = trainingData)
+    }
     pred <- scoreModel(currentModel, new.data = testData)
     actual <- (extras$yVar)[testIndices]
     recordID <- (data[testIndices,])$recordID
@@ -577,6 +582,20 @@ glmnetUpdate <- function(model, trainingData, currentYvar, config, weight_vec = 
   } else {
     config$lambda_no_cv
   }
+  return(currentModel)
+}
+
+C50Update <- function(model, trainingData, currentYvar, config, weight_vec = NULL) {
+  var_names <- getNamesFromOrdered(names(trainingData), config$`use.weights`)
+  if (config$`use.weights`) {
+    currentModel <- update(model, formula. = makeFormula(getXVars(model), currentYvar),
+                           data = trainingData, weights = weight_vec)
+  } else {
+    currentModel <- update(model, formula. = makeFormula(getXVars(model), currentYvar), data = trainingData)
+  }
+  currentModel$yvar <- var_names$y
+  currentModel$xlevels <- lapply(X = trainingData[var_names$x], FUN = levels)
+  currentModel$ylevels <- levels(trainingData[[var_names$y]])
   return(currentModel)
 }
 
