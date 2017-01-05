@@ -44,17 +44,16 @@ interactive_lr <- function(
   digits <- 3
 
   # Prep and test inputs.
-
   glm_b <- FALSE
   regularized_b <- FALSE
   cv_b <- FALSE
   if('glm' %in% class(model)){
     glm_b <- TRUE
     title <- 'Classical Logistic Regression'
-  } else if(any(c('reg_glm', 'glmnet')) %in% class(model)){
+  } else if(any(c('reg_glm', 'glmnet') %in% class(model))){
     regularized_b <- TRUE
     title <- 'Regularized Logistic Regression'
-  } else if(any(c('cv.glmt', 'cv.glmnet')) %in% class(model) ){
+  } else if(any(c('cv.glmt', 'cv.glmnet') %in% class(model))){
     cv_b <- TRUE
     title <- 'Cross-Validated Logistic Regression'
   } else{
@@ -68,38 +67,42 @@ interactive_lr <- function(
   logistic_b <- FALSE
   probit_b <- FALSE
   log_log_b <- FALSE
-  if(
-    'glm' %in% class(model) &&
-    model$family$family == 'binomial'
-  ){
-    if(model$family$link == 'logit'){
-      logistic_b <- TRUE
-      link_function <- 'logit'
-    } else if(model$family$link == 'probit'){
-      probit_b <- TRUE
-      link_function <- 'probit'
-    } else if(model$family$link == 'cloglog'){
-      log_log_b <- TRUE
-      link_function <- 'complementary log log'
+  if (glm_b) {
+    if(
+      model$family$family == 'binomial'
+    ){
+      if(model$family$link == 'logit'){
+        logistic_b <- TRUE
+        link_function <- 'logit'
+      } else if(model$family$link == 'probit'){
+        probit_b <- TRUE
+        link_function <- 'probit'
+      } else if(model$family$link == 'cloglog'){
+        log_log_b <- TRUE
+        link_function <- 'complementary log log'
+      } else{
+        stop.Alteryx2(
+          paste(
+            'An invalid link function was passed to interactive_lr. ',
+            'Please contact Alteryx support!')
+        )
+      }
     } else{
       stop.Alteryx2(
         paste(
-          'An invalid link function was passed to interactive_lr. ',
-          'Please contact Alteryx support!')
+          'An invalid model family was passed to interactive_lr. ',
+          'Please contact Alteryx support!'
+        )
       )
     }
-  } else{
-    stop.Alteryx2(
-      paste(
-        'An invalid model family was passed to interactive_lr. ',
-        'Please contact Alteryx support!'
-      )
-    )
   }
   use_sampling_weights_b <- config$`Use Weights`
   n <- nrow(data)
   p <- ncol(data) - 1 - as.numeric(use_sampling_weights_b)
   actual_values <- data[, 1]
+  if (is.factor(actual_values)) {
+    actual_values <- as.numeric(actual_values) - 1
+  }
   actual_values_f <- factor(
     actual_values,
     levels = 0:1,
@@ -170,7 +173,6 @@ interactive_lr <- function(
   # Prepare UI elements.
 
   # page 1:  model summary
-
   row_1_1 <- fdRow(
     fdBox(
       fdPanelClassificationMetrics(
