@@ -43,7 +43,7 @@ getResultsCrossValidationLinReg <- function(inputs, config){
 #' @export
 runCrossValidationLinReg <- function(inputs, config){
   results <- getResultsCrossValidationLinReg(inputs, config)
-  write.Alteryx2(results$data, 2)
+  # write.Alteryx2(results$data, 2)
   write.Alteryx2(results$fitMeasures, 3)
   AlteryxGraph2(results$outputPlot, 4)
 }
