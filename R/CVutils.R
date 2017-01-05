@@ -171,7 +171,7 @@ getPosClass <- function(yVar, order) {
 #' @import C50 rpart glmnet
 #' @importFrom stats update
 getActualandResponse <- function(model, data, testIndices, extras, mid, config){
-  if(class(model) == "rpart" || class(model) == "C5.0") {
+  if(class(model) == "rpart" || class(model) == "C5.0" || any(class(model) == "glm")) {
     trainingData <- data[-testIndices,]
     testData <- data[testIndices,]
     testData <- matchLevels(testData, getXlevels(model))
@@ -208,11 +208,11 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
       #this conversion wouldn't be necessary with every trial/fold. However, the code assumes
       #that we're dealing with a df in many other places. This are could be ripe for refactoring
       #in the future.
-      weights_v <- trainingData[[config$`Weight Vec`]]
+      weights_v <- if(config$`Use Weights`) trainingData[[config$`Weight Vec`]] else NULL
       trainingData <- df2NumericMatrix(trainingData)
       #No need to call df2NmericMatrix on testData, since scoreModel calls df2NumericMatrix with glmnet models.
       currentModel <- glmnetUpdate(model, trainingData, currentYvar, config, weight_vec = weights_v)
-    } else {
+    } else if (inherits(model, "lm")){
       if (config$`Use Weights`) {
         # WORKAROUND
         # The assign() statement below moves the token ‘getActualandResponse’ to the global environment, where the update() function can find it.
@@ -234,14 +234,10 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
         currentModel <- update(model, formula. = makeFormula(getXVars(model), currentYvar), data = trainingData)
       }
     }
-    if (inherits(currentModel, 'gbm')){
-      currentModel <- adjustGbmModel(currentModel)
-    }
-    pred <- if (packageVersion('AlteryxPredictive') <= '0.3.2') {
-      scoreModel2(currentModel, new.data = testData)
-    } else {
-      scoreModel(currentModel, new.data = testData)
-    }
+    # if (inherits(currentModel, 'gbm')){
+    #   currentModel <- adjustGbmModel(currentModel)
+    # }
+    pred <- scoreModel(currentModel, new.data = testData)
     actual <- (extras$yVar)[testIndices]
     recordID <- (data[testIndices,])$recordID
     response <- pred$Score
