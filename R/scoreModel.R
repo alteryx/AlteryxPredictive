@@ -264,7 +264,7 @@ scoreModel.lognet <- function(mod.obj, new.data, score.field = "Score",
     if (length(y.levels) != 2) {
       AlteryxMessage2("Adjusting for the oversampling of the target is only valid for a binary
                       categorical variable, so the predicted probabilities will not be adjusted.", iType = 2, iPriority = 3)
-      scores <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred, type = 'class')
+      scores <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred, type = 'response')
       #Note that the predict.glmnet documentation says that only the probability of the second class is produced
       #So we need to take 1 - that result and set the first column to that
       scores <- data.frame(cbind((1 - scores), scores))
@@ -272,7 +272,7 @@ scoreModel.lognet <- function(mod.obj, new.data, score.field = "Score",
       sample.pct <- samplePct(mod.obj, os.value, new.data)
       wr <- sample.pct/os.pct
       wc <- (100 - sample.pct)/(100 - os.pct)
-      pred.prob <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred, type = 'class')
+      pred.prob <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred, type = 'response')
       pred.prob <- as.data.frame(cbind((1 - pred.prob), pred.prob))
       pred.prob <- pred.prob[ , (1:2)[y.levels == os.value]]
       adj.prob <- (pred.prob/wr)/(pred.prob/wr + (1 - pred.prob)/wc)
@@ -283,7 +283,7 @@ scoreModel.lognet <- function(mod.obj, new.data, score.field = "Score",
       }
      }
   } else {
-    scores <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred, type = 'class')
+    scores <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred, type = 'response')
     scores <- data.frame(cbind((1 - scores), scores))
   }
   names(scores) <- paste(score.field, "_", y.levels, sep = "")
