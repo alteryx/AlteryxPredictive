@@ -6,6 +6,76 @@ library(htmltools)
 library(rpart)
 library(C50)
 
+# The classification_mismatches function produces a sparse confusion
+# matrix listing misclassifications in descending order of frequency,
+# and limiting its output to some total cumulative percentage of
+# misclassifications (in case there's a long tail of low-probability
+# misclassifications).  This lets the user try to alter the model
+# in ways calculated to achieve improvement around specific, frequently
+# occurring cases of misclassification.
+
+classification_mismatches <- function(
+  actual_values,
+  fitted_values,
+  digits = 3,
+  cutoff_cumulative_percent = 80
+){
+  # defensive coding to bounds check cutoff_cumulative_percent
+  if(
+    cutoff_cumulative_percent < 20 ||
+    cutoff_cumulative_percent > 100
+  ){
+    cutoff_cumulative_percent <- 80
+  }
+  # actual vs fitted data frame
+  actual_fitted_df <- data.frame(
+    actual_values = actual_values[which(fitted_values != actual_values)],
+    fitted_values = fitted_values[which(fitted_values != actual_values)]
+  )
+  # deduplicate actual_fitted_df and add frequencies (counts)
+  duplicate_df <- aggregate(
+    cbind(
+      actual_fitted_df[0],
+      count = 1
+    ),
+    actual_fitted_df,
+    length
+  )
+  # sort in descending frequency order
+  duplicate_df <- duplicate_df[order(-duplicate_df$count), ]
+  # compute each row count's percentage of total duplicates
+  duplicate_df$percent <- round(
+    x = duplicate_df$count * 100 / sum(duplicate_df$count),
+    digits = digits
+  )
+  # compute each row's cumulative percentage
+  duplicate_df$cumulative_percent <- round(
+    x = ave(duplicate_df$percent, FUN = cumsum),
+    digits = digits
+  )
+  # add column names for display in a chart
+  names(duplicate_df) <- c(
+    'Actual Value',
+    'Fitted Value',
+    'Frequency',
+    '% Total',
+    'Cumulative %'
+  )
+  # display at least one row, if one exists
+  if(nrow(duplicate_df) > 0){
+    index_v <- which(duplicate_df$cumulative_percent <= cutoff_cumulative_percent)
+    length_index_v <- length(index_v)
+    if(length_index_v == 0){
+      max_index <- 1
+    } else{
+      max_index <- index_v[length_index_v]
+    }
+    duplicate_df <- duplicate_df[1:max_index, ]
+  }
+  # That's all folks!
+  return(duplicate_df)
+}
+
 
 interactive_dt <- function(
   config,
@@ -20,76 +90,6 @@ interactive_dt <- function(
     `Use Weights` = FALSE,
     `Omit Constant` = FALSE
   )
-
-  # The classification_mismatches function produces a sparse confusion
-  # matrix listing misclassifications in descending order of frequency,
-  # and limiting its output to some total cumulative percentage of
-  # misclassifications (in case there's a long tail of low-probability
-  # misclassifications).  This lets the user try to alter the model
-  # in ways calculated to achieve improvement around specific, frequently
-  # occurring cases of misclassification.
-
-  classification_mismatches <- function(
-    actual_values,
-    fitted_values,
-    digits = 3,
-    cutoff_cumulative_percent = 80
-  ){
-    # defensive coding to bounds check cutoff_cumulative_percent
-    if(
-      cutoff_cumulative_percent < 20 ||
-      cutoff_cumulative_percent > 100
-    ){
-      cutoff_cumulative_percent <- 80
-    }
-    # actual vs fitted data frame
-    actual_fitted_df <- data.frame(
-      actual_values = actual_values[which(fitted_values != actual_values)],
-      fitted_values = fitted_values[which(fitted_values != actual_values)]
-    )
-    # deduplicate actual_fitted_df and add frequencies (counts)
-    duplicate_df <- aggregate(
-      cbind(
-        actual_fitted_df[0],
-        count = 1
-      ),
-      actual_fitted_df,
-      length
-    )
-    # sort in descending frequency order
-    duplicate_df <- duplicate_df[order(-duplicate_df$count), ]
-    # compute each row count's percentage of total duplicates
-    duplicate_df$percent <- round(
-      x = duplicate_df$count * 100 / sum(duplicate_df$count),
-      digits = digits
-    )
-    # compute each row's cumulative percentage
-    duplicate_df$cumulative_percent <- round(
-      x = ave(duplicate_df$percent, FUN = cumsum),
-      digits = digits
-    )
-    # add column names for display in a chart
-    names(duplicate_df) <- c(
-      'Actual Value',
-      'Fitted Value',
-      'Frequency',
-      '% Total',
-      'Cumulative %'
-    )
-    # display at least one row, if one exists
-    if(nrow(duplicate_df) > 0){
-      index_v <- which(duplicate_df$cumulative_percent <= cutoff_cumulative_percent)
-      length_index_v <- length(index_v)
-      if(length_index_v == 0){
-        max_index <- 1
-      } else{
-        max_index <- index_v[length_index_v]
-      }
-      duplicate_df <- duplicate_df[1:max_index, ]
-    }
-    # That's all folks!
-    return(duplicate_df)
-  }
 
   # UI layout constants
 
