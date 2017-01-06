@@ -90,6 +90,7 @@ interactive_dt <- function(
   data,
   model
 ) {
+  requireNamespace("flightdeck")
   # test inputs
   rpart_regression_b <- FALSE
   rpart_classification_b <- TRUE
