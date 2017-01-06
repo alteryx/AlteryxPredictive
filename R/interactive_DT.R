@@ -21,13 +21,6 @@ interactive_dt <- function(
     `Omit Constant` = FALSE
   )
 
-  #interactive_dt <- function(
-  #  config,
-  #  data,
-  #  model
-  #){
-  #} end interactive_dt
-
   # The classification_mismatches function produces a sparse confusion
   # matrix listing misclassifications in descending order of frequency,
   # and limiting its output to some total cumulative percentage of
