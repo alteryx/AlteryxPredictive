@@ -146,12 +146,13 @@ interactive_dt <- function(
         )
       )
     } else{
-      stop.Alteryx2(
-        paste(
-          'An invalid model type was passed to interactive_dt. ',
-          'Please contact Alteryx support!'
+      return(badDash(
+        paste0(
+          'Interactive visualization not available for models of class ',
+          class(model),
+          '.'
         )
-      )
+      ))
     }
   } else if('C5.0' %in% class(model)){
     c50_b <- TRUE
@@ -165,12 +166,12 @@ interactive_dt <- function(
       )
     )
   } else{
-    stop.Alteryx2(
+    return(badDash(
       paste(
         'An invalid model type was passed to interactive_lm. ',
         'Please contact Alteryx support!'
       )
-    )
+    ))
   }
   if(rpart_classification_b || c50_b){
     actual_values_f <- as.factor(actual_values)
