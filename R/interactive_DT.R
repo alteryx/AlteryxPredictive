@@ -6,6 +6,7 @@ library(htmltools)
 library(rpart)
 library(C50)
 
+
 interactive_dt <- function(
   config,
   data,
@@ -19,53 +20,6 @@ interactive_dt <- function(
     `Use Weights` = FALSE,
     `Omit Constant` = FALSE
   )
-  data <- mtcars
-  if(rpart_regression_b){
-    # Move mpg to col 1 for generating the test regression model.
-    mpg_v <- data$mpg
-    data$mpg <- NULL
-    data <- cbind(
-      mpg = mpg_v,
-      data
-    )
-    model <- rpart(
-      formula = mpg ~ .,
-      data = data,
-      method = 'anova',
-      model = TRUE,
-      x = FALSE,
-      y = TRUE
-    )
-  } else{
-    # Make cyl a factor for generating the test classification models.
-    cyl_v <- data$cyl
-    data$cyl <- NULL
-    data <- cbind(
-      cyl = as.factor(cyl_v),
-      data
-    )
-    if(rpart_classification_b){
-      model <- rpart(
-        formula = cyl ~ .,
-        data = data,
-        method = 'class',
-        model = TRUE,
-        x = FALSE,
-        y = TRUE
-      )
-    } else{
-      model <- C5.0(
-        formula = cyl ~ .,
-        data = data
-      )
-    }
-    # Restore cyl to numeric for testing.
-    data$cyl <- NULL
-    data <- cbind(
-      cyl = cyl_v,
-      data
-    )
-  }
 
   #interactive_dt <- function(
   #  config,
