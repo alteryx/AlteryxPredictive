@@ -6,6 +6,7 @@
 \alias{scoreModel.default}
 \alias{scoreModel.elnet}
 \alias{scoreModel.lm}
+\alias{scoreModel.lognet}
 \alias{scoreModel.rxDForest}
 \alias{scoreModel.rxDTree}
 \alias{scoreModel.rxGlm}
@@ -37,7 +38,11 @@ scoreModel(mod.obj, new.data, score.field = "Score", ...)
 
 \method{scoreModel}{elnet}(mod.obj, new.data, score.field = "Score", ...)
 
-\method{scoreModel}{cv.glmnet}(mod.obj, new.data, score.field = "Score", ...)
+\method{scoreModel}{lognet}(mod.obj, new.data, score.field = "Score",
+  os.value = NULL, os.pct = NULL, ...)
+
+\method{scoreModel}{cv.glmnet}(mod.obj, new.data, score.field = "Score",
+  os.value = NULL, os.pct = NULL, ...)
 }
 \arguments{
 \item{mod.obj}{model object}
