@@ -104,7 +104,7 @@ interactive_dt <- function(
 
   # Prep and test inputs.
 
-  fitted_intercept <- !config$`Omit Constant`
+  fitted_intercept <- TRUE
   rpart_regression_b <- FALSE
   rpart_classification_b <- FALSE
   c50_b <- FALSE
