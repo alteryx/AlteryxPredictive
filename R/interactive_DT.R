@@ -94,10 +94,6 @@ interactive_dt <- function(
   rpart_regression_b <- FALSE
   rpart_classification_b <- TRUE
   c50_b <- FALSE
-  config <- list(
-    `Use Weights` = FALSE,
-    `Omit Constant` = FALSE
-  )
 
   # UI layout constants
 
