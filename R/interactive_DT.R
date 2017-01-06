@@ -1,19 +1,18 @@
-library(AlteryxPredictive)
-library(flightdeck)
-library(MLmetrics)
-library(glmnet)
-library(htmltools)
-library(rpart)
-library(C50)
 
-# The classification_mismatches function produces a sparse confusion
-# matrix listing misclassifications in descending order of frequency,
-# and limiting its output to some total cumulative percentage of
-# misclassifications (in case there's a long tail of low-probability
-# misclassifications).  This lets the user try to alter the model
-# in ways calculated to achieve improvement around specific, frequently
-# occurring cases of misclassification.
-
+#' The classification_mismatches function produces a sparse confusion
+#' matrix listing misclassifications in descending order of frequency,
+#' and limiting its output to some total cumulative percentage of
+#' misclassifications (in case there's a long tail of low-probability
+#' misclassifications).  This lets the user try to alter the model
+#' in ways calculated to achieve improvement around specific, frequently
+#' occurring cases of misclassification.
+#'
+#' @param actual_values vector of expected values
+#' @param fitted_values vector of fitted values
+#' @param digits number of digits past the decimal to round to
+#' @param cutoff_cumulative_percent cumulative percentage at which to stop outputting
+#' @return dataframe with at least one row truncated at the cumulative percent
+#' @author Todd Morley
 classification_mismatches <- function(
   actual_values,
   fitted_values,
@@ -76,7 +75,16 @@ classification_mismatches <- function(
   return(duplicate_df)
 }
 
-
+#' Dashboard generation for decision tree models
+#'
+#' @param config list of configuration elements
+#' @param data dataframe
+#' @param model model object - should be one of
+#'  rpart
+#'  C5.0
+#' @return dashboard object for rendering
+#' @export
+#' @author Todd Morley, Dylan Blanchard
 interactive_dt <- function(
   config,
   data,
