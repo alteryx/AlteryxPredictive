@@ -77,7 +77,7 @@ writeOutputs.DecisionTree <- function(results, config) {
     AlteryxGraph2(plot(x = 1, y = 1), nOutput = 4)
   }
   # Interactive Dashboard
-  AlteryxRviz::renderInComposer(results$dashboard, nOutput = 5)
+  flightdeck::fdRender(x = results$dashboard, nOutput = 5)
 }
 
 # Logistic Regression ----
