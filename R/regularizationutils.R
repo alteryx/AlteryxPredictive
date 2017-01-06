@@ -74,6 +74,9 @@ processElasticNet <- function(inputs, config){
   #scoreModel.
   the.model$xvars <- colnames(x)
   the.model$yvar <- var_names$y
+  if (family != "gaussian") {
+    the.model$ylevels <- levels(inputs$the.data[,var_names$y])
+  }
   return(the.model)
 }
 

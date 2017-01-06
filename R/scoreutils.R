@@ -230,6 +230,16 @@ getYlevels.C5.0 <- function(x, ...){
   x$ylevels
 }
 
+#' @export
+getYlevels.glmnet <- function(x, ...){
+  x$ylevels
+}
+
+#' @export
+getYlevels.cv.glmnet <- function(x, ...){
+  x$ylevels
+}
+
 ## Predict probabilities ----
 predProb <- function(x, new.data, ...){
   UseMethod('predProb')
