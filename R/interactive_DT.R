@@ -391,7 +391,7 @@ interactive_dt <- function(
     )
     row_2_1 <- fdRow(
       fdBox(
-        title = 'Misclassification Matrix'
+        title = 'Misclassification Matrix',
         fdPlotMismatchMatrix(confusion_table, digits = digits),
         footer = 'This table shows misclassified pairs sorted by frequency.',
         width = totalWidth
