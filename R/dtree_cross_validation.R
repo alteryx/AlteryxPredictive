@@ -63,6 +63,7 @@ getResultsCrossValidationDTree <- function(inputs, config){
       plotRegressionData(plotData, config, modelNames)
     }
   } else {
+    empty_df <- data.frame()
     emptyPlot <- ggplot2::ggplot(empty_df) + ggplot2::geom_point() + ggplot2::xlim(0, 1) + ggplot2::ylim(0, 1)
     AlteryxGraph2(emptyPlot, nOutput = 4)
   }
