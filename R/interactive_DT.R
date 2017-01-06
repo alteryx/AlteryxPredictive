@@ -84,7 +84,7 @@ classification_mismatches <- function(
 #'  C5.0
 #' @return dashboard object for rendering
 #' @export
-#' @author Todd Morley, Dylan Blanchard
+#' @author Todd Morley
 interactive_dt <- function(
   config,
   data,
