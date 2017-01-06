@@ -77,7 +77,7 @@ writeOutputs.DecisionTree <- function(results, config) {
     AlteryxGraph2(plot(x = 1, y = 1), nOutput = 4)
   }
   # Interactive Dashboard
-  AlteryxRviz::renderInComposer(results$dashboard, nOutput = 5)
+  flightdeck::fdRender(x = results$dashboard, nOutput = 5)
 }
 
 # Logistic Regression ----
@@ -218,7 +218,7 @@ getResultsDecisionTree <- function(inputs, config) {
   if(config$prune.plot) {
     makePrunePlot <- function(){createPrunePlotDT(the.model.rpart)}
   }
-  dashboard <- createDashboardDT(the.model)
+  dashboard <- interactive_dt(config, inputs$the.data, the.model)
 
   results <- list(model = the.model, report = the.report,
                   treePlot = makeTreePlot, prunePlot = makePrunePlot,
