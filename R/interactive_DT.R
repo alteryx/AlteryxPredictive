@@ -147,11 +147,7 @@ interactive_dt <- function(
       )
     } else{
       return(badDash(
-        paste0(
-          'Interactive visualization not available for models of class ',
-          class(model),
-          '.'
-        )
+          'Interactive visualization not available rpart model without method "class" or "anova" '
       ))
     }
   } else if('C5.0' %in% class(model)){
@@ -167,9 +163,10 @@ interactive_dt <- function(
     )
   } else{
     return(badDash(
-      paste(
-        'An invalid model type was passed to interactive_lm. ',
-        'Please contact Alteryx support!'
+      paste0(
+        'Interactive visualization not available for models of class ',
+        class(model),
+        '.'
       )
     ))
   }

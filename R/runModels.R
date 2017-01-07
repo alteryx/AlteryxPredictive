@@ -184,8 +184,7 @@ getResultsDecisionTree <- function(inputs, config) {
   set.seed(1)
 
   if(inputs$XDFInfo$is_XDF)
-    config$model.algorithm == "rxDTree"
-
+    config$model.algorithm <- "rxDTree"
   # Rename arguments to be consistent with rpart.
   config <- plyr::rename(config, c(
     use.weights = 'used.weights', `Model Name` = 'model.name',
@@ -241,7 +240,6 @@ runDecisionTree <- function(inputs, config){
     config$bands.check <- FALSE
     config$GlobalPruning <- FALSE
   }
-
   results <- getResultsDecisionTree(inputs, config)
   writeOutputs(results, config)
 }
