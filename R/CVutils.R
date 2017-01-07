@@ -132,6 +132,7 @@ getYvars <- function(data, models) {
 #' @return string - name of positive class
 #' @export
 setPositiveClass <- function(tar_lev, order) {
+
   yes_id <- match("yes", tolower(tar_lev))
   true_id <- match("true", tolower(tar_lev))
   if (!is.na(yes_id)) {
@@ -143,7 +144,7 @@ setPositiveClass <- function(tar_lev, order) {
   } else if (order == "common") {
     first_class <- tar_lev[1]
     second_class <- tar_lev[which(tar_lev != first_class)[1]]
-    if ((length(which(tar_lev) == first_class)) > (length(which(tar_lev) == second_class))) {
+    if ((length(which(tar_lev == first_class))) > (length(which(tar_lev == second_class)))) {
       #First_class is larger, so second_class is the positive class
       return (second_class)
     } else {
