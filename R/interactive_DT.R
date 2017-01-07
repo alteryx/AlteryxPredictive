@@ -172,11 +172,9 @@ interactive_dt <- function(
   }
   if(rpart_classification_b || c50_b){
     actual_values_f <- as.factor(actual_values)
-    mismatch_df <- classification_mismatches(
-      actual_values = actual_values_f,
-      fitted_values = fitted_values,
-      digits = digits,
-      cutoff_cumulative_percent = 80
+    confusion_table <- table(
+      actual = actual_values_f,
+      predicted = fitted_values
     )
   }
 
@@ -394,9 +392,9 @@ interactive_dt <- function(
     )
     row_2_1 <- fdRow(
       fdBox(
-        fdTable(
-          x = mismatch_df
-        ),
+        title = 'Misclassification Matrix',
+        fdPlotMismatchMatrix(confusion_table, digits = digits),
+        footer = 'This table shows misclassified pairs sorted by frequency.',
         width = totalWidth
       )
     )
