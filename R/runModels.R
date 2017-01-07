@@ -16,6 +16,9 @@ writeOutputs.GLM <- function(results, config){
   # Model Object
   the.obj <- prepModelForOutput(config$`Model Name`, results$model)
   write.Alteryx2(the.obj, nOutput = 3)
+  # Write out empty plots so MetaInfo is filled out.
+  AlteryxGraph2(emptyPlot(), nOutput = 4)
+  AlteryxGraph2(emptyPlot(), nOutput = 5)
 }
 
 
