@@ -62,3 +62,10 @@ checkInstalls <- function(packages) {
     setInternet2(use = FALSE)
   }
 }
+
+# Create an empty plot.
+emptyPlot <- function(){
+  plot(x = c(0,1), y = c(0,1), type = "n",
+    xlab = "", ylab = "", xaxt = "n", yaxt = "n"
+  )
+}
