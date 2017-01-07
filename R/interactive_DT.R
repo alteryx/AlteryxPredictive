@@ -1,4 +1,3 @@
-
 #' The classification_mismatches function produces a sparse confusion
 #' matrix listing misclassifications in descending order of frequency,
 #' and limiting its output to some total cumulative percentage of
@@ -13,68 +12,6 @@
 #' @param cutoff_cumulative_percent cumulative percentage at which to stop outputting
 #' @return dataframe with at least one row truncated at the cumulative percent
 #' @author Todd Morley
-classification_mismatches <- function(
-  actual_values,
-  fitted_values,
-  digits = 3,
-  cutoff_cumulative_percent = 80
-){
-  # defensive coding to bounds check cutoff_cumulative_percent
-  if(
-    cutoff_cumulative_percent < 20 ||
-    cutoff_cumulative_percent > 100
-  ){
-    cutoff_cumulative_percent <- 80
-  }
-  # actual vs fitted data frame
-  actual_fitted_df <- data.frame(
-    actual_values = actual_values[which(fitted_values != actual_values)],
-    fitted_values = fitted_values[which(fitted_values != actual_values)]
-  )
-  # deduplicate actual_fitted_df and add frequencies (counts)
-  duplicate_df <- aggregate(
-    cbind(
-      actual_fitted_df[0],
-      count = 1
-    ),
-    actual_fitted_df,
-    length
-  )
-  # sort in descending frequency order
-  duplicate_df <- duplicate_df[order(-duplicate_df$count), ]
-  # compute each row count's percentage of total duplicates
-  duplicate_df$percent <- round(
-    x = duplicate_df$count * 100 / sum(duplicate_df$count),
-    digits = digits
-  )
-  # compute each row's cumulative percentage
-  duplicate_df$cumulative_percent <- round(
-    x = ave(duplicate_df$percent, FUN = cumsum),
-    digits = digits
-  )
-  # add column names for display in a chart
-  names(duplicate_df) <- c(
-    'Actual Value',
-    'Fitted Value',
-    'Frequency',
-    '% Total',
-    'Cumulative %'
-  )
-  # display at least one row, if one exists
-  if(nrow(duplicate_df) > 0){
-    index_v <- which(duplicate_df$cumulative_percent <= cutoff_cumulative_percent)
-    length_index_v <- length(index_v)
-    if(length_index_v == 0){
-      max_index <- 1
-    } else{
-      max_index <- index_v[length_index_v]
-    }
-    duplicate_df <- duplicate_df[1:max_index, ]
-  }
-  # That's all folks!
-  return(duplicate_df)
-}
-
 #' Dashboard generation for decision tree models
 #'
 #' @param config list of configuration elements
@@ -147,7 +84,7 @@ interactive_dt <- function(
       )
     } else{
       return(badDash(
-          'Interactive visualization not available rpart model without method "class" or "anova" '
+        'Interactive visualization not available rpart model without method "class" or "anova" '
       ))
     }
   } else if('C5.0' %in% class(model)){
@@ -172,11 +109,9 @@ interactive_dt <- function(
   }
   if(rpart_classification_b || c50_b){
     actual_values_f <- as.factor(actual_values)
-    mismatch_df <- classification_mismatches(
-      actual_values = actual_values_f,
-      fitted_values = fitted_values,
-      digits = digits,
-      cutoff_cumulative_percent = 80
+    mismatch_t <- table(
+      actual = actual_values_f,
+      predicted = fitted_values
     )
   }
 
@@ -290,18 +225,6 @@ interactive_dt <- function(
     # page 2:  performance
     row_2_1 <- fdRow(
       fdBox(
-        #      fdTable(
-        #        x = mismatch_df
-        #      ),
-        fdPlotMismatchMatrix(
-          x = mismatch_df,
-          digits = digits
-        ),
-        width = totalWidth
-      )
-    )
-    row_2_2 <- fdRow(
-      fdBox(
         fdPanelRegressionMetrics(
           actual = actual_values,
           predicted  = fitted_values,
@@ -310,7 +233,7 @@ interactive_dt <- function(
         width = totalWidth
       )
     )
-    row_2_3 <- fdRow(
+    row_2_2 <- fdRow(
       fdBox(
         fdPanelHistogram(
           x = residuals,
@@ -323,7 +246,6 @@ interactive_dt <- function(
     page_2 <- fdPage(
       row_2_1,
       row_2_2,
-      row_2_3,
       id = 'page_2',
       display = FALSE
     )
@@ -394,13 +316,14 @@ interactive_dt <- function(
     )
     row_2_1 <- fdRow(
       fdBox(
-        fdTable(
-          x = mismatch_df
+        fdPlotMismatchMatrix(
+          x = mismatch_t,
+          digits = digits
         ),
         width = totalWidth
       )
     )
-    page_2 <-fdPage(
+    page_2 <- fdPage(
       row_2_1,
       id = 'page_2',
       display = FALSE
@@ -420,6 +343,32 @@ interactive_dt <- function(
         id = 'page_3',
         display = FALSE
       )
+      sidebar <- fdSidebarMenu(
+        fdMenuItem(
+          text = 'Summary',
+          icon = fdIcon(
+            name = 'caret-right',
+            lib = "font-awesome"
+          ),
+          pageName = 'page_1'
+        ),
+        fdMenuItem(
+          text = 'Misclassifications',
+          icon = fdIcon(
+            name = 'caret-right',
+            lib = "font-awesome"
+          ),
+          pageName = 'page_2'
+        ),
+        fdMenuItem(
+          text = 'Tree',
+          icon = fdIcon(
+            name = 'caret-right',
+            lib = "font-awesome"
+          ),
+          pageName = 'page_3'
+        )
+      )
       body <- fdBody(
         page_1,
         page_2,
@@ -427,37 +376,29 @@ interactive_dt <- function(
       )
 
     } else{
+      sidebar <- fdSidebarMenu(
+        fdMenuItem(
+          text = 'Summary',
+          icon = fdIcon(
+            name = 'caret-right',
+            lib = "font-awesome"
+          ),
+          pageName = 'page_1'
+        ),
+        fdMenuItem(
+          text = 'Misclassifications',
+          icon = fdIcon(
+            name = 'caret-right',
+            lib = "font-awesome"
+          ),
+          pageName = 'page_2'
+        )
+      )
       body <- fdBody(
         page_1,
         page_2
       )
     }
-    sidebar <- fdSidebarMenu(
-      fdMenuItem(
-        text = 'Summary',
-        icon = fdIcon(
-          name = 'caret-right',
-          lib = "font-awesome"
-        ),
-        pageName = 'page_1'
-      ),
-      fdMenuItem(
-        text = 'Misclassifications',
-        icon = fdIcon(
-          name = 'caret-right',
-          lib = "font-awesome"
-        ),
-        pageName = 'page_2'
-      ),
-      fdMenuItem(
-        text = 'Tree',
-        icon = fdIcon(
-          name = 'caret-right',
-          lib = "font-awesome"
-        ),
-        pageName = 'page_3'
-      )
-    )
   }
   fdBoard(
     fdHeader(
