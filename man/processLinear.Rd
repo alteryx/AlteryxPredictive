@@ -15,7 +15,7 @@ processLinearXDF(inputs, config)
 \item{config}{configuration passed to the tool}
 }
 \description{
-These two function take `inputs` and `config` and return the model object
+These two functions take `inputs` and `config` and return the model object
 along with other elements essential to create the reports and plots
 }
 

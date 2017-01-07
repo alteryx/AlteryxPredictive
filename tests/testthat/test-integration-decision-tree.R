@@ -1,5 +1,5 @@
 context("Decision Tree: smoke test with admission data")
-
+library(flightdeck)
 config <- list(
   `Branch Dist` = TRUE, classification = TRUE, Counts = FALSE,
   cp = 0.01, max.bins = "Default", max.depth = 20, min.bucket = 7,
@@ -15,11 +15,12 @@ config <- list(
   use.gini = TRUE, use.information = FALSE, use.weights = FALSE,
   usesurrogate.0 = FALSE, usesurrogate.1 = FALSE, usesurrogate.2 = TRUE,
   `X Vars` = c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
-  xval.folds = 10,
-  `Y Var` = "Species"
+  xval.folds = 10, `Y Var` = "Species", model.algorithm = "rpart",
+  display.static = TRUE, trials = 1, rules = FALSE, subset = TRUE,
+  bands.check = FALSE, bands = 10, winnow = FALSE, GlobalPruning = TRUE,
+  CF = .25, minCases = 2, fuzzyThreshold = FALSE, sample = 0, seed = 1,
+  earlyStopping = TRUE
 )
-
-class(config) <- "OSR"
 
 inputs <- list(
   the.data = iris[, c(config$`Y Var`, config$`X Vars`)],
@@ -41,6 +42,14 @@ test_that("Iris data with vanilla decision tree model", {
   expect_equal(result$model$frame,exp_tree_model$frame)
 })
 
+config$model.algorithm <- "C5.0"
+
+exp_C50_model <- C50::C5.0(formula = Species ~ ., data = iris)
+
+test_that("Iris data with vanilla C5.0 tree model", {
+  result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
+  expect_equal(result$model$tree, exp_C50_model$tree)
+})
 
 testDir = '~/Desktop/SNIPPETS/dev/Predictive_Refresh/Logistic_Regression/Extras/Tests'
 comment = 'This workflow tests that admission data with logit link returns correct coefficients'
@@ -55,3 +64,47 @@ comment = 'This workflow tests that admission data with logit link returns corre
 #   ),
 #   outFile = file.path(testDir, "LogisticTest1.yxmd")
 # )
+
+config$rules <- TRUE
+
+exp_C50_model <- C50::C5.0(formula = Species ~ ., data = iris, rule = TRUE)
+
+test_that("Iris data with C5.0 rules model", {
+  result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
+  expect_equal(result$model$tree, exp_C50_model$tree)
+})
+
+set.seed(1)
+weights_vec <- runif(nrow(iris))
+
+iris_weights <- rev(iris)
+iris_weights$weights <- weights_vec
+
+inputs <- list(
+  the.data = iris_weights,
+  XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
+)
+
+config$rules <- FALSE
+
+config$use.weights <- TRUE
+config$select.weights <- "weights"
+
+config$model.algorithm <- "rpart"
+
+exp_tree_model <- rpart::rpart(formula = Species ~ ., data = iris, weights = weights_vec)
+
+
+test_that("Iris data with rpart weighted model", {
+  result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
+  expect_true(all(result$model$where == exp_tree_model$where))
+})
+
+exp_C50_model <- C50::C5.0(formula = Species ~ ., data = iris, weights = weights_vec)
+
+config$model.algorithm <- "C5.0"
+
+# test_that("Iris data with C5.0 weighted model", {
+#   result <- AlteryxPredictive:::getResultsDecisionTree(inputs, config)
+#   expect_equal(result$model$tree, exp_C50_model$tree)
+# })

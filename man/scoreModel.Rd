@@ -2,8 +2,12 @@
 % Please edit documentation in R/scoreModel.R
 \name{scoreModel}
 \alias{scoreModel}
+\alias{scoreModel.cv.glmnet}
 \alias{scoreModel.default}
+\alias{scoreModel.elnet}
 \alias{scoreModel.lm}
+\alias{scoreModel.lognet}
+\alias{scoreModel.rxDForest}
 \alias{scoreModel.rxDTree}
 \alias{scoreModel.rxGlm}
 \alias{scoreModel.rxLinMod}
@@ -28,6 +32,17 @@ scoreModel(mod.obj, new.data, score.field = "Score", ...)
 
 \method{scoreModel}{rxDTree}(mod.obj, new.data, score.field, os.value = NULL,
   os.pct = NULL, ...)
+
+\method{scoreModel}{rxDForest}(mod.obj, new.data, score.field,
+  os.value = NULL, os.pct = NULL, ...)
+
+\method{scoreModel}{elnet}(mod.obj, new.data, score.field = "Score", ...)
+
+\method{scoreModel}{lognet}(mod.obj, new.data, score.field = "Score",
+  os.value = NULL, os.pct = NULL, ...)
+
+\method{scoreModel}{cv.glmnet}(mod.obj, new.data, score.field = "Score",
+  os.value = NULL, os.pct = NULL, ...)
 }
 \arguments{
 \item{mod.obj}{model object}
@@ -52,6 +67,6 @@ scoreModel(mod.obj, new.data, score.field = "Score", ...)
 Score function
 }
 \author{
-Ramnath Vaidyanathan, Dan Putler
+Ramnath Vaidyanathan, Dan Putler, Bridget Toomey
 }
 

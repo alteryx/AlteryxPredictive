@@ -24,7 +24,7 @@ getXVarsFromCall <- function(x){
 #' @export
 getXVars.default <- function(x) {
   the.call <- x$call
-  if(class(the.call) != "call") stop("The argument was not a call object.")
+  if(class(the.call) != "call") stop.Alteryx2("The argument was not a call object.")
   xvars <- getXVarsFromCall(x)
   xvars <- xvars[xvars != "-1"]
   chkNewLine <- function(string) {
@@ -44,6 +44,13 @@ getXVars.naiveBayes <- function(x) {
 
 #' @export
 getXVars.svm.formula <- getXVars.naiveBayes
+#The component xvars was added to glmnet model objects
+#in the linearregutils code, so we can also extract it using
+#$xvars.
+#' @export
+getXVars.glmnet <- getXVars.naiveBayes
+#' @export
+getXVars.cv.glmnet <- getXVars.naiveBayes
 
 #' Remove non numeric elements from a list
 #'
@@ -76,7 +83,7 @@ matchLevels <- function(nd, ol) {
     ol.names <- names(ol)
     ol.names <- ol.names[!is.na(ol.names)]
     if (!all(ol.names %in% the.factors))
-      stop("There are factor variables in the model that are not present in the data to be scored.")
+      stop.Alteryx2("There are factor variables in the model that are not present in the data to be scored.")
 
     # The function to use with sapply to determine which factors have different
     # levels in the new data versus the levels used in model estimation.
@@ -141,6 +148,10 @@ getXlevels.gbm <- function(x){
   noZeroLevels(xlevels)
 }
 
+#' @export
+getXlevels.C5.0 <- function(x){
+  noNullLevels(x$xlevels)
+}
 
 #' Get Y levels from model object
 #'
@@ -212,6 +223,21 @@ getYlevels.svm <- function(x, ...){
   } else {
     NULL
   }
+}
+
+#' @export
+getYlevels.C5.0 <- function(x, ...){
+  x$ylevels
+}
+
+#' @export
+getYlevels.glmnet <- function(x, ...){
+  x$ylevels
+}
+
+#' @export
+getYlevels.cv.glmnet <- function(x, ...){
+  x$ylevels
 }
 
 ## Predict probabilities ----

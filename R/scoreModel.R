@@ -5,7 +5,7 @@
 #' @param score.field name given to the score field
 #' @param ... additional arguments
 #' @export
-#' @author Ramnath Vaidyanathan, Dan Putler
+#' @author Ramnath Vaidyanathan, Dan Putler, Bridget Toomey
 #' @rdname scoreModel
 scoreModel <- function(mod.obj, new.data, score.field = "Score", ...) {
   UseMethod('scoreModel')
@@ -204,4 +204,107 @@ scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL,
   scores
 }
 
+#' @export
+#' @rdname scoreModel
 scoreModel.rxDForest <- scoreModel.rxDTree
+
+#' @export
+#' @rdname scoreModel
+scoreModel.elnet <- function(mod.obj, new.data, score.field = "Score", ...) {
+  #The code in the score tool has already subsetted the columns of the original
+  #data to be scored, so there's no need to subset in that case.
+  #However, we need to perform the subsetting and column ordering in case of future tools
+  #that might use scoreModel. Unfortunately, glmnet isn't smart enough to order the columns
+  #correctly in the predict function if they're provided in the wrong order.
+  used_x_vars <- getXVars(mod.obj)
+  new.data <- df2NumericMatrix(new.data)
+  if (!all(used_x_vars %in% colnames(new.data))) {
+    missing_x_vars <- used_x_vars[!(used_x_vars %in% colnames(new.data))]
+    if (length(missing_x_vars) == 1) {
+      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing
+                                              the variable ", missing_x_vars, ". Please make
+                                              sure you provide this variable and try again."))
+    } else {
+      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing
+                                              the variables ", missing_x_vars, ". Please make
+                                              sure you provide these variables and try again."))
+    }
+  }
+  used_data <- new.data[,used_x_vars]
+  requireNamespace('glmnet')
+  score <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred)
+  score <- as.data.frame(score)
+  names(score) <- score.field
+  return(score)
+}
+
+#' @export
+#' @rdname scoreModel
+scoreModel.lognet <- function(mod.obj, new.data, score.field = "Score",
+                                 os.value = NULL, os.pct = NULL, ...) {
+  used_x_vars <- getXVars(mod.obj)
+  new.data <- df2NumericMatrix(new.data)
+  target.value <- os.value
+  y.levels <- getYlevels(mod.obj)
+  if (!all(used_x_vars %in% colnames(new.data))) {
+    missing_x_vars <- used_x_vars[!(used_x_vars %in% colnames(new.data))]
+    if (length(missing_x_vars) == 1) {
+      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing
+                                              the variable ", missing_x_vars, ". Please
+                                              make sure you provide this variable and try again."))
+    } else {
+      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing
+                                              the variables ", missing_x_vars, ". Please
+                                              make sure you provide these variables and try again."))
+    }
+  }
+  used_data <- new.data[,used_x_vars]
+  requireNamespace('glmnet')
+  if (!is.null(os.value)) {
+    if (length(y.levels) != 2) {
+      AlteryxMessage2("Adjusting for the oversampling of the target is only valid for a binary
+                      categorical variable, so the predicted probabilities will not be adjusted.", iType = 2, iPriority = 3)
+      scores <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred, type = 'class')
+      #Note that the predict.glmnet documentation says that only the probability of the second class is produced
+      #So we need to take 1 - that result and set the first column to that
+      scores <- data.frame(cbind((1 - scores), scores))
+    } else {
+      sample.pct <- samplePct(mod.obj, os.value, new.data)
+      wr <- sample.pct/os.pct
+      wc <- (100 - sample.pct)/(100 - os.pct)
+      pred.prob <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred, type = 'class')
+      pred.prob <- as.data.frame(cbind((1 - pred.prob), pred.prob))
+      pred.prob <- pred.prob[ , (1:2)[y.levels == os.value]]
+      adj.prob <- (pred.prob/wr)/(pred.prob/wr + (1 - pred.prob)/wc)
+      if (y.levels[1] == target.value) {
+        scores <- data.frame(score1 = adj.prob, score2 = 1 - adj.prob)
+       } else {
+         scores <- data.frame(score1 = 1 - adj.prob, score2 = adj.prob)
+      }
+     }
+  } else {
+    scores <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred, type = 'class')
+    scores <- data.frame(cbind((1 - scores), scores))
+  }
+  names(scores) <- paste(score.field, "_", y.levels, sep = "")
+  return(scores)
+}
+
+#' @export
+#' @rdname scoreModel
+scoreModel.cv.glmnet <- function(mod.obj, new.data, score.field = "Score",
+                              os.value = NULL, os.pct = NULL, ...) {
+  if (inherits(mod.obj$glmnet.fit, 'lognet')) {
+    return(scoreModel.lognet(mod.obj, new.data, score.field = "Score",
+                      os.value = NULL, os.pct = NULL, ...))
+  } else {
+    scoreModel.elnet(mod.obj, new.data, score.field = "Score",
+                     os.value = NULL, os.pct = NULL, ...)
+  }
+}
+
+
+
+
+#Note: When doing this for logistic regression, I'll need to update to differentiate between
+#elnet and lognet types. I can test whether mod.obj$glmnet.fit inherits elnet.

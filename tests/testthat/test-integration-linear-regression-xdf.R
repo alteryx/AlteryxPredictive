@@ -6,7 +6,8 @@ config <- list(
   `Omit Constant` = FALSE,
   `Use Weights` = FALSE,
   `X Vars` = names(mtcars)[-1],
-  `Y Var` = 'mpg'
+  `Y Var` = 'mpg',
+  regularization = FALSE
 )
 
 inputs <- list(

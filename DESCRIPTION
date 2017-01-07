@@ -1,6 +1,6 @@
 Package: AlteryxPredictive
 Title: Utility functions used by the predictive tools in Alteryx
-Version: 0.3.4
+Version: 0.4.1
 Authors@R: c(
     person("Ramnath", "Vaidyanathan", role = c("aut", "cre"), email = "ramnath@alteryx.com"),
     person("Kuo", "Liu", role = "aut"),
@@ -8,6 +8,7 @@ Authors@R: c(
     person("Chris", "Freeman", role = "aut"),
     person("Dan", "Putler", role = "aut"),
     person("Bridget", "Toomey", role = "aut"),
+    person("Todd", "Morley", role = "aut"),
     person(family = "Alteryx", role = "cph")
   )
 Description: This package contains utility functions used by the
@@ -26,7 +27,16 @@ Imports:
   rpart.plot,
   htmltools,
   assertthat,
-  plyr
+  plyr,
+  glmnet,
+  C50,
+  DT,
+  MLmetrics,
+  ROCR,
+  ggplot2,
+  TunePareto,
+  reshape2,
+  stats
 Suggests:
   knitr,
   rmarkdown,
@@ -34,7 +44,8 @@ Suggests:
   testthat,
   XML,
   survey,
-  AlteryxRviz
+  AlteryxRviz,
+  flightdeck
 Enhances:
   AlteryxRDataX,
   RevoScaleR

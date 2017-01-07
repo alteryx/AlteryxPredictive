@@ -1,6 +1,6 @@
 #' Process Linear Regression Inputs
 #'
-#' These two function take `inputs` and `config` and return the model object
+#' These two functions take `inputs` and `config` and return the model object
 #' along with other elements essential to create the reports and plots
 #'
 #' @param inputs input data streams to the tool
@@ -16,7 +16,24 @@ processLinearOSR <- function(inputs, config){
   }
   # FIXME: Revisit what we pass to the weights argument.
   if (config$`Use Weight`){
-    lm(the.formula, inputs$the.data, weights = inputs$the.data[[var_names$w]])
+    weight_col <- var_names$w
+    weights_v <- inputs$the.data[[weight_col]]
+    # WORKAROUND
+    # The code below ensures that weights_v gets saved to the execution environment
+    # of lm.
+    my_envir <- environment()
+    lapply(
+      X = 1:ncol(inputs$the.data),
+      FUN = function(i){
+        assign(
+          x = names(inputs$the.data)[i],
+          value = inputs$the.data[,i],
+          envir = my_envir
+        )
+      }
+    )
+
+    lm(formula = the.formula, data = environment(), weights = weights_v)
   } else {
     lm(the.formula, inputs$the.data)
   }
@@ -84,7 +101,6 @@ createReportLinearXDF <- function(the.model, config){
   lm.out
 }
 
-
 #' Create Plots
 #'
 #' Prepare the basic regression diagnostic plots if it is requested
@@ -104,3 +120,5 @@ createPlotOutputsLinearOSR <- function(the.model){
 createPlotOutputsLinearXDF <- function(){
   noDiagnosticPlot("The diagnostic plot is not available for XDF based models")
 }
+
+

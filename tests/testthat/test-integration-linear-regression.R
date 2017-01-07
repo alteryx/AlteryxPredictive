@@ -6,16 +6,17 @@ config <- list(
   `Omit Constant` = FALSE,
   `Use Weights` = FALSE,
   `Weight Vec` = NULL,
-  `X Vars` = names(mtcars)[-1],
-  `Y Var` = 'mpg'
+  `X Vars` = c('disp', 'hp', 'drat', 'wt', 'qsec'),
+  `Y Var` = 'mpg',
+  regularization = FALSE
 )
 
 inputs <- list(
-  the.data = mtcars,
+  the.data = mtcars[,c(config$`Y Var`, config$`X Vars`)],
   XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
 )
 
-exp_model <- lm(mpg ~ ., data = mtcars)
+exp_model <- lm(mpg ~ ., data = inputs$the.data)
 test_that('linear regression works correctly on mtcars', {
   results <- AlteryxPredictive:::getResultsLinearRegression(inputs, config)
   expect_equal(results$model$coefficients, exp_model$coefficients)
@@ -28,8 +29,8 @@ coef_dframe <- data.frame(
 )
 
 
-testDir = '~/Desktop/SNIPPETS/dev/Predictive_Refresh/Linear_Regression/Extras/Tests/'
-comment = 'This workflow tests that mtcars data returns correct coefficients'
+# testDir = '~/Desktop/SNIPPETS/dev/Predictive_Tools/Linear_Regression/Extras/Tests/'
+# comment = 'This workflow tests that mtcars data returns correct coefficients'
 # AlteryxRhelper::makeWorkflow2(
 #   template = file.path(testDir, "SampleTest.yxmd"),
 #   repl = list(
@@ -79,3 +80,25 @@ comment = 'This workflow tests that diamonds data returns correct coefficients'
 #   ),
 #   outFile = file.path(testDir, "LinearTest2.yxmd")
 # )
+
+config <- list(
+  `graph.resolution` = '1x',
+  `Model Name` = 'Linear_Regression_With_Weights',
+  `Omit Constant` = FALSE,
+  `Use Weights` = TRUE,
+  `Weight Vec` = 'carb',
+  `X Vars` = c('disp', 'hp', 'drat', 'wt', 'qsec'),
+  `Y Var` = 'mpg',
+  regularization = FALSE
+)
+
+inputs <- list(
+  the.data = mtcars[,c(config$`Y Var`, config$`X Vars`, config$`Weight Vec`)],
+  XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
+)
+
+exp_model <- lm(mpg ~ disp + hp + drat + wt + qsec, data = mtcars, weights = mtcars$carb)
+test_that('weighted linear regression works correctly on mtcars', {
+  results <- AlteryxPredictive:::getResultsLinearRegression(inputs, config)
+  expect_equal(results$model$coefficients, exp_model$coefficients)
+})

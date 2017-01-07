@@ -4,12 +4,17 @@
 \alias{createTreePlotDT}
 \title{Create Tree Plot}
 \usage{
-createTreePlotDT(model, config)
+createTreePlotDT(model, config, inputs)
 }
 \arguments{
 \item{model}{model object}
 
 \item{config}{configuration object}
+
+\item{inputs}{input list}
+}
+\value{
+graphs
 }
 \description{
 Create Tree Plot
