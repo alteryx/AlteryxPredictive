@@ -75,11 +75,12 @@ getResultsCrossValidationLogReg <- function(inputs, config) {
 
   outputPlot <- plotBinaryData(plotData, config, modelNames)
 
-  list(
+  return(list(
     data = preppedOutput1,
     fitMeasures = preppedOutput2,
     confMats = confMats,
     outputPlot = outputPlot
+    )
   )
 }
 

@@ -242,7 +242,14 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
     pred <- scoreModel(currentModel, new.data = testData)
     actual <- (extras$yVar)[testIndices]
     recordID <- (data[testIndices,])$recordID
-    response <- pred$Score
+    if (config$classification) {
+      response <- gsub("Score_", "", names(pred)[max.col(pred)])
+      d <- data.frame(recordID = recordID, response = response, actual = actual)
+      return(cbind(d, pred))
+    } else {
+      response <- pred$Score
+      return(data.frame(recordID = recordID, response = response, actual = actual))
+    }
     return(data.frame(recordID = recordID, response = response, actual = actual))
   }
 }
@@ -579,6 +586,9 @@ glmnetUpdate <- function(model, trainingData_noyvar, y_vec, config, weight_vec =
     }
   } else {
     config$lambda_no_cv
+  }
+  if ((inherits(model, "lognet")) || (inherits(model$glmnet.fit, "lognet"))) {
+    currentModel$ylevels <- levels(y_vec)
   }
   return(currentModel)
 }
