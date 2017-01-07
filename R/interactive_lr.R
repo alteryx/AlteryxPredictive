@@ -96,7 +96,6 @@ interactive_lr <- function(
       ))
     }
   }
-
   the_actual_values <- data[, 1]
   fitted_intercept <- !config$`Omit Constant`
   alpha <- config$alpha
@@ -118,6 +117,19 @@ interactive_lr <- function(
       } else{
         lambda <- model$lambda.min
       }
+    }
+    if(all(unlist(model$coefficients[-1] == 0))){
+      msg1 <- "All model coefficients were zero. Cannot generate dashboard. "
+      if(regularized_b) {
+        msg2 <- "Consider using a smaller value of lambda."
+      } else { # cv_b is true
+        if (config$lambda_1se) {
+          msg2 <- "Consider using lambda.min instead of lambda for simple model."
+        } else {
+          msg2 <- ""
+        }
+      }
+      return(badDash(paste0(msg1,msg2)))
     }
     the_fitted_values <- unname(
       predict(
@@ -162,7 +174,7 @@ interactive_lr <- function(
     predictions = probability_v,
     labels = actual_values
   )
-  roc_performance = ROCR::performance(
+  roc_performance <- ROCR::performance(
     prediction.obj = prediction_object,
     measure = 'tpr',
     x.measure = 'fpr'
