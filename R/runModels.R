@@ -180,14 +180,11 @@ runLinearRegression <- function(inputs, config){
 
 # Decision Tree ----
 getResultsDecisionTree <- function(inputs, config) {
-  print("WHAT THE HELL IS GOING ON")
   # Set the seed to get run-over-run consistency
   set.seed(1)
 
   if(inputs$XDFInfo$is_XDF)
     config$model.algorithm <- "rxDTree"
-  print("ALGO")
-  print(config$model.algorithm)
   # Rename arguments to be consistent with rpart.
   config <- plyr::rename(config, c(
     use.weights = 'used.weights', `Model Name` = 'model.name',
@@ -243,7 +240,6 @@ runDecisionTree <- function(inputs, config){
     config$bands.check <- FALSE
     config$GlobalPruning <- FALSE
   }
-  saveRDS(list(inputs = inputs, config = config), "C:/Users/dblanchard/Documents/params.rds")
   results <- getResultsDecisionTree(inputs, config)
   writeOutputs(results, config)
 }

@@ -408,8 +408,6 @@ createReportDT.rpart <- function(model, config, names, xdf_path) {
 #' @importFrom magrittr %>% extract
 createReportDT.rxDTree <- function(model, config, names, xdf_path) {
   model_rpart <- RevoScaleR::rxAddInheritance(model)
-  printcp(model_rpart)
-
   out <- capture.output(printcp(model_rpart))
 
   model$xlevels <- do.call(match.fun("getXdfLevels"),
