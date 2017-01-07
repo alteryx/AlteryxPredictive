@@ -180,7 +180,8 @@ createDTParams <- function(config, names) {
   params$usesurrogate <- which(unlist(usesurrogate, use.names = F)) - 1
 
   # get max bins param
-  params$maxNumBins <- config$maxNumBins
+  params$maxNumBins <- as.numeric(config$maxNumBins)
+
 
   params$noGlobalPruning <- !(config$GlobalPruning)
 
