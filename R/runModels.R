@@ -60,7 +60,7 @@ writeOutputs.DecisionTree <- function(results, config) {
     )
   } else if (!(config$`display.static`)) {
     #Write out garbage data that will get filtered out on the Alteryx side
-    AlteryxGraph2(plot(x = 1, y = 1), nOutput = 2)
+    AlteryxGraph2(emptyPlot(), nOutput = 2)
   }
 
   # Model Object
@@ -76,9 +76,9 @@ writeOutputs.DecisionTree <- function(results, config) {
     AlteryxGraph2(results$prunePlot(), nOutput = 4, width = whr[1], height = whr[2],
                   res = whr[3], pointsize = config$prune.pointsize
     )
-  } else if (!(config$`display.static`)) {
+  } else {
     #Write out garbage data that will get filtered out on the Alteryx side
-    AlteryxGraph2(plot(x = 1, y = 1), nOutput = 4)
+    AlteryxGraph2(emptyPlot(), nOutput = 4)
   }
   # Interactive Dashboard
   flightdeck::fdRender(x = results$dashboard, nOutput = 5)
