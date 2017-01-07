@@ -13,12 +13,13 @@ writeOutputs.GLM <- function(results, config){
   AlteryxGraph2(results$plot(), 2, width = whr[1], height = whr[2],
     res = whr[3], pointsize = 9)
 
-  # Model Object
-  the.obj <- prepModelForOutput(config$`Model Name`, results$model)
-  write.Alteryx2(the.obj, nOutput = 3)
   # Write out empty plots so MetaInfo is filled out.
   AlteryxGraph2(emptyPlot(), nOutput = 4)
   AlteryxGraph2(emptyPlot(), nOutput = 5)
+
+  # Model Object
+  the.obj <- prepModelForOutput(config$`Model Name`, results$model)
+  write.Alteryx2(the.obj, nOutput = 3)
 }
 
 
