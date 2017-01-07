@@ -68,4 +68,5 @@ emptyPlot <- function(){
   plot(x = c(0,1), y = c(0,1), type = "n",
     xlab = "", ylab = "", xaxt = "n", yaxt = "n"
   )
+  return(TRUE)
 }
