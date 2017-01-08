@@ -52,7 +52,7 @@ interactive_lm_report <- function(
   use_cv_lambda_1se <- config$lambda_1se
   lambda <- config$lambda_no_cv
   n <- nrow(the_data)
-  p <- ncol(the_data) - 1 - as.numeric(config$`Use Weights`)
+  p <- ncol(the_data) - 1
 
   # model-summary numbers
 

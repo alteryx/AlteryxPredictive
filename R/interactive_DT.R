@@ -37,7 +37,7 @@ interactive_dt <- function(
   c50_b <- FALSE
   use_sampling_weights_b <- config$`Use Weights`
   n <- nrow(data)
-  p <- ncol(data) - 1 - as.numeric(use_sampling_weights_b)
+  p <- ncol(data) - 1
   actual_values <- data[, 1]
   if('rpart' %in% class(model)){
     if(model$method == 'anova'){

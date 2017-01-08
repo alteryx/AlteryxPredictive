@@ -146,7 +146,7 @@ interactive_lr <- function(
 
   use_sampling_weights_b <- config$`Use Weights`
   n <- nrow(data)
-  p <- ncol(data) - 1 - as.numeric(use_sampling_weights_b)
+  p <- ncol(data) - 1
   actual_values <- data[, 1]
   if (is.factor(actual_values)) {
     actual_values <- as.numeric(actual_values) - 1
