@@ -11,6 +11,9 @@ interactive_lm_report <- function(
   data,
   model
 ){
+  if(config$`Use Weights`) {
+    data <- data[,-NCOL(data)]
+  }
   requireNamespace("flightdeck")
   # UI layout constants
   totalWidth <- 12

@@ -14,6 +14,9 @@ interactive_lr <- function(
   data,
   model
 ){
+  if(config$`Use Weights`) {
+    data <- data[,-NCOL(data)]
+  }
   requireNamespace("flightdeck")
   # optimal cutoff probability from ROC analysis,
   # weighing sensitivity and specificity equally;

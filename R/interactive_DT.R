@@ -14,6 +14,9 @@ interactive_dt <- function(
   data,
   model
 ) {
+  if(config$`Use Weights`) {
+    data <- data[,-NCOL(data)]
+  }
   requireNamespace("flightdeck")
   # test inputs
   rpart_regression_b <- FALSE
