@@ -14,6 +14,10 @@ interactive_dt <- function(
   data,
   model
 ) {
+  print(names(config))
+  if(config$used.weights) {
+    data <- data[,-NCOL(data)]
+  }
   requireNamespace("flightdeck")
   # test inputs
   rpart_regression_b <- FALSE
@@ -32,9 +36,9 @@ interactive_dt <- function(
   rpart_regression_b <- FALSE
   rpart_classification_b <- FALSE
   c50_b <- FALSE
-  use_sampling_weights_b <- config$`Use Weights`
+  use_sampling_weights_b <- config$used.weights
   n <- nrow(data)
-  p <- ncol(data) - 1 - as.numeric(use_sampling_weights_b)
+  p <- ncol(data) - 1
   actual_values <- data[, 1]
   if('rpart' %in% class(model)){
     if(model$method == 'anova'){

@@ -22,6 +22,7 @@ config <- list(
   earlyStopping = TRUE
 )
 
+
 inputs <- list(
   the.data = iris[, c(config$`Y Var`, config$`X Vars`)],
   XDFInfo = list(is_XDF = FALSE, xdf_path = NULL)
