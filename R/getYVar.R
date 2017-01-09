@@ -23,11 +23,13 @@ getYVar.C5.0 <- function(mod) {
   mod$yvar
 }
 
-#Note that this will need to be updated once regularized logistic regression
-#is finished. We can put an if statement to check if mod$glmnet.fit is elnet
-#or lognet and proceed accordingly.
 #' @export
 getYVar.cv.glmnet <- function(mod) {
+  mod$yvar
+}
+
+#' @export
+getYVar.lognet <- function(mod) {
   mod$yvar
 }
 
