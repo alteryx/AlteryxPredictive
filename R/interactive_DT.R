@@ -14,7 +14,6 @@ interactive_dt <- function(
   data,
   model
 ) {
-  print(names(config))
   if(config$used.weights) {
     data <- data[,-NCOL(data)]
   }
