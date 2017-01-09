@@ -227,7 +227,7 @@ convertDTParamsToArgsrxDTree <- function(params) {
                     "maxdepth", "xval", "surrogatestyle", "maxNumBins")
 
   args_rpart <- params[intersect(names(params), params_rpart)]
-
+  args_rpart$weights <- if(is.null(args_rpart$weights)) NULL else as.character(args_rpart$weights)
   plyr::rename(args_rpart, c("weights" = "pweights",
                              "usesurrogate" = "useSurrogate",
                              "minsplit" = "minSplit",
@@ -323,7 +323,6 @@ processDT <- function(inputs, config) {
     params$data <- inputs$XDFInfo$xdf_path
 
   args <- convertDTParamsToArgs(params, config$model.algorithm)
-
   model <- do.call(config$model.algorithm, args)
 
   if(config$model.algorithm == "C5.0") {
