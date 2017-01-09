@@ -58,7 +58,7 @@ writeOutputs.DecisionTree <- function(results, config) {
     AlteryxGraph2(results$treePlot(), nOutput = 2, width = whr[1], height = whr[2],
                   res = whr[3], pointsize = config$tree.pointsize
     )
-  } else if (!(config$`display.static`)) {
+  } else {
     #Write out garbage data that will get filtered out on the Alteryx side
     AlteryxGraph2(emptyPlot(), nOutput = 2)
   }
@@ -106,10 +106,12 @@ getResultsLogisticRegression <- function(inputs, config){
         createPlotOutputsLogisticOSR(d$the.model, FALSE, config)
       }
     }
+    d$the.model$config <- config
     results <- list(model = d$the.model, report = glm.out, plot = plot.out)
     class(results) <- "GLM"
   } else {
     the.model <- processElasticNet(inputs, config)
+    the.model$config <- config
     #We don't need to worry about backwards compatibility in this section.
     #In order to enter this side of the outer if loop, config$regularization
     #must exist and be true. Thus, config$display_graphs must exist as well.
@@ -153,10 +155,12 @@ getResultsLinearRegression <- function(inputs, config){
       lm.out <- createReportLinearOSR(the.model, config)
       plot.out <- function(){createPlotOutputsLinearOSR(the.model)}
     }
+    the.model$config <- config
     results <- list(model = the.model, report = lm.out, plot = plot.out)
     class(results) <- "GLM"
   } else {
     the.model <- processElasticNet(inputs, config)
+    the.model$config <- config
     #We don't need to worry about backwards compatibility in this section.
     #In order to enter this side of the outer if loop, config$regularization
     #must exist and be true. Thus, config$display_graphs must exist as well.
@@ -207,10 +211,6 @@ getResultsDecisionTree <- function(inputs, config) {
   the.model.rpart <- if(inputs$XDFInfo$is_XDF) the.report.list$model_rpart else the.model
   the.report <- the.report.list$out
 
-  if(config$model.algorithm == "C5.0" && config$rules){
-    config$tree.plot <- FALSE
-    AlteryxMessage2("Tree Plot not available for C5.0 when rules-based model is chosen")
-  }
 
   makeTreePlot <- NULL
   makePrunePlot <- NULL
@@ -245,5 +245,9 @@ runDecisionTree <- function(inputs, config){
     config$GlobalPruning <- FALSE
   }
   results <- getResultsDecisionTree(inputs, config)
+  if(config$model.algorithm == "C5.0" && config$rules){
+    config$tree.plot <- FALSE
+    AlteryxMessage2("Tree Plot not available for C5.0 when rules-based model is chosen")
+  }
   writeOutputs(results, config)
 }
