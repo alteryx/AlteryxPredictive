@@ -390,11 +390,16 @@ interactive_dt <- function(
       )
     }
   }
+  titleWidth <- computeWidth(title)
   fdBoard(
     fdHeader(
       title = title,
-      titleWidth = 600),
-    fdSidebar(sidebar),
+      titleWidth = titleWidth
+    ),
+    fdSidebar(
+      sidebar,
+      sidebarWidth = titleWidth
+    ),
     body,
     fixed = TRUE
   )
