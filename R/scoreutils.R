@@ -182,7 +182,7 @@ getYlevels.glm <- function(x, ...) {
   if (family(x)$family != "binomial") {
     return(NULL)
   }
-  y_name <- unlist(strsplit(as.character(x$call)[2], " ~ "))[1]
+  y_name <- as.character(formula(x))[2]
   y_var <- eval(parse(text = paste0("x$data$", y_name)))
   levels(y_var)
 }
