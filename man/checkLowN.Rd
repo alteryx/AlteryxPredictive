@@ -4,9 +4,7 @@
 \alias{checkLowN}
 \title{Check if data has enough rows}
 \usage{
-checkLowN(data, threshold = 25, mult = 1,
-  msg = paste0("The incoming data may not have ",
-  "enough data to generate a model succesfully."))
+checkLowN(data, threshold = 25, mult = 1, msg)
 }
 \arguments{
 \item{data}{dataframe}
