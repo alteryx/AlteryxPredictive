@@ -211,8 +211,11 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
       #in the future.
       weights_v <- if(config$`Use Weights`) trainingData[[config$`Weight Vec`]] else NULL
       y_vec <- trainingData[[currentYvar]]
-      trainingData_noyvar <- trainingData[!(colnames(trainingData) %in% currentYvar)]
-      trainingData_noyvar <- df2NumericMatrix(trainingData_noyvar)
+      trainingData_noyvar <- trainingData[, !(colnames(trainingData) %in% currentYvar), drop = FALSE]
+      trainingData_noyvar <- df2NumericMatrix(
+        x = trainingData_noyvar,
+        filtering_message = "Non-numeric variables are among the predictors. They are now being removed."
+      )
       #No need to call df2NmericMatrix on testData, since scoreModel calls df2NumericMatrix with glmnet models.
       currentModel <- glmnetUpdate(model, trainingData_noyvar, y_vec, config, weight_vec = weights_v)
     } else if (inherits(model, "lm")){
@@ -566,6 +569,14 @@ checkXVars <- function(inputs){
 
 glmnetUpdate <- function(model, trainingData_noyvar, y_vec, config, weight_vec = NULL) {
   predictors <- trainingData_noyvar[,getXVars(model)]
+  if (ncol(predictors) < 2) {
+    stop.Alteryx2(
+      paste0(
+        "Regularization requires at least two numeric predictors. ",
+        "Please  switch to a non-regularized model, or use more predictors. "
+      )
+    )
+  }
   response <- y_vec
   model_w_call <- if (config$internal_cv) {
     model$glmnet.fit
