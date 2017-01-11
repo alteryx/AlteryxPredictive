@@ -20,6 +20,7 @@ checkMissing.omit <- function(data) {
 #' @param mult multiplier portion of data used for model training
 #' @param msg output message (warning)
 #' @return no return - only throws warning
+#' @export
 checkLowN <- function(data,
                       threshold = 25,
                       mult = 1,
