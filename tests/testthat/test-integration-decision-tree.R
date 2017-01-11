@@ -19,7 +19,7 @@ config <- list(
   display.static = TRUE, trials = 1, rules = FALSE, subset = TRUE,
   bands.check = FALSE, bands = 10, winnow = FALSE, GlobalPruning = TRUE,
   CF = .25, minCases = 2, fuzzyThreshold = FALSE, sample = 0, seed = 1,
-  earlyStopping = TRUE
+  earlyStopping = TRUE, posClass = ""
 )
 
 

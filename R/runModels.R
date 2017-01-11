@@ -48,7 +48,10 @@ writeOutputs.GLMNET <- function(results, config) {
 writeOutputs.DecisionTree <- function(results, config) {
   # Report Output
   write.Alteryx2(results$report, nOutput = 1)
-
+  if(class(results$model) == "C5.0" && config$rules && config$tree.plot) {
+    AlteryxMessage2("Tree Plot not available for C5.0 rules-based model", 2, 2)
+    config$tree.plot <- FALSE
+  }
   # Tree Plot
   whr <- graphWHR2(inches = config$tree.inches, in.w = config$tree.in.w,
     in.h = config$tree.in.h, cm.w = config$tree.cm.w, cm.h = config$tree.cm.h,
@@ -201,6 +204,7 @@ getResultsDecisionTree <- function(inputs, config) {
     `Branch Dist` = 'b.dist'
   ))
 
+  config$posClass <- verifyClass(inputs$the.data[,1], config$posClass)
   config$model.name <- validName(config$model.name)
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$used.weights)
 
