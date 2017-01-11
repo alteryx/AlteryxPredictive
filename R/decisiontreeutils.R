@@ -23,6 +23,8 @@ checkValidConfig <- function(config, the.data, names) {
 checkValidConfigrpart <- function(config, the.data, names) {
   checkLowN(
     data = the.data,
+    threshold = 25,
+    mult = 1,
     msg = paste0("The incoming data may not have ",
                  "enough rows to generate a model succesfully."
                  )
@@ -74,6 +76,7 @@ checkValidConfigrxDTree <- function(config, the.data, names) {
 checkValidConfigC5.0 <- function(config, the.data, names) {
   checkLowN(
     data = the.data,
+    threshold = 25,
     mult = 1 - config$sample,
     msg = paste0("The incoming data may not have ",
                  "enough data to generate a model succesfully. ",
