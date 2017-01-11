@@ -248,10 +248,10 @@ runDecisionTree <- function(inputs, config){
     config$bands.check <- FALSE
     config$GlobalPruning <- FALSE
   }
-  results <- getResultsDecisionTree(inputs, config)
   if(config$model.algorithm == "C5.0" && config$rules){
     config$tree.plot <- FALSE
     AlteryxMessage2("Tree Plot not available for C5.0 when rules-based model is chosen")
   }
+  results <- getResultsDecisionTree(inputs, config)
   writeOutputs(results, config)
 }

@@ -20,11 +20,11 @@ checkMissing.omit <- function(data) {
 #' @param mult multiplier portion of data used for model training
 #' @param msg output message (warning)
 #' @return no return - only throws warning
+#' @export
 checkLowN <- function(data,
                       threshold = 25,
                       mult = 1,
-                      msg = paste0("The incoming data may not have ",
-                                   "enough data to generate a model succesfully.")
+                      msg
 ){
   if(NROW(data)*mult < threshold){
     AlteryxMessage2(msg, 2, 2)

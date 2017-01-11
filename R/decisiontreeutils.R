@@ -21,7 +21,14 @@ checkValidConfig <- function(config, the.data, names) {
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
 checkValidConfigrpart <- function(config, the.data, names) {
-  checkLowN(the.data)
+  checkLowN(
+    data = the.data,
+    threshold = 25,
+    mult = 1,
+    msg = paste0("The incoming data may not have ",
+                 "enough rows to generate a model succesfully."
+                 )
+    )
 
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
@@ -69,6 +76,7 @@ checkValidConfigrxDTree <- function(config, the.data, names) {
 checkValidConfigC5.0 <- function(config, the.data, names) {
   checkLowN(
     data = the.data,
+    threshold = 25,
     mult = 1 - config$sample,
     msg = paste0("The incoming data may not have ",
                  "enough data to generate a model succesfully. ",
