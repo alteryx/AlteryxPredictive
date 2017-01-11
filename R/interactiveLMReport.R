@@ -477,14 +477,17 @@ interactive_lm_report <- function(
     ),
     third_menu_item
   )
-
+  titleWidth <- computeWidth(the_title)
   fdBoard(
     fdHeader(
       title = the_title,
-      titleWidth = 600),
-    fdSidebar(the_sidebar),
+      titleWidth = titleWidth
+    ),
+    fdSidebar(
+      the_sidebar,
+      sidebarWidth = titleWidth
+    ),
     the_body,
     fixed = TRUE
   )
-
 }

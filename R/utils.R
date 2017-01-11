@@ -69,3 +69,7 @@ emptyPlot <- function(){
     xlab = "", ylab = "", xaxt = "n", yaxt = "n"
   )
 }
+
+computeWidth <- function(title, cex = 1.5, dpi = 96){
+  strwidth(title, cex = cex, units = 'in')*dpi
+}
