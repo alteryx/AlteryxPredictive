@@ -111,7 +111,10 @@ interactive_lr <- function(
   if(glm_b){
     the_fitted_values <- unname(model$fitted.values)
   } else{
-    independent_variable_m <- df2NumericMatrix(data[,-1])
+    independent_variable_m <- df2NumericMatrix(
+      x = data[ , -1, drop = FALSE],
+      filtering_message = "Non-numeric variables are among the predictors. They are now being removed."
+    )
     if(regularized_b){
       lambda <- config$lambda_no_cv
     } else{
@@ -156,20 +159,6 @@ interactive_lr <- function(
     levels = 0:1,
     labels = c('no', 'yes')
   )
-  # probability_v <- if (glm_b) {
-  #   predict(
-  #     object = model,
-  #     type = 'response'
-  #   )
-  # } else {
-  #   predict(
-  #     object = model,
-  #     type = 'response',
-  #     newx = df2NumericMatrix(data[,1]),
-  #     s = model$lambda
-  #   )
-  # }
-
   probability_v <- the_fitted_values
 
   # ROCR computations

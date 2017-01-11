@@ -1,13 +1,44 @@
 #' Convert data frame into a numeric matrix, filtering out non-numeric columns
+#' and warning the user (by displaying a message passed in as an argument) when
+#' such filtering occurs.
 #'
 #' @param x data frame to coerce to a numeric matrix
-df2NumericMatrix <- function(x){
+#' @export
+df2NumericMatrix <- function(
+  x,
+  filtering_message
+){
+  if(
+    is.vector(x) &&
+    convertVectorToDataFrame
+  ){
+    x <- as.data.frame(x)
+  }
+  if(!inherits(x, "data.frame")){
+    stop.Alteryx2(
+      paste0(
+        "An object not inheriting from class data.frame was passed to df2NumericMatrix.",
+        "Please contact Alteryx Support. "
+      )
+    )
+  }
   numNonNumericCols <- NCOL(Filter(Negate(is.numeric), x))
   if (numNonNumericCols == NCOL(x)){
-    AlteryxMessage2("All of the provided variables were non-numeric. Please provide at least one numeric variable and try again.", iType = 2, iPriority = 3)
+    AlteryxMessage2(
+      paste0(
+        "All of the provided variables were non-numeric. ",
+        "Please provide at least one numeric variable and try again."
+      ),
+      iType = 2,
+      iPriority = 3
+    )
     stop.Alteryx2()
   } else if ((length(numNonNumericCols) > 0) && (numNonNumericCols > 0)){
-    AlteryxMessage2("Non-numeric variables were included to glmnet. They are now being removed.", iType = 1, iPriority = 3)
+    AlteryxMessage2(
+      filtering_message,
+      iType = 1,
+      iPriority = 3
+    )
     x <- Filter(is.numeric, x)
   }
   x <- as.matrix(x)
@@ -41,8 +72,19 @@ getFamily <- function(inputs, config){
 #' @import glmnet
 processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weights`)
+  x <- df2NumericMatrix(
+    x = inputs$the.data[,var_names$x, drop = FALSE],
+    filtering_message = "Non-numeric variables are among the predictors. They are now being removed."
+  )
+  if (ncol(x) < 2) {
+    stop.Alteryx2(
+      paste0(
+        "Regularization requires at least two numeric predictors. ",
+        "Please  switch to a non-regularized model, or use more predictors. "
+      )
+    )
+  }
   glmFun <- if (config$internal_cv) glmnet::cv.glmnet else glmnet::glmnet
-  x <- df2NumericMatrix(inputs$the.data[,var_names$x])
   family <- getFamily(inputs, config)
   funParams <- list(x = x,
                     y = inputs$the.data[,var_names$y], family = family,
