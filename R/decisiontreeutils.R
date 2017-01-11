@@ -21,6 +21,8 @@ checkValidConfig <- function(config, the.data, names) {
 #' @param the.data incoming data
 #' @param names list of x, y, w names for data
 checkValidConfigrpart <- function(config, the.data, names) {
+  checkLowN(the.data)
+
   cp <- if (config$cp == "Auto" || config$cp == "") .00001 else config$cp
 
   target <- the.data[[names$y]]
@@ -65,6 +67,15 @@ checkValidConfigrxDTree <- function(config, the.data, names) {
 #' @param names list of x, y, w names for data
 #' @import assertthat
 checkValidConfigC5.0 <- function(config, the.data, names) {
+  checkLowN(
+    data = the.data,
+    mult = 1 - config$sample,
+    msg = paste0("The incoming data may not have ",
+                 "enough data to generate a model succesfully. ",
+                 "Consider holding out less data for model evaluation."
+    )
+  )
+
   # check on trials
   Alteryx_assert(is.boundedInt(config$trials, min = 1),
                  "trials must be a integer with value at least 1"
