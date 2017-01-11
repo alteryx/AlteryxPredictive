@@ -23,8 +23,7 @@ checkMissing.omit <- function(data) {
 checkLowN <- function(data,
                       threshold = 25,
                       mult = 1,
-                      msg = paste0("The incoming data may not have ",
-                                   "enough data to generate a model succesfully.")
+                      msg
 ){
   if(NROW(data)*mult < threshold){
     AlteryxMessage2(msg, 2, 2)
