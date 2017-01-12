@@ -53,9 +53,7 @@ interactive_lm_report <- function(
   lambda <- config$lambda_no_cv
   n <- nrow(the_data)
   p <- ncol(the_data) - 1
-
   # model-summary numbers
-
   if(lm_b){
     the_fitted_values <- unname(the_model$fitted.values)
   } else{
@@ -74,12 +72,12 @@ interactive_lm_report <- function(
       }
     }
     the_fitted_values <- unname(
-      predict(
-        object = the_model,
-        newx = independent_variable_m,
-        s = lambda,
-        type = 'response'
-      )
+        predict(
+          object = the_model,
+          newx = independent_variable_m,
+          s = lambda,
+          type = 'response'
+        )[, 1, drop = TRUE]
     )
   }
   the_residuals <- unname(the_actual_values - the_fitted_values)
@@ -88,14 +86,25 @@ interactive_lm_report <- function(
   } else{
     intercept_degrees_freedom <- 0
   }
-  r_squared <- R2_Score(
-    y_pred = the_fitted_values,
-    y_true = the_actual_values
+#  We're no longer using MLMetrics.
+#  r_squared <- R2_Score(
+#    y_pred = the_fitted_values,
+#    y_true = the_actual_values
+#  )
+  r_squared <- rSquared(
+    numeric_vector_1 = the_fitted_values,
+    numeric_vector_2 = the_actual_values
   )
-  adj_r_squared <-
-    1 - (1 - r_squared) *
-    (n - intercept_degrees_freedom) /
-    (n - p - intercept_degrees_freedom)
+  if(is.nan(r_squared)){
+    adjusted_r_squared <- NaN
+  }
+  else {
+    adj_r_squared <-
+      1 -
+      (1 - r_squared) *
+      (n - intercept_degrees_freedom) /
+      (n - p - intercept_degrees_freedom)
+  }
   if(lm_b){
     sigma <- sigma(the_model)
     f_statistic_text <- paste(
