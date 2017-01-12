@@ -248,6 +248,10 @@ runDecisionTree <- function(inputs, config){
     config$bands.check <- FALSE
     config$GlobalPruning <- FALSE
   }
+  if(config$use.weights && config$model.algorithm == "C5.0") {
+    AlteryxMessage2("Case weights not currently supported with C5.0.", 2, 2)
+    config$use.weights <- FALSE
+  }
   if(config$model.algorithm == "C5.0" && config$rules){
     config$tree.plot <- FALSE
     AlteryxMessage2("Tree Plot not available for C5.0 when rules-based model is chosen")
