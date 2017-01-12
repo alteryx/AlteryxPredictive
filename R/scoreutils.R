@@ -179,6 +179,7 @@ getYlevels.rpart <- function(x, new.data, ...){
 
 #' @export
 getYlevels.glm <- function(x, ...) {
+# Should this be as in getYlevels.svyglm below?
   if (family(x)$family != "binomial") {
     return(NULL)
   }
@@ -189,10 +190,15 @@ getYlevels.glm <- function(x, ...) {
 
 #' @export
 getYlevels.svyglm <- function(x, ...) {
-  if (family(x)$family != "quasibinomial") {
+  # The assumption here is we only return Y levels for classification
+  # models, but svyglm can be used for regression models too?
+  if (!family(x)$family %in% c("quasibinomial", "binomial")){
     return(NULL)
   }
-  y_name <- unlist(strsplit(as.character(x$call)[2], " ~ "))[1]
+#  original code:
+#  y_name <- unlist(strsplit(as.character(x$call)[2], " ~ "))[1]
+#  code consistent with getYlevels.glm
+  y_name <- as.character(formula(x))[2]
   y_var <- eval(parse(text = paste0("x$data$", y_name)))
   levels(y_var)
 }

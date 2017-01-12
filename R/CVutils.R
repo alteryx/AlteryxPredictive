@@ -171,6 +171,7 @@ getPosClass <- function(yVar, order) {
 # Given a model, a dataset and index of test cases, return actual and response
 #' @import C50 rpart glmnet
 #' @importFrom stats update
+#' @importFrom survey svyglm
 getActualandResponse <- function(model, data, testIndices, extras, mid, config){
   if(class(model) == "rpart" || class(model) == "C5.0" || any(class(model) == "glm")) {
     trainingData <- data[-testIndices,]
@@ -180,7 +181,15 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
     if (inherits(model, "C5.0")) {
       weights_v <- trainingData[[config$`select.weights`]]
       currentModel <- C50Update(model, trainingData, currentYvar, config, weight_vec = weights_v)
-    } else {
+    } else if (inherits(model, 'svyglm')){
+      currentModel <- update(
+        object = model,
+        data = trainingData,
+        design = model$survey.design,
+        # for consistency with original model
+        family = quasibinomial(config$Link)
+      )
+    } else{
       currentModel <- update(model, data = trainingData)
     }
     pred <- scoreModel(currentModel, new.data = testData)

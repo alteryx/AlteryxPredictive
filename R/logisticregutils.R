@@ -28,8 +28,11 @@ processLogisticOSR <- function(inputs, config){
     the.design <- survey::svydesign(
       ids = ~1, weights = makeFormula(var_names$w, ""), data = the.data
     )
-    the.model <- survey::svyglm(the.formula, family = quasibinomial(config$Link),
-      design = the.design)
+    the.model <- survey::svyglm(
+      the.formula,
+      family = quasibinomial(config$Link),
+      design = the.design
+    )
   } else {
     model_type <- "binomial"
     the.model <- glm(the.formula, family = binomial(config$Link), data = the.data)
