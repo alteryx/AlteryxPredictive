@@ -36,7 +36,8 @@ Imports:
   ggplot2,
   TunePareto,
   reshape2,
-  stats
+  stats,
+  survey
 Suggests:
   knitr,
   rmarkdown,
