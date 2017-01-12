@@ -217,7 +217,10 @@ scoreModel.elnet <- function(mod.obj, new.data, score.field = "Score", ...) {
   #that might use scoreModel. Unfortunately, glmnet isn't smart enough to order the columns
   #correctly in the predict function if they're provided in the wrong order.
   used_x_vars <- getXVars(mod.obj)
-  new.data <- df2NumericMatrix(new.data)
+  new.data <- df2NumericMatrix(
+    x = new.data,
+    filtering_message = "Non-numeric variables are among the predictors. They are now being removed."
+  )
   if (!all(used_x_vars %in% colnames(new.data))) {
     missing_x_vars <- used_x_vars[!(used_x_vars %in% colnames(new.data))]
     if (length(missing_x_vars) == 1) {
@@ -243,7 +246,10 @@ scoreModel.elnet <- function(mod.obj, new.data, score.field = "Score", ...) {
 scoreModel.lognet <- function(mod.obj, new.data, score.field = "Score",
                                  os.value = NULL, os.pct = NULL, ...) {
   used_x_vars <- getXVars(mod.obj)
-  new.data <- df2NumericMatrix(new.data)
+  new.data <- df2NumericMatrix(
+    x = new.data,
+    filtering_message = "Non-numeric variables are among the predictors. They are now being removed."
+  )
   target.value <- os.value
   y.levels <- getYlevels(mod.obj)
   if (!all(used_x_vars %in% colnames(new.data))) {

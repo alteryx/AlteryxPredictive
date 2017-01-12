@@ -2,14 +2,21 @@
 % Please edit documentation in R/regularizationutils.R
 \name{df2NumericMatrix}
 \alias{df2NumericMatrix}
-\title{Convert data frame into a numeric matrix, filtering out non-numeric columns}
+\title{Convert data frame into a numeric matrix, filtering out non-numeric columns
+and warning the user (by displaying a message passed in as an argument) when
+such filtering occurs.}
 \usage{
-df2NumericMatrix(x)
+df2NumericMatrix(x, filtering_message)
 }
 \arguments{
 \item{x}{data frame to coerce to a numeric matrix}
+
+\item{filtering_message}{a message telling the end user that the input data
+frame will have its non-numeric columns removed}
 }
 \description{
 Convert data frame into a numeric matrix, filtering out non-numeric columns
+and warning the user (by displaying a message passed in as an argument) when
+such filtering occurs.
 }
 
