@@ -6,13 +6,15 @@
 #'  glm - with binomial family
 #'  glmnet
 #'  cv.glmnet
+#' @param cv_metrics metrics returned by runCrossValidationLogReg
 #' @return dashboard object for rendering
 #' @export
 #' @author Todd Morley
 interactive_lr <- function(
   config,
   data,
-  model
+  model,
+  cv_metrics = NULL
 ){
   if(config$`Use Weights`) {
     data <- data[,-NCOL(data)]
@@ -175,8 +177,15 @@ interactive_lr <- function(
     perf = roc_performance,
     pred = prediction_object
   )
-  print(paste0("Optimal cutoff determined to be ", round(optimal_cutoff_nv[3],
-                                                         digits = digits)))
+#  print(
+#    paste0(
+#      "Optimal probability cutoff = ",
+#      round(
+#        x = optimal_cutoff_nv[3],
+#        digits = digits
+#      )
+#    )
+#  )
   fitted_values <- as.integer(probability_v >= optimal_cutoff_nv[3])
   if(length(unique(fitted_values)) == 1) {
     msg1 <- "All values are being fitted to the same class. "
@@ -189,37 +198,35 @@ interactive_lr <- function(
     msg3 <- "Interactive dashboard could not be generated."
     return(badDash(paste0(msg1,msg2,msg3)))
   }
-
-  true_positive_count <- length(
-    intersect(
-      which(fitted_values == 1),
-      which(actual_values == 1)
+  if(is.null(x = cv_metrics)){
+    true_positive_count <- length(
+      intersect(
+        which(fitted_values == 1),
+        which(actual_values == 1)
+      )
     )
-  )
-  true_positive_percent <- round(
-    true_positive_count * 100 / n,
-    digits
-  )
-  false_positive_count <- length(which(fitted_values > actual_values))
-  false_positive_percent <- round(
-    false_positive_count * 100 / n,
-    digits
-  )
-  true_negative_count <- length(
-    intersect(
-      which(fitted_values == 0),
-      which(actual_values == 0)
+    true_negative_count <- length(
+      intersect(
+        which(fitted_values == 0),
+        which(actual_values == 0)
+      )
     )
-  )
-  true_negative_percent <- round(
-    true_negative_count * 100 / n,
-    digits
-  )
-  false_negative_count <- length(which(fitted_values < actual_values))
-  false_negative_percent <- round(
-    false_negative_count * 100 / n,
-    digits
-  )
+    false_positive_count <- length(which(fitted_values > actual_values))
+    false_negative_count <- length(which(fitted_values < actual_values))
+    accuracy <- (true_positive_count + true_negative_count) / n
+    precision <- true_positive_count / (true_positive_count + false_positive_count)
+    recall <- true_positive_count / (true_positive_count + false_negative_count)
+    f1 <- 1 / mean(1 / c(precision, recall))
+  } else{
+    true_positive_count <- cv_metrics['pred_pos_actual_pos']
+    true_negative_count <- cv_metrics['pred_neg_actual_neg']
+    false_positive_count <- cv_metrics['pred_pos_actual_neg']
+    false_negative_count <- cv_metrics['pred_neg_actual_pos']
+    accuracy <- cv_metrics['accuracy']
+    precision <- cv_metrics['precision']
+    recall <- cv_metrics['recall']
+    f1 <- cv_metrics['f1']
+  }
   confusion_matrix_m <- matrix(
     data = c(
       true_positive_count,
@@ -235,17 +242,79 @@ interactive_lr <- function(
 
   # Prepare UI elements.
   # page 1:  model summary
+
   row_1_1 <- fdRow(
-    fdBox(
-      fdPanelClassificationMetrics(
-        actual = actual_values,
-        predicted = fitted_values,
-        metrics = c("Accuracy", "Recall", "Precision", "F1_Score")
+    fdInfoBox(
+      title = 'Accuracy',
+      value = round(
+        x = accuracy,
+        digits = digits
       ),
-      width = totalWidth
+      icon = fdIcon(
+        name = 'check',
+        lib = 'font-awesome'
+      ),
+      color = 'blue',
+      width = halfWidth
+    ),
+    fdInfoBox(
+      title = 'Precision',
+      value = round(
+        x = precision,
+        digits = digits
+      ),
+      icon = fdIcon(
+        name = 'check',
+        lib = 'font-awesome'
+      ),
+      color = 'blue',
+      width = halfWidth
     )
   )
   row_1_2 <- fdRow(
+    fdInfoBox(
+      title = 'Recall',
+      value = round(
+        x = recall,
+        digits = digits
+      ),
+      icon = fdIcon(
+        name = 'check',
+        lib = 'font-awesome'
+      ),
+      color = 'blue',
+      width = halfWidth
+    ),
+    fdInfoBox(
+      title = 'F1',
+      value = round(
+        x = f1,
+        digits = digits
+      ),
+      icon = fdIcon(
+        name = 'check',
+        lib = 'font-awesome'
+      ),
+      color = 'blue',
+      width = halfWidth
+    )
+  )
+  row_1_3 <- fdRow(
+    fdInfoBox(
+      title = 'Optimal Probability Cutoff',
+      value = round(
+        x = optimal_cutoff_nv[3],
+        digits = digits
+      ),
+      icon = fdIcon(
+        name = 'check',
+        lib = 'font-awesome'
+      ),
+      color = 'blue',
+      width = totalWidth
+    )
+  )
+  row_1_4 <- fdRow(
     fdBox(
       fdPlotConfusionMatrix(x = confusion_matrix_m),
       width = totalWidth
@@ -254,6 +323,8 @@ interactive_lr <- function(
   page_1 <- fdPage(
     row_1_1,
     row_1_2,
+    row_1_3,
+    row_1_4,
     id = 'page_1',
     display = TRUE
   )
