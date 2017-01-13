@@ -101,7 +101,11 @@ runCrossValidationLogReg <- function(inputs, config) {
   fitness_metrics <- plyr::daply(
     .data = results$fitMeasures,
     .variables = c('variable'),
-    .fun = function(df){mean(df$value)}
+    .fun = function(df){
+      # na.rm also filters NaNs, which lets us return a meaningful
+      # value more often
+      mean(x = df$value, na.rm = TRUE)
+    }
   )
   conf_mats_df <- results$confMats
   conf_mats_df <- conf_mats_df[, c('Predicted_class', 'Variable', 'Value')]
