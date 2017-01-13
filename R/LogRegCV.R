@@ -107,17 +107,25 @@ runCrossValidationLogReg <- function(inputs, config) {
   conf_mats <- conf_mats[, c('Predicted_class', 'Variable', 'Value')]
   names(conf_mats) <- c('predicted', 'actual', 'count')
   conf_mats$actual <- gsub('Class_', '', conf_mats$actual)
+<<<<<<< HEAD
 #  conf_mats <- data.frame(lapply(X = conf_mats, FUN = as.numeric))
   conf_mats$count <- as.numeric(conf_mats$count)
+=======
+  conf_mats <- data.frame(lapply(X = conf_mats, FUN = as.numeric))
+>>>>>>> e368471387538e716aae4dff9c74890a251d2e6c
   confusion_matrix <- plyr::daply(
     .data = conf_mats,
     .variables = c('predicted', 'actual'),
     .fun = function(df){sum(df$count)}
   )
+<<<<<<< HEAD
   return_value_v <- rep_len(
     x = 0,
     length.out = 8
   )
+=======
+  return_value_v <- rep_len(x = 0, length.out = 8)
+>>>>>>> e368471387538e716aae4dff9c74890a251d2e6c
   names(return_value_v) <- c(
     'accuracy',
     'precision',
