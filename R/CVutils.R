@@ -123,50 +123,38 @@ getYvars <- function(data, models) {
   return(list(y_col = data[[y_name]], y_name = y_name))
 }
 
-#' Set the postive class for two-class classification.
+#' Get the postive class for two-class classification, choosing the
+#' positive class to the less-common class when all else fails.
 #'
-#' @param tar_lev a vector of string with the levels of target variable
-#' @param order string - choices are "alpha" and "common".
-#'  For "alpha", use first by alphabetical order.
-#'  For "common", use less common class.
+#' @param target_levels a vector of strings with the target variable's levels
 #' @return string - name of positive class
 #' @export
-setPositiveClass <- function(tar_lev, order) {
-
-  yes_id <- match("yes", tolower(tar_lev))
-  true_id <- match("true", tolower(tar_lev))
+getPositiveClass <- function(target_levels) {
+  # no/yes
+  yes_id <- match("yes", tolower(target_levels))
   if (!is.na(yes_id)) {
-    return (tar_lev[yes_id])
-  } else if (!is.na(true_id)) {
-    return (tar_lev[true_id])
-  } else if(order == "alpha") {
-    return (tar_lev[1])
-  } else if (order == "common") {
-    first_class <- tar_lev[1]
-    second_class <- tar_lev[which(tar_lev != first_class)[1]]
-    if ((length(which(tar_lev == first_class))) > (length(which(tar_lev == second_class)))) {
-      #First_class is larger, so second_class is the positive class
-      return (second_class)
-    } else {
-      return (first_class)
-    }
+    return (target_levels[yes_id])
+  }
+  # false/true
+  true_id <- match("true", tolower(target_levels))
+  if(!is.na(true_id)) {
+    return (target_levels[true_id])
+  }
+  # 0/1
+  one_id <- match("1", target_levels)
+  if(!is.na(one_id)) {
+    return (target_levels[one_id])
+  }
+  # Nothing obvious, so assume less-common class is positive.
+  first_class <- target_levels[1]
+  second_class <- target_levels[which(target_levels != first_class)[1]]
+  if (length(which(target_levels == first_class)) > length(which(target_levels == second_class))) {
+    #First_class is larger, so second_class is the positive class
+    return (second_class)
   } else {
-    AlteryxMessage2("Invalid order parameter. Changing order to 'alpha' and re-running")
-    setPositiveClass(tar_lev, "alpha")
+    return (first_class)
   }
 }
-
-#' In the 2-class classification case, get the positive class. Otherwise, do nothing.
-#'
-#' @param yVar to set Positive class for
-#' @param order string - choices are "alpha" and "common".
-#'  For "alpha", use first by alphabetical order.
-#'  For "common", use less common class.
-#' @return string - name of positive class
-getPosClass <- function(yVar, order) {
-  return(setPositiveClass(tar_lev = yVar, order = order))
-}
-
 
 # Given a model, a dataset and index of test cases, return actual and response
 #' @import C50 rpart glmnet
@@ -358,7 +346,16 @@ getMeasuresClassification <- function(outData, extras) {
     AUC <- unlist(AUC@y.values)
     percentClass1Right <- sum(scoredOutput[which(actual == (extras$levels)[1])] == (extras$levels)[[1]])/length(which(actual == (extras$levels)[1]))
     percentClass2Right <- sum(scoredOutput[which(actual == (extras$levels)[2])] == (extras$levels)[[2]])/length(which(actual == (extras$levels)[2]))
-    outVec <- c(mid = modelIndic, trial = trialIndic, fold = foldIndic, Accuracy_Overall = overallAcc, Accuracy_Class_1 = percentClass1Right, Accuracy_Class_2 = percentClass2Right, F1 = F1, AUC = AUC)
+    outVec <- c(
+      mid = modelIndic,
+      trial = trialIndic,
+      fold = foldIndic,
+      Accuracy_Overall = overallAcc,
+      Accuracy_Class_1 = percentClass1Right,
+      Accuracy_Class_2 = percentClass2Right,
+      F1 = F1,
+      AUC = AUC
+    )
   } else {
     #Compute accuracy by class
     outVec <- vector(length = length((extras$levels)))
