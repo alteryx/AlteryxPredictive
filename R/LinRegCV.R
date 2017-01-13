@@ -1,5 +1,7 @@
 getResultsCrossValidationLinReg <- function(inputs, config){
-  inputs$data$recordID <- 1:NROW(inputs$data)
+  n <- NROW(inputs$data)
+  p <- NCOL(inputs$data) - 1
+  inputs$data$recordID <- 1:n
   yVarList <- getYvars(inputs$data, inputs$models)
   yVar <- yVarList$y_col
   y_name <- yVarList$y_name
@@ -37,13 +39,45 @@ getResultsCrossValidationLinReg <- function(inputs, config){
 }
 
 #' process for Linear Regression with Cross Validation
+#' returns named vector of six model-performance metrics
+#' r_squared, adj_r_squared, avg_mae, avg_mape, avg_mse, avg_rmse
 #'
 #' @param inputs list of inputs
 #' @param config list of config elements
 #' @export
 runCrossValidationLinReg <- function(inputs, config){
+  n <- NROW(inputs$data)
+  p <- NCOL(inputs$data) - 1
   results <- getResultsCrossValidationLinReg(inputs, config)
   # write.Alteryx2(results$data, 2)
   write.Alteryx2(results$fitMeasures, 3)
   AlteryxGraph2(results$outputPlot, 4)
+  # results are a list.
+  # results$fitMeasures is a df
+  fitness_metrics <- plyr::daply(
+    .data = results$fitMeasures,
+    .variables = c('variable'),
+    .fun = function(df){mean(df$value)}
+  )
+  return_value_v <- rep_len(x = 0, length.out = 6)
+  names(return_value_v) <- c(
+    'r_squared',
+    'adj_r_squared',
+    'avg_mae',
+    'avg_mape',
+    'avg_mse',
+    'avg_rmse'
+  )
+  return_value_v['r_squared'] <- fitness_metrics['Correlation']^2
+  return_value_v['adj_r_squared'] <- adj_r_squared(
+    r_squared = fitness_metrics['Correlation']^2,
+    n = n,
+    p = p,
+    intercept_degrees_freedom = as.numeric(!config$`Omit Constant`)
+  )
+  return_value_v['avg_mae'] <- fitness_metrics['MAE']
+  return_value_v['avg_mape'] <- fitness_metrics['MAPE']
+  return_value_v['avg_mse'] <- fitness_metrics['RMSE']^2
+  return_value_v['avg_rmse'] <- fitness_metrics['RMSE']
+  return(return_value_v)
 }

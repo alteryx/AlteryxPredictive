@@ -3,13 +3,16 @@
 #' @param config config
 #' @param data data (breaking the usual mold a little)
 #' @param model model
+#' @param cv_metrics vector of CV model-performance metrics:
+#'   R2, adj R2, avg MAE, avg MAPE, avg MSE, avg RMSE
 #' @import MLmetrics DT
 #' @export
 #' @author Todd Morley, Dylan Blanchard
 interactive_lm_report <- function(
   config,
   data,
-  model
+  model,
+  cv_metrics = NULL # expects output vector from runCrossValidationLinReg
 ){
   if(config$`Use Weights`) {
     data <- data[,-NCOL(data)]
@@ -86,24 +89,44 @@ interactive_lm_report <- function(
   } else{
     intercept_degrees_freedom <- 0
   }
-#  We're no longer using MLMetrics.
+#  We're no longer using MLMetrics for R squared.  It's numerically unstable.
 #  r_squared <- R2_Score(
 #    y_pred = the_fitted_values,
 #    y_true = the_actual_values
 #  )
-  r_squared <- rSquared(
-    numeric_vector_1 = the_fitted_values,
-    numeric_vector_2 = the_actual_values
-  )
-  if(is.nan(r_squared)){
-    adjusted_r_squared <- NaN
-  }
-  else {
-    adj_r_squared <-
-      1 -
-      (1 - r_squared) *
-      (n - intercept_degrees_freedom) /
-      (n - p - intercept_degrees_freedom)
+  if(is.null(cv_metrics)){
+    r_squared <- rSquared(
+      numeric_vector_1 = the_fitted_values,
+      numeric_vector_2 = the_actual_values
+    )
+    adj_r_squared <- adj_r_squared(
+      r_squared = r_squared,
+      n = n,
+      p = p
+    )
+    mae <- MAE(
+      y_pred = the_fitted_values,
+      y_true = the_actual_values
+    )
+    mape <- MAPE(
+      y_pred = the_fitted_values,
+      y_true = the_actual_values
+    )
+    mse <- MSE(
+      y_pred = the_fitted_values,
+      y_true = the_actual_values
+    )
+    rmse <- RMSE(
+      y_pred = the_fitted_values,
+      y_true = the_actual_values
+    )
+  } else{
+    r_squared <- cv_metrics['r_squared']
+    adj_r_squared <- cv_metrics['adj_r_squared']
+    mae <- cv_metrics['avg_mae']
+    mape <- cv_metrics['avg_mape']
+    mse <- cv_metrics['avg_mse']
+    rmse <- cv_metrics['avg_rmse']
   }
   if(lm_b){
     sigma <- sigma(the_model)
@@ -163,10 +186,7 @@ interactive_lm_report <- function(
     fdInfoBox(
       title = 'Mean Absolute Error',
       value = round(
-        x = MAE(
-          y_pred = the_fitted_values,
-          y_true = the_actual_values
-        ),
+        x = mae,
         digits = digits
       ),
       icon = fdIcon(
@@ -179,10 +199,7 @@ interactive_lm_report <- function(
     fdInfoBox(
       title = 'Mean Absolute Percent Error',
       value = round(
-        x = MAPE(
-          y_pred = the_fitted_values,
-          y_true = the_actual_values
-        ),
+        x = mape,
         digits = digits
       ),
       icon = fdIcon(
@@ -198,10 +215,7 @@ interactive_lm_report <- function(
     fdInfoBox(
       title = 'Mean Squared Error',
       value = round(
-        x = MSE(
-          y_pred = the_fitted_values,
-          y_true = the_actual_values
-        ),
+        x = mse,
         digits = digits
       ),
       icon = fdIcon(
@@ -214,10 +228,7 @@ interactive_lm_report <- function(
     fdInfoBox(
       title = 'Root Mean Squared Error',
       value = round(
-        x = RMSE(
-          y_pred = the_fitted_values,
-          y_true = the_actual_values
-        ),
+        x = rmse,
         digits = digits
       ),
       icon = fdIcon(
@@ -319,18 +330,20 @@ interactive_lm_report <- function(
     )
   )
 
-  row_2_2 <- fdRow(
-    fdBox(
-      fdPanelRegressionMetrics(
-        actual = the_actual_values,
-        predicted  = the_fitted_values,
-        metrics = c("MAE", "MAPE", "MedianAPE", "RMSE", "RAE", "R2_Score") # not "RMSLE"
-      ),
-      width = totalWidth
-    )
-  )
+# We can't display the outer-CV metrics with this tool, and page 1 displays the same
+# numbers, so this panel is out.
+#  row_2_2 <- fdRow(
+#    fdBox(
+#      fdPanelRegressionMetrics(
+#        actual = the_actual_values,
+#        predicted  = the_fitted_values,
+#        metrics = c("MAE", "MAPE", "MedianAPE", "RMSE", "RAE", "R2_Score") # not "RMSLE"
+#      ),
+#      width = totalWidth
+#    )
+#  )
 
-  row_2_3 <- fdRow(
+  row_2_2 <- fdRow(
     fdBox(
       fdPanelHistogram(
         x = the_residuals,
@@ -344,7 +357,7 @@ interactive_lm_report <- function(
   page_2 <- fdPage(
     row_2_1,
     row_2_2,
-    row_2_3,
+#    row_2_3,
     id = 'page_2',
     display = FALSE
   )
