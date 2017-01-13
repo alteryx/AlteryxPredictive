@@ -2,7 +2,9 @@
 % Please edit documentation in R/LinRegCV.R
 \name{runCrossValidationLinReg}
 \alias{runCrossValidationLinReg}
-\title{process for Linear Regression with Cross Validation}
+\title{process for Linear Regression with Cross Validation
+returns named vector of six model-performance metrics
+r_squared, adj_r_squared, avg_mae, avg_mape, avg_mse, avg_rmse}
 \usage{
 runCrossValidationLinReg(inputs, config)
 }
@@ -13,5 +15,7 @@ runCrossValidationLinReg(inputs, config)
 }
 \description{
 process for Linear Regression with Cross Validation
+returns named vector of six model-performance metrics
+r_squared, adj_r_squared, avg_mae, avg_mape, avg_mse, avg_rmse
 }
 
