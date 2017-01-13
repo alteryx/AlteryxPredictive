@@ -39,7 +39,7 @@ getResultsCrossValidationLogReg <- function(inputs, config) {
 
   if ((config$classification) && (length(unique(yVar)) == 2)) {
     if ((is.null(config$posClass)) || (config$posClass == "")) {
-      config$posClass <- as.character(getPosClass(levels(yVar), order = "common"))
+      config$posClass <- as.character(getPositiveClass(levels(yVar)))
     }
   }
 
@@ -103,16 +103,38 @@ runCrossValidationLogReg <- function(inputs, config) {
     .variables = c('variable'),
     .fun = function(df){mean(df$value)}
   )
-  conf_mats <- results$confMats
-  conf_mats <- conf_mats[, c('Predicted_class', 'Variable', 'Value')]
-  names(conf_mats) <- c('predicted', 'actual', 'count')
-  conf_mats$actual <- gsub('Class_', '', conf_mats$actual)
-  conf_mats$count <- as.numeric(conf_mats$count)
-  confusion_matrix <- plyr::daply(
-    .data = conf_mats,
-    .variables = c('predicted', 'actual'),
-    .fun = function(df){sum(df$count)}
+  conf_mats_df <- results$confMats
+  conf_mats_df <- conf_mats_df[, c('Predicted_class', 'Variable', 'Value')]
+  names(conf_mats_df) <- c('predicted', 'actual', 'count')
+  conf_mats_df$actual <- gsub('Class_', '', conf_mats_df$actual)
+  conf_mats_df$count <- as.numeric(conf_mats_df$count)
+  # We need to construct a 2x2 confusion matrix and update it, to guard
+  # against the case where all records are predicted to belong to a single
+  # class, in which case other aggregation methods (e.g. plyr::daply, see
+  # below) might not produce a full-sized confusion matrix.
+  actual_value_v <- unique(conf_mats_df[, 2])
+  confusion_matrix_df <- data.frame(
+    c(0, 0),
+    c(0, 0)
   )
+  names(confusion_matrix_df) <- actual_value_v
+  rownames(confusion_matrix_df) <- actual_value_v
+  for(i in 1:nrow(conf_mats_df)){
+    predicted <- conf_mats_df$predicted[i]
+    actual <- conf_mats_df$actual[i]
+    confusion_matrix_df[predicted, actual] <-
+      confusion_matrix_df[predicted, actual] +
+      conf_mats_df$count[i]
+  }
+  confusion_matrix_df <- confusion_matrix_df / trials
+  # The above is also equivalent to the below, but the below only produces
+  # a single row in the pathological case.
+  #foo_df <- plyr::daply(
+  #  .data = conf_mats_df,
+  #  .variables = c('predicted', 'actual'),
+  #  .fun = function(df){sum(df$count)}
+  #)
+  #foo_df <- foo_df / trials
   return_value_v <- rep_len(
     x = 0,
     length.out = 8
@@ -127,13 +149,16 @@ runCrossValidationLogReg <- function(inputs, config) {
     'pred_neg_actual_pos',
     'pred_neg_actual_neg'
   )
+  positive_class_index <- which(actual_value_v == getPositiveClass(target_levels = actual_value_v))
+  negative_class_index <- which(actual_value_v != getPositiveClass(target_levels = actual_value_v))
+
   return_value_v['accuracy'] <- fitness_metrics['Accuracy_Overall']
-  return_value_v['precision'] <- confusion_matrix[2, 2] / sum(confusion_matrix[2, ])
-  return_value_v['recall'] <- confusion_matrix[2, 2] / sum(confusion_matrix[, 2])
+  return_value_v['precision'] <- confusion_matrix_df[2, 2] / sum(confusion_matrix_df[2, ])
+  return_value_v['recall'] <- confusion_matrix_df[2, 2] / sum(confusion_matrix_df[, 2])
   return_value_v['f1'] <- fitness_metrics['F1']
-  return_value_v['pred_pos_actual_pos'] <- round(x = confusion_matrix[2, 2] / trials, digits = 0)
-  return_value_v['pred_pos_actual_neg'] <- round(x = confusion_matrix[2, 1] / trials, digits = 0)
-  return_value_v['pred_neg_actual_pos'] <- round(x = confusion_matrix[1, 2] / trials, digits = 0)
-  return_value_v['pred_neg_actual_neg'] <- round(x = confusion_matrix[1, 1] / trials, digits = 0)
+  return_value_v['pred_pos_actual_pos'] <- confusion_matrix_df[positive_class_index, positive_class_index]
+  return_value_v['pred_pos_actual_neg'] <- confusion_matrix_df[positive_class_index, negative_class_index]
+  return_value_v['pred_neg_actual_pos'] <- confusion_matrix_df[negative_class_index, positive_class_index]
+  return_value_v['pred_neg_actual_neg'] <- confusion_matrix_df[negative_class_index, negative_class_index]
   return(return_value_v)
 }

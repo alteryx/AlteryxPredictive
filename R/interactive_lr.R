@@ -177,15 +177,6 @@ interactive_lr <- function(
     perf = roc_performance,
     pred = prediction_object
   )
-#  print(
-#    paste0(
-#      "Optimal probability cutoff = ",
-#      round(
-#        x = optimal_cutoff_nv[3],
-#        digits = digits
-#      )
-#    )
-#  )
   fitted_values <- as.integer(probability_v >= optimal_cutoff_nv[3])
   if(length(unique(fitted_values)) == 1) {
     msg1 <- "All values are being fitted to the same class. "
@@ -216,6 +207,7 @@ interactive_lr <- function(
     accuracy <- (true_positive_count + true_negative_count) / n
     precision <- true_positive_count / (true_positive_count + false_positive_count)
     recall <- true_positive_count / (true_positive_count + false_negative_count)
+    # This should be a harmonic mean.  It could be NaN, which for now is OK.
     f1 <- 1 / mean(1 / c(precision, recall))
   } else{
     true_positive_count <- cv_metrics['pred_pos_actual_pos']
@@ -229,10 +221,10 @@ interactive_lr <- function(
   }
   confusion_matrix_m <- matrix(
     data = c(
-      true_positive_count,
-      false_positive_count,
-      false_negative_count,
-      true_negative_count
+      round(x = true_positive_count, digits = digits),
+      round(x = false_negative_count, digits = digits),
+      round(x = false_positive_count, digits = digits),
+      round(x = true_negative_count, digits = digits)
     ),
     nrow = 2,
     ncol = 2
