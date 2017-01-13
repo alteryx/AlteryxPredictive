@@ -5,7 +5,7 @@
 \title{linear-model interactive-report function
 This function generates the interactive report for the Linear Model tool.}
 \usage{
-interactive_lm_report(config, data, model)
+interactive_lm_report(config, data, model, cv_metrics = NULL)
 }
 \arguments{
 \item{config}{config}
@@ -13,6 +13,9 @@ interactive_lm_report(config, data, model)
 \item{data}{data (breaking the usual mold a little)}
 
 \item{model}{model}
+
+\item{cv_metrics}{vector of CV model-performance metrics:
+R2, adj R2, avg MAE, avg MAPE, avg MSE, avg RMSE}
 }
 \description{
 linear-model interactive-report function

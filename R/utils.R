@@ -1,3 +1,30 @@
+#' Translates an R squared into an adjusted R squared, returning NaN
+#' if the input is Nan.
+#'
+#' @param r_squared R squared
+#' @param n number of records (rows)
+#' @param p number of independent variables (predictors)
+#' @param intercept_degrees_freedom one if model includes intercept,
+#'   else zero
+#'
+#' @export
+adj_r_squared <- function(
+  r_squared,
+  n,
+  p,
+  intercept_degrees_freedom
+){
+  if(is.nan(x = r_squared)){
+    return(NaN)
+  }
+  return(
+    1 -
+    (1 - r_squared) *
+    (n - intercept_degrees_freedom) /
+    (n - p - intercept_degrees_freedom)
+  )
+}
+
 #' Tries very hard to compute a sensible R squared, else returns NaN.
 #'
 #' @param numeric_vector_1 one numeric vector
