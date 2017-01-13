@@ -85,6 +85,9 @@ runCrossValidationDTree <- function(inputs, config){
   #if the LHS is false. We're relying on that property of R here. Only rpart objects
   #have a method component, so we only want to look at the RHS if we're in the rpart
   #(ie not C5.0) case.
+  if(config$use.weights && config$model.algorithm == "C5.0") {
+    config$use.weights <- FALSE
+  }
   mod_obj <- inputs$models$Decision_Tree
   if (((config$`model.algorithm`) == 'C5.0') || ((mod_obj$method) == "class")) {
     config$classification <- TRUE
