@@ -1,3 +1,66 @@
+#' Tries very hard to compute a sensible R squared, else returns NaN.
+#'
+#' @param numeric_vector_1 one numeric vector
+#' @param numeric_vector_2 another numeric vector of the same length
+#'
+#' @export
+rSquared <- function(
+  numeric_vector_1,
+  numeric_vector_2
+){
+  if(
+    !inherits(x = numeric_vector_1, what = 'numeric') ||
+    !inherits(x = numeric_vector_2, what = 'numeric')
+  ){
+    stop.Alteryx2(
+      msg = paste(
+        "An object other than a numeric vector was passed to",
+        "AlteryxPredictive::rSquared().  Please contact Alteryx Support. "
+      )
+    )
+  }
+  if(length(numeric_vector_1) != length(numeric_vector_2)){
+    stop.Alteryx2(
+      msg = paste(
+        "The vectors passed to AlteryxPredictive::rSquared() were of",
+        "unequal length.  Please contact Alteryx Support. "
+      )
+    )
+  }
+  r_squared <- NULL
+  try(
+    expr = r_squared <-
+      cov(numeric_vector_1, numeric_vector_2)^2 /
+      (var(numeric_vector_1) * var(numeric_vector_2)),
+    silent = TRUE
+  )
+  if(
+    is.null(r_squared) ||
+    is.nan(r_squared) ||
+    r_squared < 0.0 ||
+    r_squared > 1.0
+  ){
+    try(
+      expr = r_squared <-
+        exp(
+          2 * log(cov(numeric_vector_1, numeric_vector_2)) -
+          log(var(numeric_vector_1)) -
+          log(var(numeric_vector_2))
+        ),
+      silent = TRUE
+    )
+  }
+  if(
+    is.null(r_squared) ||
+    is.nan(r_squared) ||
+    r_squared < 0.0 ||
+    r_squared > 1.0
+  ){
+    r_squared <- NaN
+  }
+  return(r_squared)
+}
+
 #' Returns TRUE if called inside an Alteryx R Tool.
 #'
 #' @export
