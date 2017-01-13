@@ -57,10 +57,12 @@ interactive_dt <- function(
         y_pred = fitted_values,
         y_true = actual_values
       )
-      adj_r_squared <-
-        1 - (1 - r_squared) *
-        (n - intercept_degrees_freedom) /
-        (n - p - intercept_degrees_freedom)
+      adj_r_squared <- adj_r_squared(
+        r_squared = r_squared,
+        n = n,
+        p = p,
+        intercept_degrees_freedom = intercept_degrees_freedom
+      )
       residuals <- unname(actual_values - fitted_values)
     } else if(model$method == 'class'){
       rpart_classification_b <- TRUE

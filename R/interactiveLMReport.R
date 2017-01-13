@@ -102,7 +102,8 @@ interactive_lm_report <- function(
     adj_r_squared <- adj_r_squared(
       r_squared = r_squared,
       n = n,
-      p = p
+      p = p,
+      intercept_degrees_freedom = intercept_degrees_freedom
     )
     mae <- MAE(
       y_pred = the_fitted_values,
