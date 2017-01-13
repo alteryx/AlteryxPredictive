@@ -304,15 +304,34 @@ interactive_dt <- function(
       id = 'page_1',
       display = TRUE
     )
-    row_2_1 <- fdRow(
-      fdBox(
-        fdPlotMismatchMatrix(
-          x = mismatch_t,
-          digits = digits
-        ),
-        width = totalWidth
+
+    if(all.equal(
+      length(levels(actual_values)),
+      length(levels(fitted_values)),
+      2
+    )){
+      # 2 classes
+      confusion_matrix_m <- getBinaryConfusionMatrix(fitted_values, actual_values)
+
+      row_2_1 <- fdRow(
+        fdBox(
+          fdPlotConfusionMatrix(x = confusion_matrix_m),
+          width = totalWidth
+        )
       )
-    )
+    } else {
+      # More than 2 classes
+      row_2_1 <- fdRow(
+        fdBox(
+          fdPlotMismatchMatrix(
+            x = mismatch_t,
+            digits = digits
+          ),
+          width = totalWidth
+        )
+      )
+    }
+
     page_2 <- fdPage(
       row_2_1,
       id = 'page_2',
