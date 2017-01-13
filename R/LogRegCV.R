@@ -91,8 +91,46 @@ getResultsCrossValidationLogReg <- function(inputs, config) {
 #' @return list of results for outputting
 #' @export
 runCrossValidationLogReg <- function(inputs, config) {
+  n <- NROW(inputs$data)
+  p <- NCOL(inputs$data) - 1
+  trials <- config$numberTrials
   results <- getResultsCrossValidationLogReg(inputs, config)
-  # write.Alteryx2(results$data, 2)
   write.Alteryx2(results$fitMeasures, 3)
   AlteryxGraph2(results$outputPlot, 4)
+  # results is a list including data frames fitMeasures and confMats
+  fitness_metrics <- plyr::daply(
+    .data = results$fitMeasures,
+    .variables = c('variable'),
+    .fun = function(df){mean(df$value)}
+  )
+  conf_mats <- results$confMats
+  conf_mats <- conf_mats[, c('Predicted_class', 'Variable', 'Value')]
+  names(conf_mats) <- c('predicted', 'actual', 'count')
+  conf_mats$actual <- gsub('Class_', '', conf_mats$actual)
+  conf_mats <- data.frame(lapply(X = conf_mats, FUN = as.numeric))
+  confusion_matrix <- plyr::daply(
+    .data = conf_mats,
+    .variables = c('predicted', 'actual'),
+    .fun = function(df){sum(df$count)}
+  )
+  return_value_v <- rep_len(x = 0, length.out = 8)
+  names(return_value_v) <- c(
+    'accuracy',
+    'precision',
+    'recall',
+    'f1',
+    'pred_pos_actual_pos',
+    'pred_pos_actual_neg',
+    'pred_neg_actual_pos',
+    'pred_neg_actual_neg'
+  )
+  return_value_v['accuracy'] <- fitness_metrics['Accuracy_Overall']
+  return_value_v['precision'] <- confusion_matrix[2, 2] / sum(confusion_matrix[2, ])
+  return_value_v['recall'] <- confusion_matrix[2, 2] / sum(confusion_matrix[, 2])
+  return_value_v['f1'] <- fitness_metrics['F1']
+  return_value_v['pred_pos_actual_pos'] <- round(x = confusion_matrix[2, 2] / trials, digits = 0)
+  return_value_v['pred_pos_actual_neg'] <- round(x = confusion_matrix[2, 1] / trials, digits = 0)
+  return_value_v['pred_neg_actual_pos'] <- round(x = confusion_matrix[1, 2] / trials, digits = 0)
+  return_value_v['pred_neg_actual_neg'] <- round(x = confusion_matrix[1, 1] / trials, digits = 0)
+  return(return_value_v)
 }

@@ -4,7 +4,7 @@
 \alias{interactive_lr}
 \title{Dashboard generation for logistic regression models}
 \usage{
-interactive_lr(config, data, model)
+interactive_lr(config, data, model, cv_metrics = NULL)
 }
 \arguments{
 \item{config}{list of configuration elements}
@@ -15,6 +15,8 @@ interactive_lr(config, data, model)
 glm - with binomial family
 glmnet
 cv.glmnet}
+
+\item{cv_metrics}{metrics returned by runCrossValidationLogReg}
 }
 \value{
 dashboard object for rendering
