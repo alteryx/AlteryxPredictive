@@ -4,7 +4,8 @@
 #' @param r_squared R squared
 #' @param n number of records (rows)
 #' @param p number of independent variables (predictors)
-#' @param intercept_degrees_freedom one if model includes intercept, else zero
+#' @param intercept_degrees_freedom one if model includes intercept,
+#'   else zero
 #'
 #' @export
 adj_r_squared <- function(

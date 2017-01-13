@@ -14,7 +14,8 @@ adj_r_squared(r_squared, n, p, intercept_degrees_freedom)
 
 \item{p}{number of independent variables (predictors)}
 
-\item{intercept_degrees_freedom}{one if model includes intercept, else zero}
+\item{intercept_degrees_freedom}{one if model includes intercept,
+else zero}
 }
 \description{
 Translates an R squared into an adjusted R squared, returning NaN
