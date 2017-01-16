@@ -1,6 +1,7 @@
 #' @import ggplot2
 #' @import reshape2
 getResultsCrossValidationDTree <- function(inputs, config){
+  config$posClass <- verifyClass(inputs$data[,1], config$posClass)
   inputs$data$recordID <- 1:NROW(inputs$data)
   yVarName <- getYVar(inputs$models$Decision_Tree)
   yVar <- inputs$data[[yVarName]]
