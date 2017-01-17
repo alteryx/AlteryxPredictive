@@ -14,6 +14,8 @@ genearateDataForPlotLogReg <- function(d, extras, config) {
 #' @return list of results for outputting
 #' @export
 getResultsCrossValidationLogReg <- function(inputs, config) {
+  if(config$Link == "complementary log-log")
+    config$Link <- "cloglog"
   config$posClass <- verifyClass(inputs$the.data[,1], config$posClass)
   ###### WORKAROUND #########################################
   # Namespace issues require redefining the call and family
