@@ -101,15 +101,17 @@ interactive_lm_report <- function(
     #calling rSquared, since that function tests if the input vectors
     #are numeric and errors if they're not. We don't want to change the
     #behavior of rSquared because correlation is defined on the real numbers.
+    the_fitted_values_r2 <- the_fitted_values
+    the_actual_values_r2 <- the_actual_values
     if (inherits(x = the_fitted_values, what = "integer")) {
-      the_fitted_values <- as.numeric(the_fitted_values)
+      the_fitted_values_r2 <- as.numeric(the_fitted_values)
     }
     if (inherits(x = the_actual_values, what = "integer")) {
-      the_actual_values <- as.numeric(the_actual_values)
+      the_actual_values_r2 <- as.numeric(the_actual_values)
     }
     r_squared <- rSquared(
-      numeric_vector_1 = the_fitted_values,
-      numeric_vector_2 = the_actual_values
+      numeric_vector_1 = the_fitted_values_r2,
+      numeric_vector_2 = the_actual_values_r2
     )
     adj_r_squared <- adj_r_squared(
       r_squared = r_squared,
