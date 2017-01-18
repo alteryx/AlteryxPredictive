@@ -95,6 +95,18 @@ interactive_lm_report <- function(
 #    y_true = the_actual_values
 #  )
   if(is.null(cv_metrics)){
+    #In R, testing inherits(vec, "numeric") when vec is a vector of
+    #integers returns FALSE. Thus, we need to coerce the_fitted_values
+    #and the_actual_values to numeric if they're integer vectors before
+    #calling rSquared, since that function tests if the input vectors
+    #are numeric and errors if they're not. We don't want to change the
+    #behavior of rSquared because correlation is defined on the real numbers.
+    if (inherits(x = the_fitted_values, what = "integer")) {
+      the_fitted_values <- as.numeric(the_fitted_values)
+    }
+    if (inherits(x = the_actual_values, what = "integer")) {
+      the_actual_values <- as.numeric(the_actual_values)
+    }
     r_squared <- rSquared(
       numeric_vector_1 = the_fitted_values,
       numeric_vector_2 = the_actual_values
