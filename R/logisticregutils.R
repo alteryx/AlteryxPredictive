@@ -28,11 +28,21 @@ processLogisticOSR <- function(inputs, config){
     the.design <- survey::svydesign(
       ids = ~1, weights = makeFormula(var_names$w, ""), data = the.data
     )
-    the.model <- survey::svyglm(
-      the.formula,
-      family = quasibinomial(config$Link),
-      design = the.design
-    )
+    ### this seemingly useless if statement is very necessary
+    ### best guess is there is some strange environment doings in svyglm
+    if (config$Link == "complementary log-log" || config$Link == "cloglog"){
+      the.model <- survey::svyglm(
+        the.formula,
+        family = quasibinomial("cloglog"),
+        design = the.design
+      )
+    } else {
+      the.model <- survey::svyglm(
+        the.formula,
+        family = quasibinomial(config$Link),
+        design = the.design
+      )
+    }
   } else {
     model_type <- "binomial"
     the.model <- glm(the.formula, family = binomial(config$Link), data = the.data)

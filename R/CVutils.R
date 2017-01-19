@@ -170,13 +170,25 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
       weights_v <- trainingData[[config$`select.weights`]]
       currentModel <- C50Update(model, trainingData, currentYvar, config, weight_vec = weights_v)
     } else if (inherits(model, 'svyglm')){
-      currentModel <- update(
-        object = model,
-        data = trainingData,
-        design = model$survey.design,
-        # for consistency with original model
-        family = quasibinomial(config$Link)
-      )
+      ### this seemingly useless if statement is very necessary
+      ### best guess is there is some strange environment doings in svyglm
+      if (config$Link == "complementary log-log" || config$Link == "cloglog"){
+        currentModel <- update(
+          object = model,
+          data = trainingData,
+          design = model$survey.design,
+          # for consistency with original model
+          family = quasibinomial("cloglog")
+        )
+      } else {
+        currentModel <- update(
+          object = model,
+          data = trainingData,
+          design = model$survey.design,
+          # for consistency with original model
+          family = quasibinomial(config$Link)
+        )
+      }
     } else{
       currentModel <- update(model, data = trainingData)
     }
