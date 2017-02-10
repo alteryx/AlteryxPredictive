@@ -115,7 +115,8 @@ interactive_lr <- function(
   } else{
     independent_variable_m <- df2NumericMatrix(
       x = data[ , -1, drop = FALSE],
-      filtering_message = "Non-numeric variables are among the predictors. They are now being removed."
+      filtering_message = "Non-numeric variables are among the predictors. They are now being removed.",
+      convertVectorToDataFrame = TRUE
     )
     if(regularized_b){
       lambda <- config$lambda_no_cv

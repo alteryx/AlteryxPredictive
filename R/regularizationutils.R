@@ -5,10 +5,13 @@
 #' @param x data frame to coerce to a numeric matrix
 #' @param filtering_message a message telling the end user that the input data
 #'   frame will have its non-numeric columns removed
+#' @param convertVectorToDataFrame a boolean specifying whether x should be
+#' converted to a df if it's provided as a vector.
 #' @export
 df2NumericMatrix <- function(
   x,
-  filtering_message
+  filtering_message,
+  convertVectorToDataFrame = FALSE
 ){
   if(
     is.vector(x) &&
@@ -76,13 +79,14 @@ processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weights`)
   x <- df2NumericMatrix(
     x = inputs$the.data[,var_names$x, drop = FALSE],
-    filtering_message = "Non-numeric variables are among the predictors. They are now being removed."
+    filtering_message = "Non-numeric variables are among the predictors. They are now being removed.",
+    convertVectorToDataFrame = TRUE
   )
   if (ncol(x) < 2) {
     stop.Alteryx2(
       paste0(
         "Regularization requires at least two numeric predictors. ",
-        "Please  switch to a non-regularized model, or use more predictors. "
+        "Please switch to a non-regularized model, or use more numeric predictors."
       )
     )
   }

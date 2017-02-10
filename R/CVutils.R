@@ -223,7 +223,8 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
       trainingData_noyvar <- trainingData[, !(colnames(trainingData) %in% currentYvar), drop = FALSE]
       trainingData_noyvar <- df2NumericMatrix(
         x = trainingData_noyvar,
-        filtering_message = "Non-numeric variables are among the predictors. They are now being removed."
+        filtering_message = "Non-numeric variables are among the predictors. They are now being removed.",
+        convertVectorToDataFrame = TRUE
       )
       #No need to call df2NmericMatrix on testData, since scoreModel calls df2NumericMatrix with glmnet models.
       currentModel <- glmnetUpdate(model, trainingData_noyvar, y_vec, config, weight_vec = weights_v)

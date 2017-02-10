@@ -6,13 +6,16 @@
 and warning the user (by displaying a message passed in as an argument) when
 such filtering occurs.}
 \usage{
-df2NumericMatrix(x, filtering_message)
+df2NumericMatrix(x, filtering_message, convertVectorToDataFrame = FALSE)
 }
 \arguments{
 \item{x}{data frame to coerce to a numeric matrix}
 
 \item{filtering_message}{a message telling the end user that the input data
 frame will have its non-numeric columns removed}
+
+\item{convertVectorToDataFrame}{a boolean specifying whether x should be
+converted to a df if it's provided as a vector.}
 }
 \description{
 Convert data frame into a numeric matrix, filtering out non-numeric columns
