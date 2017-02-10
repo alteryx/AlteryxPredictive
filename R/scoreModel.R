@@ -219,7 +219,8 @@ scoreModel.elnet <- function(mod.obj, new.data, score.field = "Score", ...) {
   used_x_vars <- getXVars(mod.obj)
   new.data <- df2NumericMatrix(
     x = new.data,
-    filtering_message = "Non-numeric variables are among the predictors. They are now being removed."
+    filtering_message = "Non-numeric variables are among the predictors. They are now being removed.",
+    convertVectorToDataFrame = TRUE
   )
   if (!all(used_x_vars %in% colnames(new.data))) {
     missing_x_vars <- used_x_vars[!(used_x_vars %in% colnames(new.data))]
@@ -248,7 +249,8 @@ scoreModel.lognet <- function(mod.obj, new.data, score.field = "Score",
   used_x_vars <- getXVars(mod.obj)
   new.data <- df2NumericMatrix(
     x = new.data,
-    filtering_message = "Non-numeric variables are among the predictors. They are now being removed."
+    filtering_message = "Non-numeric variables are among the predictors. They are now being removed.",
+    convertVectorToDataFrame = TRUE
   )
   target.value <- os.value
   y.levels <- getYlevels(mod.obj)
