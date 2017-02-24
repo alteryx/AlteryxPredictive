@@ -12,8 +12,13 @@
 #' @export
 #' @family Alteryx.Report
 Alteryx.ReportLM <- function (lm.obj){
-  if (class(lm.obj) != "lm")
-    stop.Alteryx2("The object provided is not a glm class object")
+  if (class(lm.obj) != "lm") {
+    stop.Alteryx2(
+      XMSG(
+        "The object provided is not a glm class object."
+      )
+    )
+  }
   full.sum <- summary(lm.obj)
   the.call <- paste(capture.output(full.sum$call), collapse = "")
   the.call = gsub("\\s\\s", "", the.call)
@@ -25,20 +30,41 @@ Alteryx.ReportLM <- function (lm.obj){
   coef.est <- paste(dimnames(full.sum$coefficients)[[1]], format(full.sum$coefficients[,1], digits = 4),
                     format(full.sum$coefficients[,2], digits = 4), format(full.sum$coefficients[,3], digits = 4),
                     as.character(p.stars$p_txt), as.character(p.stars$Stars), sep = "|")
-  coef.lab <- "Coefficients:"
+  coef.lab <- XMSG("Coefficients:")
   # Address variables that were omitted due to singularities
   omitted <- names(full.sum$aliased)[full.sum$aliased]
   if (length(omitted) > 0) {
-    coef.lab <- paste(coef.lab, " (", length(omitted), " not defined because of singularities)", sep = "")
+    coef.lab <- XMSG(
+      "@1 (@2 not defined because of singularities)",
+      coef.lab,
+      length(omitted)
+      )
     for (i in omitted)
       coef.est <- c(coef.est, paste(i, "NA|NA|NA|NA|  ", sep = "|"))
   }
-  resid.se <- paste("Residual standard error:", format(full.sum$sigma, digits = 5), "on", full.sum$df[2], "degrees of freedom")
-  r.sq <- paste("Multiple R-squared: ", format(full.sum$r.squared, digits = 4), ", Adjusted R-Squared: ", format(full.sum$adj.r.squared, digits = 4), sep = "")
+  resid.se <- XMSG(
+    "Residual standard error: @1 on @2 degrees of freedom",
+    format(
+      full.sum$sigma,
+      digits = 5
+    ),
+    full.sum$df[2]
+  )
+  r.sq <- XMSG(
+    "Multiple R-squared: @1, Adjusted R-Squared: @2",
+    format(full.sum$r.squared, digits = 4),
+    format(full.sum$adj.r.squared, digits = 4)
+  )
   p.f1 <- 1 - pf(full.sum$fstatistic[1], full.sum$fstatistic[2], full.sum$fstatistic[3])
   p.f2 <- format(p.f1, digits = 4)
   p.f2[p.f1 < 2.2e-16] <- "< 2.2e-16"
-  f.stat <- paste("F-statistic: ", format(full.sum$fstatistic[1], digits = 4), " on ", as.integer(full.sum$fstatistic[2]), " and ", as.integer(full.sum$fstatistic[3]), " DF, p-value: ", p.f2, sep = "")
+  f.stat <- XMSG(
+    "F-statistic: @1 on @2 and @3 degrees of freedom (DF), p-value @4",
+    format(full.sum$fstatistic[1], digits = 4),
+    as.integer(full.sum$fstatistic[2]),
+    as.integer(full.sum$fstatistic[3]),
+    p.f2
+  )
   sum.grps <- c("Call", "Residuals", "Coef_Label", rep("Coef_Est", length(coef.est)), rep("Fit_Stats", 3))
   sum.out <- c(the.call, resid.sum, coef.lab, coef.est, resid.se, r.sq, f.stat)
   summary.df <- data.frame(grp = sum.grps, out = sum.out)
@@ -68,8 +94,13 @@ Alteryx.ReportLM <- function (lm.obj){
 #' @export
 #' @family Alteryx.Report
 Alteryx.ReportGLM <- function (glm.obj){
-  if (class(glm.obj)[1] != "glm" && class(glm.obj)[2] != "glm")
-    stop.Alteryx2("The object provided is not a glm class object")
+  if (class(glm.obj)[1] != "glm" && class(glm.obj)[2] != "glm") {
+    stop.Alteryx2(
+      XMSG(
+        "The object provided is not a glm class object."
+        )
+      )
+  }
   full.sum <- summary(glm.obj)
   the.call <- paste(capture.output(full.sum$call), collapse = "")
   the.call = gsub("\\s\\s", "", the.call)
@@ -81,11 +112,15 @@ Alteryx.ReportGLM <- function (glm.obj){
   coef.est <- paste(dimnames(full.sum$coefficients)[[1]], format(full.sum$coefficients[,1], digits = 4),
                     format(full.sum$coefficients[,2], digits = 4), format(full.sum$coefficients[,3], digits = 4),
                     as.character(p.stars$p_txt), as.character(p.stars$Stars), sep = "|")
-  coef.lab <- "Coefficients:"
+  coef.lab <- XMSG("Coefficients:")
   # Address variables that were omitted due to singularities
   omitted <- names(full.sum$aliased)[full.sum$aliased]
   if (length(omitted) > 0) {
-    coef.lab <- paste(coef.lab, " (", length(omitted), " not defined because of singularities)", sep = "")
+    coef.lab <- XMSG(
+      "@1 (@2 not defined because of singularities)",
+      coef.lab,
+      length(omitted)
+    )
     for (i in omitted)
       coef.est <- c(coef.est, paste(i, "NA|NA|NA|NA|  ", sep = "|"))
   }
@@ -93,13 +128,32 @@ Alteryx.ReportGLM <- function (glm.obj){
   # and add the estimates of theta and its se to ceof.est
   if (!is.null(glm.obj$theta))
     coef.est <- c(coef.est, paste("theta", format(glm.obj$theta, digits = 6), format(glm.obj$SE.theta, digits = 6), "| | ", sep = "|"))
-  dispersion <- paste("(Dispersion parameter for ", full.sum$family$family, " taken to be ", full.sum$dispersion, ")", sep = "")
+  dispersion <- XMSG(
+    "(Dispersion parameter for @1 taken to be @2 )",
+    full.sum$family$family,
+    full.sum$dispersion
+  )
   df.null <- full.sum$df[2] + full.sum$df[3] - 1
-  null.dev <- paste("Null deviance:", format(full.sum$null.deviance, digits = 5), "on", df.null, "degrees of freedom")
-  mod.dev <- paste("Residual deviance:", format(full.sum$deviance, digits = 5), "on", full.sum$df[2], "degrees of freedom")
+  null.dev <- XMSG(
+    "Null deviance: @1 on @2 degrees of freedom",
+    format(full.sum$null.deviance, digits = 5),
+    df.null
+  )
+  mod.dev <- XMSG(
+    "Residual deviance: @1 on @2 degrees of freedom",
+    format(full.sum$deviance, digits = 5),
+    full.sum$df[2]
+  )
   McF.R2 <- 1 - (glm.obj$deviance/glm.obj$null.deviance)
-  mod.fit <- paste("McFadden R-Squared: ", format(McF.R2, digits = 4), ", AIC: ", format(full.sum$aic, digits = 4), sep="")
-  fisher.it <- paste("Number of Fisher Scoring iterations:", full.sum$iter)
+  mod.fit <- XMSG(
+    "McFadden R-Squared: @1, Akaike Information Criterion @2",
+    format(McF.R2, digits = 4),
+    format(full.sum$aic, digits = 4)
+  )
+  fisher.it <- XMSG(
+    "Number of Fisher Scoring iterations: @1",
+    full.sum$iter
+  )
   sum.grps <- c("Call", "Residuals", "Coef_Label", rep("Coef_Est", length(coef.est)), "Dispersion", rep("Fit_Stats", 3), "Fisher")
   sum.out <- c(the.call, resid.sum, coef.lab, coef.est, dispersion, null.dev, mod.dev, mod.fit, fisher.it)
   summary.df <- data.frame(grp = sum.grps, out = sum.out)
@@ -132,8 +186,13 @@ Alteryx.ReportAnova <- function (model.obj)
 {
   if (class(model.obj)[1] != "lm" && class(model.obj)[1] !=
       "glm" && class(model.obj)[2] != "glm") {
-    stop.Alteryx2("The object provided is not a lm or glm class object")
+    stop.Alteryx2(
+      XMSG(
+        "The object provided is not a lm or glm class object."
+      )
+    )
   }
+  #
   the.anova <- car::Anova(model.obj, type = "II")
   response <- attributes(the.anova)$heading[2]
   if (class(model.obj)[1] == "lm") {
@@ -158,6 +217,8 @@ Alteryx.ReportAnova <- function (model.obj)
   anova.df$grp <- as.character(anova.df$grp)
   anova.df$out <- as.character(anova.df$out)
   anova.df <- rbind(anova.df, c("Model_Class", class(model.obj)[1]))
+  #The only user-facing strings in anova.df come from R, so there's no need
+  #to localize them.
   return(anova.df)
 }
 
@@ -169,7 +230,11 @@ Alteryx.ReportAnova <- function (model.obj)
 # Author: Dan Putler
 Alteryx.ParseCoefSum <- function(coef_sum) {
   if(!is.character(coef_sum)) {
-    stop.Alteryx2("The argument to the function must be a character vector")
+    stop.Alteryx2(
+      XMSG(
+        "The argument to the function must be a character vector."
+        )
+    )
   }
   # parseRow is the function that is used in the apply function
   parseRow <- function(a_row) {
@@ -217,7 +282,11 @@ Alteryx.ParseCoefSum <- function(coef_sum) {
 # Author: Dan Putler
 Alteryx.ParseAnova <- function(the_anova, obj.class) {
   if(!is.character(the_anova)) {
-    stop.Alteryx2("The argument to the function must be a character vector")
+    stop.Alteryx2(
+      XMSG(
+        "The argument to the function must be a character vector."
+      )
+    )
   }
   # parseRow is the function that is used in the apply function
   parseRow <- function(a_row, obj.class) {
@@ -263,7 +332,11 @@ Alteryx.ParseAnova <- function(the_anova, obj.class) {
 #' @export
 AlteryxReportRx <- function (rx.obj, null.deviance = NULL) {
   if (!(class(rx.obj) %in% c("rxLinMod","rxLogit","rxGlm")))
-    stop.Alteryx2("The object provided is not an appropriate RevoScaleR class object")
+    stop.Alteryx2(
+      XMSG(
+        "The object provided is not an appropriate RevoScaleR class object."
+      )
+    )
   the.call <- paste(capture.output(rx.obj$call), collapse = "")
   the.call = gsub("\\s\\s", "", the.call)
   # The coefficients and related estimates need to be done by class
@@ -271,59 +344,99 @@ AlteryxReportRx <- function (rx.obj, null.deviance = NULL) {
     param.names <- attributes(rx.obj$coefficients)$dimnames[[1]]
     coefs1 <- rx.obj$coefficients[,1]
     the.coefs <- format(coefs1, digits = 4)
-    the.coefs[is.na(coefs1)] <- "Dropped"
+    the.coefs[is.na(coefs1)] <- XMSG("Dropped")
     the.se <- format(rx.obj$coef.std.error[,1], digits = 4)
-    the.se[is.na(coefs1)] <- "Dropped"
+    the.se[is.na(coefs1)] <- XMSG("Dropped")
     the.t <- format(rx.obj$coef.t.value[,1], digits = 4)
-    the.t[is.na(coefs1)] <- "Dropped"
+    the.t[is.na(coefs1)] <- XMSG("Dropped")
     p.stars <- pStars(rx.obj$coef.p.value[,1])
     p.stars$p_txt <- as.character(p.stars$p_txt)
-    p.stars$p_txt[is.na(coefs1)] <- "Dropped"
+    p.stars$p_txt[is.na(coefs1)] <- XMSG("Dropped")
     p.stars$Stars <- as.character(p.stars$Stars)
     p.stars$Stars[is.na(coefs1)] <- " "
   } else {
     param.names <- names(rx.obj$coefficients)
     the.coefs <- format(rx.obj$coefficients, digits = 4)
-    the.coefs[is.na(rx.obj$coefficients)] <- "Dropped"
+    the.coefs[is.na(rx.obj$coefficients)] <- XMSG("Dropped")
     the.se <- format(rx.obj$coef.std.error, digits = 4)
-    the.se[is.na(rx.obj$coefficients)] <- "Dropped"
+    the.se[is.na(rx.obj$coefficients)] <- XMSG("Dropped")
     the.t <- format(rx.obj$coef.t.value, digits = 4)
-    the.t[is.na(rx.obj$coefficients)] <- "Dropped"
+    the.t[is.na(rx.obj$coefficients)] <- XMSG("Dropped")
     p.stars <- pStars(rx.obj$coef.p.value)
     p.stars$p_txt <- as.character(p.stars$p_txt)
-    p.stars$p_txt[is.na(rx.obj$coefficients)] <- "Dropped"
+    p.stars$p_txt[is.na(rx.obj$coefficients)] <- XMSG("Dropped")
     p.stars$Stars <- as.character(p.stars$Stars)
     p.stars$Stars[is.na(rx.obj$coefficients)] <- " "
   }
   coef.est <- paste(param.names, the.coefs, the.se, the.t, p.stars$p_txt, p.stars$Stars, sep = "|")
-  coef.lab <- "Coefficients:"
+  coef.lab <- XMSG("Coefficients:")
   omitted <- names(rx.obj$aliased)[rx.obj$aliased]
-  if (length(omitted) > 0)
-    coef.lab <- paste(coef.lab, " (", length(omitted), " not defined because of singularities)", sep = "")
+  if (length(omitted) > 0) {
+    coef.lab <- XMSG(
+      "@1 (@2  not defined because of singularities)",
+      coef.lab,
+      length(omitted)
+    )
+  }
   # Model summary, slightly different for glm based objects versus lm objects
   if (class(rx.obj) != "rxLinMod") {
-    if (class(rx.obj) == "rxGlm")
-      dispersion <- paste("(Dispersion parameter for ", rx.obj$family$family, " taken to be ", rx.obj$dispersion, ")", sep = "")
-    if (class(rx.obj) == "rxLogit")
-      dispersion <- "(Dispersion parameter for binomial taken to be 1)"
+    if (class(rx.obj) == "rxGlm") {
+      dispersion <- XMSG(
+        "(Dispersion parameter for @1 taken to be @2)",
+        rx.obj$family$family,
+        rx.obj$dispersion
+      )
+    }
+    if (class(rx.obj) == "rxLogit") {
+      dispersion <- XMSG("(Dispersion parameter for binomial taken to be 1)")
+    }
     df.null <- rx.obj$nValidObs - 1
     df.mod <- rx.obj$nValidObs - length(param.names)
-    null.dev <- paste("Null deviance:", format(null.deviance, digits = 5), "on", df.null, "degrees of freedom")
-    mod.dev <- paste("Residual deviance:", format(rx.obj$deviance, digits = 5), "on", df.mod, "degrees of freedom")
+    null.dev <- XMSG(
+      "Null deviance: @1 on @2 degrees of freedom",
+      format(null.deviance, digits = 5),
+      df.null
+    )
+    mod.dev <- XMSG(
+      "Residual deviance: @1 on @2 degrees of freedom",
+      format(rx.obj$deviance, digits = 5),
+      df.mod
+    )
     McF.R2 <- 1 - (rx.obj$deviance/null.deviance)
-    mod.fit <- paste("McFadden R-Squared: ", format(McF.R2, digits = 4), ", AIC: ", format(rx.obj$aic, digits = 4), sep = "")
-    fisher.it <- paste("Number of IRLS iterations:", rx.obj$iter)
+    mod.fit <- XMSG(
+      "McFadden R-Squared: @1, Akaike Information Criterion: @2",
+      format(McF.R2, digits = 4),
+      format(rx.obj$aic, digits = 4)
+    )
+    fisher.it <- XMSG(
+      "Number of IRLS iterations: @1",
+      rx.obj$iter
+    )
     sum.grps <- c("Call", "Coef_Label", rep("Coef_Est", length(coef.est)), "Dispersion", rep("Fit_Stats", 3), "Fisher")
     sum.out <- c(the.call, coef.lab, coef.est, dispersion, null.dev, mod.dev, mod.fit, fisher.it)
     summary.df <- data.frame(grp = sum.grps, out = sum.out)
     summary.df$grp <- as.character(summary.df$grp)
     summary.df$out <- as.character(summary.df$out)
   } else {
-    resid.se <- paste("Residual standard error:", format(rx.obj$sigma, digits = 5), "on", rx.obj$df[2], "degrees of freedom")
-    r.sq <- paste("Multiple R-squared: ", format(rx.obj$r.squared, digits = 4), ", Adjusted R-Squared: ", format(rx.obj$adj.r.squared, digits = 4), sep = "")
+    resid.se <- XMSG(
+      "Residual standard error: @1 on @2 degrees of freedom",
+      format(rx.obj$sigma, digits = 5),
+      rx.obj$df[2]
+    )
+    r.sq <- XMSG(
+      "Multiple R-squared: @1, Adjusted R-Squared: @2",
+      format(rx.obj$r.squared, digits = 4),
+      format(rx.obj$adj.r.squared, digits = 4)
+    )
     p.f <- format(rx.obj$f.pvalue, digits = 4)
     p.f[rx.obj$f.pvalue < 2.2e-16] <- "< 2.2e-16"
-    f.stat <- paste("F-statistic: ", format(rx.obj$fstatistic$value, digits = 4), " on ", as.integer(rx.obj$fstatistic$numdf), " and ", as.integer(rx.obj$fstatistic$dendf), " DF, p-value: ", p.f, sep = "")
+    f.stat <- XMSG(
+      "F-statistic: @1 on @2 and @3 degrees of freedom (DF), p-value @4",
+      format(rx.obj$fstatistic$value, digits = 4),
+      as.integer(rx.obj$fstatistic$numdf),
+      as.integer(rx.obj$fstatistic$dendf),
+      p.f
+    )
     sum.grps <- c("Call", "Coef_Label", rep("Coef_Est", length(coef.est)), rep("Fit_Stats", 3))
     sum.out <- c(the.call, coef.lab, coef.est, resid.se, r.sq, f.stat)
     summary.df <- data.frame(grp = sum.grps, out = sum.out)
