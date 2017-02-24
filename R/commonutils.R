@@ -16,21 +16,47 @@
 #' @param col color palette to use
 #' @param ... additional arguments. unused currently.
 #' @export
-plotMeans <- function (response, factor1, factor2, error.bars = c("se", "sd",
-    "conf.int", "none"), level = 0.95, xlab = deparse(substitute(factor1)),
-    ylab = paste("mean of", deparse(substitute(response))), legend.lab = deparse(substitute(factor2)),
-    main = "Plot of Means", pch = 1:n.levs.2, lty = 1:n.levs.2,
-    col = palette(), ...)
+plotMeans <- function(
+  response,
+  factor1,
+  factor2,
+  error.bars = c(
+    "se",
+    "sd",
+    "conf.int",
+    "none"
+    ),
+  level = 0.95,
+  xlab = deparse(substitute(factor1)),
+  ylab = XMSG(
+    "mean of @1",
+    deparse(substitute(response))
+  ),
+  legend.lab = deparse(substitute(factor2)),
+  main = XMSG("Plot of Means"),
+  pch = 1:n.levs.2,
+  lty = 1:n.levs.2,
+  col = palette(), ...)
 {
-    if (!is.numeric(response))
-        stop.Alteryx2("Argument response must be numeric.")
+    if (!is.numeric(response)) {
+      stop.Alteryx2(
+        XMSG(
+          "Argument response must be numeric."
+          )
+        )
+    }
     xlab
     ylab
     legend.lab
     error.bars <- match.arg(error.bars)
     if (missing(factor2)) {
-        if (!is.factor(factor1))
-            stop.Alteryx2("Argument factor1 must be a factor.")
+        if (!is.factor(factor1)) {
+          stop.Alteryx2(
+            XMSG(
+              "Argument factor1 must be a factor."
+            )
+          )
+        }
         valid <- complete.cases(factor1, response)
         factor1 <- factor1[valid]
         response <- response[valid]
@@ -60,8 +86,13 @@ plotMeans <- function (response, factor1, factor2, error.bars = c("se", "sd",
                 angle = 90, lty = 2, code = 3, length = 0.125)
     }
     else {
-        if (!(is.factor(factor1) | is.factor(factor2)))
-            stop.Alteryx2("Arguments factor1 and factor2 must be factors.")
+        if (!(is.factor(factor1) | is.factor(factor2))) {
+          stop.Alteryx2(
+            XMSG(
+              "Arguments factor1 and factor2 must be factors."
+              )
+            )
+        }
         valid <- complete.cases(factor1, factor2, response)
         factor1 <- factor1[valid]
         factor2 <- factor2[valid]
@@ -89,9 +120,15 @@ plotMeans <- function (response, factor1, factor2, error.bars = c("se", "sd",
             col <- rep(col, n.levs.2)
         if (length(lty) == 1)
             lty <- rep(lty, n.levs.2)
-        if (n.levs.2 > length(col))
-            stop.Alteryx2(sprintf("Number of groups for factor2, %d, exceeds number of distinct colours, %d.",
-                n.levs.2, length(col)))
+        if (n.levs.2 > length(col)) {
+          stop.Alteryx2(
+            XMSG(
+              "Number of groups for factor2, @1, exceeds number of distinct colours, @2.",
+              n.levs.2,
+              length(col)
+            )
+          )
+        }
         plot(c(1, n.levs.1 * 1.4), yrange, type = "n", xlab = xlab,
             ylab = ylab, axes = FALSE, main = main, ...)
         box()
@@ -275,7 +312,11 @@ pStars <- function (p.val){
 #' @author Dan Putler
 unitScale <- function(x) {
   if (!(class(x) %in% c("matrix", "data.frame", "numeric", "integer"))) {
-    stop.Alteryx2("The function argument cannot be coerced to be a matrix")
+    stop.Alteryx2(
+      XMSG(
+        "The function argument cannot be coerced to be a matrix."
+        )
+      )
   }
   if (class(x) == "data.frame") {
     x <- data.matrix(x)
@@ -284,13 +325,19 @@ unitScale <- function(x) {
     x <- as.matrix(x)
   }
   if (class(as.vector(x[,1])) == "character") {
-    stop.Alteryx2("The function argument must consist of numeric and/or integer data")
+    stop.Alteryx2(
+      XMSG("The function argument must consist of numeric and/or integer data."
+      )
+    )
   }
   min.x <- apply(x, 2, min)
   max.x <- apply(x, 2, max)
   max.min <- max.x - min.x
   if (any(max.min == 0)) {
-    stop.Alteryx2("One or more of the provided data columns has a single data value")
+    stop.Alteryx2(
+      XMSG("One or more of the provided data columns has a single data value."
+      )
+    )
   }
   # Subtract the column minimums
   x <- sweep(x, 2, min.x)
@@ -350,16 +397,37 @@ bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
   cex = rep(par("cex"), 2), xlabs = NULL, ylabs = NULL, expand=1, xlim = NULL,
   ylim = NULL, arrow.len = 0.1, main = NULL, sub = NULL, xlab = NULL,
   ylab = NULL, ...) {
-    if(length(choices) != 2) stop.Alteryx2("length of choices must be 2")
-    if(!length(scores <- pc$x))
-	stop.Alteryx2(gettextf("object '%s' has no scores", deparse(substitute(x))),
-             domain = NA)
-    if(is.complex(scores))
-        stop.Alteryx2("biplots are not defined for complex PCA")
+    if(length(choices) != 2) {
+      stop.Alteryx2(
+        XMSG(
+          "Length of choices must be 2."
+        )
+      )
+    }
+    if(!length(scores <- pc$x)) {
+      stop.Alteryx2(
+        XMSG("object @1 has no scores",
+             deparse(substitute(x))
+        )
+      )
+    }
+    if(is.complex(scores)) {
+      stop.Alteryx2(
+        XMSG(
+          "biplots are not defined for complex PCA"
+        )
+      )
+    }
     lam <- pc$sdev[choices]
     n <- NROW(scores)
     lam <- lam * sqrt(n)
-    if(scale < 0 || scale > 1) warning("'scale' is outside [0, 1]")
+    if(scale < 0 || scale > 1) {
+      warning(
+        XMSG(
+          "'scale' is outside [0, 1]"
+        )
+      )
+    }
     if(scale != 0) lam <- lam^scale else lam <- 1
     if(pc.biplot) lam <- lam / sqrt(n)
     cntrs <- apply(data.frame(scores[, choices]), MARGIN=2,
@@ -377,8 +445,10 @@ bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
     xlabs <- as.character(xlabs)
     dimnames(x) <- list(xlabs, dimnames(x)[[2]])
     if (missing(ylabs)) {
-	  ylabs <- dimnames(y)[[1]]
-	  if (is.null(ylabs)) ylabs <- paste("Var", 1:p)
+	    ylabs <- dimnames(y)[[1]]
+	    if (is.null(ylabs)) {
+	      ylabs <- paste(XMSG("Variable"), 1:p)
+	    }
     }
     ylabs <- as.character(ylabs)
     dimnames(y) <- list(ylabs, dimnames(y)[[2]])
@@ -450,10 +520,22 @@ bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
 #' @export
 standardize <- function(x, std.vec1, std.vec2) {
   # Input checking
-  if (!all(names(std.vec1) == names(std.vec2)))
-    stop.Alteryx2("The two standarization vectors must have the same names")
-  if (!all(dimnames(x)[[2]] == names(std.vec1)))
-    stop.Alteryx2("The data matrix and the standaridization vectors must have the same names")
+  if (!all(names(std.vec1) == names(std.vec2))) {
+    stop.Alteryx2(
+      XMSG(
+        "The two standarization vectors must have the same names."
+      )
+    )
+  }
+
+  if (!all(dimnames(x)[[2]] == names(std.vec1))) {
+    stop.Alteryx2(
+      XMSG(
+        "The data matrix and the standaridization vectors must have the same names."
+      )
+    )
+  }
+
   x <- sweep(x, 2, std.vec1)
   x <- sweep(x, 2, std.vec2, FUN="/")
   x
@@ -533,10 +615,27 @@ bootCH <- function(xdat, k_vals, clstr1, clstr2, cntrs1, cntrs2,
 # varImpPlot() function to only do a single plot related to model error as
 # opposed to the Gini or leaf purity
 # Author: Dan Putler
-varImpPlot.Alteryx <- function(x, sort=TRUE, n.var=min(30, nrow(x$importance)),
-  type=NULL, class=NULL, scale=TRUE, main="Variable Importance Plot", ...) {
-  if(!inherits(x, "randomForest")) {
-    stop.Alteryx2("This function only works for objects of class `randomForest'")
+varImpPlot.Alteryx <- function(
+  x,
+  sort = TRUE,
+  n.var = min(
+    30,
+    nrow(
+      x$importance
+    )
+  ),
+  type = NULL,
+  class = NULL,
+  scale = TRUE,
+  main = XMSG("Variable Importance Plot"),
+  ...
+) {
+  if (!inherits(x, "randomForest")) {
+    stop.Alteryx2(
+      XMSG(
+        "This function only works for objects of class `randomForest'."
+      )
+    )
   }
   imp <- randomForest::importance(x, class=class, scale=scale, type=type, ...)
   print(colnames(imp))
@@ -732,14 +831,25 @@ graphWHR <- function(inches = c("True", "False"), in.w , in.h, cm.w = NULL,
 #' @author Dan Putler
 #' @export
 validName <- function(name) {
-  if (!is.character(name) || length(name) > 1)
-    stop.Alteryx2("The name provided needs to be a character string")
+  if (!is.character(name) || length(name) > 1) {
+    stop.Alteryx2(
+      XMSG(
+        "The name provided needs to be a character string."
+      )
+    )
+  }
   if (name != make.names(name)) {
     old.name <- name
     name <- gsub("\\.", "\\_", make.names(name))
     AlteryxMessage2(
-      paste("The invalid name", old.name, "has been replaced by", name),
-        2, 2, 0
+      XMSG(
+        "The invalid name @1 has been replaced by @2.",
+        old.name,
+        name
+      ),
+      2,
+      2,
+      0
     )
   }
   name
