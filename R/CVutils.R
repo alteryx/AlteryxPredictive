@@ -38,43 +38,85 @@ checkFactorVars <- function(data, folds, config) {
       currentVar <- factorVars[,k]
       #We want to check if one of the folds on one of the trials is missing any classes.
       #If a class is missing from a fold, we output a warning suggesting that the user check their data/try to collect more data.
-      #If a training set is missing a class, we output a fatal error telling the user they must ensure
+      #If a training set is missing a class, we output a message telling the user they must ensure
       #that each training set contains all classes.
       for (i in 1: (config$numberTrials)) {
         for (j in 1:(config$numberFolds)) {
           currentTestRecords <- currentVar[unlist(folds[[i]][j])]
           currentTrainingRecords <- currentVar[unlist(folds[[i]][-j])]
-          missingTestClasses <- getMissingClasses(currentClasses = uniqueClasses, currentRecords = currentTestRecords)
-          missingTrainingClasses <- getMissingClasses(currentClasses = uniqueClasses, currentRecords = currentTrainingRecords)
+          missingTestClasses <- getMissingClasses(
+            currentClasses = uniqueClasses,
+            currentRecords = currentTestRecords
+          )
+          missingTrainingClasses <- getMissingClasses(
+            currentClasses = uniqueClasses,
+            currentRecords = currentTrainingRecords
+          )
           #testing if all classes are represented in trial i, fold j
           if (length(missingTestClasses) > 0) {
             currentColumnName <- colnames(factorVars)[k]
             if (length(missingTestClasses) > 1) {
-              warningMessage1 <- paste0("Classes ", missingTestClasses, " were not present in variable ", currentColumnName, " of the test set.")
-              warningMessage2 <- "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on these classes."
-            } else {
-              warningMessage1 <- paste0("Class ", missingTestClasses, " was not present in variable ", currentColumnName, " of the test set.")
-              warningMessage2 <- "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on this class."
-            }
-            AlteryxMessage2(warningMessage1)
-            AlteryxMessage2(warningMessage2)
+              warningMessage1 <- XMSG(
+                "Classes @1 were not present in variable @2 of the test set.",
+                missingTestClasses,
+                currentColumnName
+              )
+              warningMessage2 <- XMSG(
+                "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on these classes."
+              )
+              } else {
+              warningMessage1 <- XMSG(
+                "Class @1 was not present in variable @2 of the test set.",
+                missingTestClasses,
+                currentColumnName
+              )
+              warningMessage2 <- XMSG(
+                "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on this class."
+              )
+              }
+            AlteryxMessage2(
+              warningMessage1,
+              iType = 1,
+              iPriority = 3
+            )
+            AlteryxMessage2(
+              warningMessage2,
+              iType = 1,
+              iPriority = 3
+            )
           }
           #testing if all classes are represented in the training set when trial i, fold j is the test set.
           #So the training set here is trial i, all folds except fold j.
           if (length(missingTrainingClasses) > 0) {
             currentColumnName <- colnames(factorVars)[k]
             if (length(missingTrainingClasses) > 1) {
-              warningMessage1 <- paste0("Classes ", missingTrainingClasses, " were not present in variable ", currentColumnName," of the training set.")
-              warningMessage2 <- "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on these classes."
-              errorMessage <- "It is very difficult to create an accurate model when the training set is missing a class."
-            } else {
-              warningMessage1 <- paste0("Class ", missingTrainingClasses, " was not present in variable ", currentColumnName, " of the training set.")
-              warningMessage2 <- "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on this class."
-              errorMessage <- "It is very difficult to create an accurate model when the training set is missing classes."
+              warningMessage1 <- XMSG(
+                "Classes @1 were not present in variable @2 of the training set.",
+                missingTrainingClasses,
+                currentColumnName
+              )
+              warningMessage2 <- XMSG(
+                "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on these classes."
+              )
+              errorMessage <- XMSG(
+                "It is very difficult to create an accurate model when the training set is missing classes."
+              )
+              } else {
+              warningMessage1 <- XMSG(
+                "Class @1 was not present in variable @2 of the training set.",
+                missingTrainingClasses,
+                currentColumnName
+              )
+              warningMessage2 <- XMSG(
+                "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on this class."
+              )
+              errorMessage <- XMSG(
+                "It is very difficult to create an accurate model when the training set is missing a class."
+              )
             }
-            AlteryxMessage2(warningMessage1)
-            AlteryxMessage2(warningMessage2)
-            AlteryxMessage2(errorMessage)
+            AlteryxMessage2(warningMessage1, iType = 1, iPriority = 3)
+            AlteryxMessage2(warningMessage2, iType = 1, iPriority = 3)
+            AlteryxMessage2(errorMessage, iType = 2, iPriority = 3)
           }
         }
       }
@@ -96,8 +138,17 @@ createFolds <- function(data, config, set_seed = TRUE, seed = NULL) {
   if (set_seed) {
     set.seed(seed)
   }
-  foldList <- TunePareto::generateCVRuns(labels = target, ntimes = config$numberTrials, nfold = config$numberFolds, stratified = config$stratified)
-  checkFactorVars(data = data, folds = foldList, config = config)
+  foldList <- TunePareto::generateCVRuns(
+    labels = target,
+    ntimes = config$numberTrials,
+    nfold = config$numberFolds,
+    stratified = config$stratified
+  )
+  checkFactorVars(
+    data = data,
+    folds = foldList,
+    config = config
+  )
   return(foldList)
 }
 
@@ -113,9 +164,17 @@ getYvars <- function(data, models) {
   # throw an error.
   y_names <- sapply(models, getYVar)
   if (!all(y_names == y_names[1])) {
-    stop.Alteryx2("More than one target variable are present in the provided models")
+    stop.Alteryx2(
+      XMSG(
+        "More than one target variable are present in the provided models."
+      )
+    )
   } else if (!(y_names[1] %in% colnames(data))) {
-    stop.Alteryx2("The target variable from the models is different than the target chosen in the configuration. Please check your configuration settings and try again.")
+    stop.Alteryx2(
+      XMSG(
+        "The target variable from the models is different than the target chosen in the configuration. Please check your configuration settings and try again."
+        )
+      )
   }
   # get the target variable name
   y_name <- y_names[1]
@@ -125,18 +184,25 @@ getYvars <- function(data, models) {
 
 #' Get the postive class for two-class classification, choosing the
 #' positive class to the less-common class when all else fails.
-#'
+#' This function is localized: it tries to match target_levels to an
+#' appropriate string based on the user's language.
 #' @param target_levels a vector of strings with the target variable's levels
 #' @return string - name of positive class
 #' @export
 getPositiveClass <- function(target_levels) {
   # no/yes
-  yes_id <- match("yes", tolower(target_levels))
+  yes_id <- match(
+    XMSG("yes"),
+    tolower(target_levels)
+  )
   if (!is.na(yes_id)) {
     return (target_levels[yes_id])
   }
   # false/true
-  true_id <- match("true", tolower(target_levels))
+  true_id <- match(
+    XMSG("true"),
+    tolower(target_levels)
+  )
   if(!is.na(true_id)) {
     return (target_levels[true_id])
   }
@@ -148,7 +214,9 @@ getPositiveClass <- function(target_levels) {
   # Nothing obvious, so assume less-common class is positive.
   first_class <- target_levels[1]
   second_class <- target_levels[which(target_levels != first_class)[1]]
-  if (length(which(target_levels == first_class)) > length(which(target_levels == second_class))) {
+  if (length(which(target_levels == first_class)) > length(
+    which(target_levels == second_class)
+    )) {
     #First_class is larger, so second_class is the positive class
     return (second_class)
   } else {
@@ -192,7 +260,7 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
     } else{
       currentModel <- update(model, data = trainingData)
     }
-    pred <- scoreModel(currentModel, new.data = testData)
+    pred <- scoreModel(currentModel, new.data = testData, score.field = "Score")
     actual <- (extras$yVar)[testIndices]
     recordID <- (data[testIndices,])$recordID
     if (config$classification) {
@@ -223,7 +291,9 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
       trainingData_noyvar <- trainingData[, !(colnames(trainingData) %in% currentYvar), drop = FALSE]
       trainingData_noyvar <- df2NumericMatrix(
         x = trainingData_noyvar,
-        filtering_message = "Non-numeric variables are among the predictors. They are now being removed.",
+        filtering_message = XMSG(
+          "Non-numeric variables are among the predictors. They are now being removed."
+        ),
         convertVectorToDataFrame = TRUE
       )
       #No need to call df2NmericMatrix on testData, since scoreModel calls df2NumericMatrix with glmnet models.
@@ -245,15 +315,30 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
             )
           }
         )
-        currentModel <- update(model, formula. = makeFormula(getXVars(model), currentYvar), data = environment(), weights = trainingData$`Weight Vec`)
+        currentModel <- update(
+          model,
+          formula. = makeFormula(
+            getXVars(model),
+            currentYvar
+          ),
+          data = environment(),
+          weights = trainingData$`Weight Vec`
+        )
       } else {
-        currentModel <- update(model, formula. = makeFormula(getXVars(model), currentYvar), data = trainingData)
+        currentModel <- update(
+          model,
+          formula. = makeFormula(
+            getXVars(model),
+            currentYvar
+          ),
+          data = trainingData
+        )
       }
     }
     # if (inherits(currentModel, 'gbm')){
     #   currentModel <- adjustGbmModel(currentModel)
     # }
-    pred <- scoreModel(currentModel, new.data = testData)
+    pred <- scoreModel(currentModel, new.data = testData, score.field = "Score")
     actual <- (extras$yVar)[testIndices]
     recordID <- (data[testIndices,])$recordID
     if (config$classification) {
@@ -276,7 +361,16 @@ getCrossValidatedResults <- function(inputs, allFolds, extras, config){
     testIndices <- allFolds[[trial]][[fold]]
     out <- (safeGetActualAndResponse(model, inputs$data, testIndices, extras, mid, config))
     if (is.null(out)) {
-      AlteryxMessage2(paste0("For model ", mid, " trial ", trial, " fold ", fold, " the data could not be scored."), iType = 2, iPriority = 3)
+      AlteryxMessage2(
+        XMSG(
+          "For model @1 trial @2 fold @3 the data could not be scored.",
+          mid,
+          trial,
+          fold
+        ),
+        iType = 2,
+        iPriority = 3
+      )
     } else {
       out <- cbind(trial = trial, fold = fold, mid = mid, out)
     }
@@ -295,10 +389,24 @@ getMeasuresRegression <- function(outData, extras) {
   err <- actual - predicted
   rmse <- sqrt(mean(err*err))
   mae <- mean(abs(err))
-  # When there are values near 0 in the target variable, it can lead to an attempt to divide by 0
+  # When there are values near 0 in the target variable, it can lead to an
+  # attempt to divide by 0.
   # In this case, use the weighted version.
   if (any(abs(actual) < 0.001)) {
-    AlteryxMessage2("The target variable contains values very close to 0 (-0.001, 0.001). WPE and WAPE are being used instead of MPE and MAPE.", iType = 2, iPriority = 3)
+    AlteryxMessage2(
+      XMSG(
+        "The target variable contains values very close to 0 (-0.001, 0.001)."
+      ),
+      iType = 2,
+      iPriority = 3
+    )
+    AlteryxMessage2(
+      XMSG(
+        "Weighted Percent Error (WPE) and Weighted Absolute Percent Error (WAPE) are being used instead of Mean Percent Error (MPE) and Mean Percent Error (MAPE)."
+      ),
+      iType = 2,
+      iPriority = 3
+    )
     mpe <- 100 * sum(err) / sum(actual)
     mape <- 100 * sum(abs(err)) / sum(actual)
   } else {
@@ -395,7 +503,19 @@ generateConfusionMatrices <- function(outData, extras) {
   for (i in 1:length(extras$levels)) {
     outvec[i] <- length(which((outData$actual) == ((extras$levels)[i])))
   }
-  return(c(mid = unique(outData$mid), trial = unique(outData$trial), fold = unique(outData$fold), Predicted_class = as.character(unique(outData$response)), outvec))
+  return(
+    c(
+      mid = unique(outData$mid),
+      trial = unique(outData$trial),
+      fold = unique(outData$fold),
+      Predicted_class = as.character(
+        unique(
+          outData$response
+        )
+      ),
+      outvec
+    )
+  )
 }
 
 generateOutput3 <- function(data, extras, modelNames) {
@@ -508,23 +628,46 @@ plotBinaryData <- function(plotData, config, modelNames) {
   modelVec <- modelNames[plotData$mid]
   trialVec <- paste0('Trial ', plotData$trial)
   plotData <- cbind(plotData, modelVec, trialVec)
-  liftdf <- data.frame(Rate_positive_predictions = plotData$Rate_Pos_Predictions, lift = plotData$lift, fold = paste0("Fold", plotData$fold),
-                       models = plotData$modelVec, trial = plotData$trialVec)
-  gaindf <- data.frame(Rate_positive_predictions = plotData$Rate_Pos_Predictions, True_Pos_Rate = plotData$True_Pos_Rate, fold = paste0("Fold", plotData$fold),
-                       models = plotData$modelVec, trial = plotData$trialVec)
-  prec_recalldf <- data.frame(recall = plotData$recall, precision = plotData$Precision, fold = paste0("Fold", plotData$fold),
-                              models = plotData$modelVec, trial = plotData$trialVec)
-  rocdf <- data.frame(False_Pos_Rate = plotData$False_Pos_Rate, True_Pos_Rate = plotData$True_Pos_Rate, fold = paste0("Fold", plotData$fold),
-                      models = plotData$modelVec, trial = plotData$trialVec)
+  liftdf <- data.frame(
+    Rate_positive_predictions = plotData$Rate_Pos_Predictions,
+    lift = plotData$lift,
+    fold = paste0("Fold", plotData$fold),
+    models = plotData$modelVec,
+    trial = plotData$trialVec
+  )
+  gaindf <- data.frame(
+    Rate_positive_predictions = plotData$Rate_Pos_Predictions,
+    True_Pos_Rate = plotData$True_Pos_Rate,
+    fold = paste0("Fold", plotData$fold),
+    models = plotData$modelVec,
+    trial = plotData$trialVec
+  )
+  prec_recalldf <- data.frame(
+    recall = plotData$recall,
+    precision = plotData$Precision,
+    fold = paste0("Fold", plotData$fold),
+    models = plotData$modelVec,
+    trial = plotData$trialVec
+  )
+  rocdf <- data.frame(
+    False_Pos_Rate = plotData$False_Pos_Rate,
+    True_Pos_Rate = plotData$True_Pos_Rate,
+    fold = paste0("Fold", plotData$fold),
+    models = plotData$modelVec,
+    trial = plotData$trialVec)
 
   liftPlotObj <- ggplot2::ggplot(data = liftdf, aes_string(x = "Rate_positive_predictions", y = "lift")) +
-    ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle("Lift curves")
+    ggplot2::geom_smooth(aes_string(colour="models")) +
+    ggplot2::ggtitle(XMSG("Lift curves"))
   gainPlotObj <- ggplot2::ggplot(data = gaindf, aes_string(x = "Rate_positive_predictions", y = "True_Pos_Rate")) +
-    ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle('Gain Charts')
+    ggplot2::geom_smooth(aes_string(colour="models")) +
+    ggplot2::ggtitle(XMSG('Gain Charts'))
   PrecRecallPlotObj <- ggplot2::ggplot(data = prec_recalldf, aes_string(x = "recall", y = "precision")) +
-    ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle('Precision and Recall Curves')
+    ggplot2::geom_smooth(aes_string(colour="models")) +
+    ggplot2::ggtitle(XMSG('Precision and Recall Curves'))
   ROCPlotObj <- ggplot2::ggplot(data = rocdf, aes_string(x = "False_Pos_Rate", y = "True_Pos_Rate")) +
-    ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle('ROC Curves')
+    ggplot2::geom_smooth(aes_string(colour="models")) +
+    ggplot2::ggtitle(XMSG('ROC Curves'))
   AlteryxGraph2(liftPlotObj, nOutput = 4)
   AlteryxGraph2(gainPlotObj, nOutput = 4)
   AlteryxGraph2(PrecRecallPlotObj, nOutput = 4)
@@ -538,7 +681,8 @@ plotRegressionData <- function(plotData, config, modelNames) {
   plotdf <- data.frame(Actual = plotData$actual, Predicted = plotData$response, fold = paste0("Fold", plotData$fold),
                        models = plotData$modelVec, trial = plotData$trialVec)
   plotObj <- ggplot2::ggplot(data = plotdf, aes_string(x = "Actual", y = "Predicted")) +
-    ggplot2::geom_smooth(aes_string(colour="models")) + ggplot2::ggtitle("Predicted value vs actual values")
+    ggplot2::geom_smooth(aes_string(colour="models")) +
+    ggplot2::ggtitle(XMSG("Predicted value vs actual values"))
   AlteryxGraph2(plotObj, nOutput = 4)
 }
 
@@ -556,15 +700,23 @@ checkXVars <- function(inputs){
       mvars1 <- modelXVars[[i]]
       mvars2 <- modelXVars[[i + 1]]
       if (!areIdentical(mvars1, mvars2)){
-        errorMsg <- paste("Models", modelNames[i] , "and", modelNames[i + 1],
-                          "were created using different predictor variables.")
-        stopMsg <- "Please ensure all models were created using the same predictors."
+        errorMsg <- XMSG(
+          "Models @1 and @2 were created using different predictor variables.",
+          modelNames[i],
+          modelNames[i + 1]
+        )
+        stopMsg <- XMSG(
+          "Please ensure all models were created using the same predictors."
+        )
       }
       else if (!all(mvars1 %in% dataXVars)){
-        errorMsg <- paste("Model ", modelNames[i],
-                          "used predictor variables which were not contained in the input data.")
-        stopMsg <- paste("Please ensure input data contains all the data",
-                         "used to create the models and try again.")
+        errorMsg <- XMSG(
+          "Model @1 used predictor variables which were not contained in the input data.",
+          modelNames[i]
+        )
+        stopMsg <- XMSG(
+          "Please ensure input data contains all the data used to create the models and try again."
+        )
       }
       if (!is.null(errorMsg)){
         AlteryxMessage2(errorMsg, iType = 2, iPriority = 3)
@@ -574,10 +726,13 @@ checkXVars <- function(inputs){
   } else {
     mvars1 <- modelXVars[[1]]
     if (!all(mvars1 %in% dataXVars)){
-      errorMsg <- paste("Model ", modelNames[1],
-                        "used predictor variables which were not contained in the input data.")
-      stopMsg <- paste("Please ensure input data contains all the data",
-                       "used to create the models and try again.")
+      errorMsg <- XMSG(
+        "Model @1 used predictor variables which were not contained in the input data.",
+        modelNames[1]
+      )
+      stopMsg <- XMSG(
+        "Please ensure input data contains all the data used to create the models and try again."
+      )
     }
     if (!is.null(errorMsg)){
       AlteryxMessage2(errorMsg, iType = 2, iPriority = 3)
@@ -590,9 +745,8 @@ glmnetUpdate <- function(model, trainingData_noyvar, y_vec, config, weight_vec =
   predictors <- trainingData_noyvar[,getXVars(model)]
   if (ncol(predictors) < 2) {
     stop.Alteryx2(
-      paste0(
-        "Regularization requires at least two numeric predictors. ",
-        "Please  switch to a non-regularized model, or use more predictors. "
+      XMSG(
+        "Regularization requires at least two numeric predictors. Please  switch to a non-regularized model, or use more predictors. "
       )
     )
   }
