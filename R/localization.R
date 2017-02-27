@@ -14,34 +14,53 @@
 #' @param in.sixthBindVar_sc the sixth bind variable
 #' @export
 XMSG <- function(
-  in.translString_sc,
-  in.firstBindVar_sc = NULL,
-  in.secondBindVar_sc = NULL,
-  in.thirdBindVar_sc = NULL,
-  in.fourthBindVar_sc = NULL,
-  in.fifthBindVar_sc = NULL,
-  in.sixthBindVar_sc = NULL
+  in.targetString_sc,
+  in.firstBindVariable_sc = NULL,
+  in.secondBindVariable_sc = NULL,
+  in.thirdBindVariable_sc = NULL,
+  in.fourthBindVariable_sc = NULL,
+  in.fifthBindVariable_sc = NULL,
+  in.sixthBindVariable_sc = NULL
 ){
-  return(
-    paste0(
-      'main string: [[[',
-      toupper(
-        in.translString_sc
-        ),
-      ']]]. bindvars: ',
-      in.firstBindVar_sc,
-      " ",
-      in.secondBindVar_sc,
-      " ",
-      in.thirdBindVar_sc,
-      " ",
-      in.fourthBindVar_sc,
-      " ",
-      in.fifthBindVar_sc,
-      " ",
-      in.sixthBindVar_sc
+  bindVariable_vc <- c(
+    in.firstBindVariable_sc,
+    in.secondBindVariable_sc,
+    in.thirdBindVariable_sc,
+    in.fourthBindVariable_sc,
+    in.fifthBindVariable_sc,
+    in.sixthBindVariable_sc
+  )
+  returnValue_sc <- paste0(
+    '[[[',
+    in.targetString_sc
+  )
+  if(length(bindVariable_vc) > 0){
+    for(i in 1:length(bindVariable_vc)){
+      returnValue_sc <- paste0(
+        returnValue_sc,
+        '++',
+        bindVariable_vc[i]
       )
-    )
+    }
+  }
+  returnValue_sc <- paste0(
+    returnValue_sc,
+    ']]]'
+  )
+  return(returnValue_sc)
 }
 
-
+xmsg_and_pipe_delimit <- function(in.term_vc){
+  returnValue_sc <- paste0(
+    unlist(
+      sapply(
+        X = 1:length(in.term_vc),
+        FUN = function(X){
+          XMSG(in.term_vc[X])
+        }
+      )
+    ),
+    collapse = '|'
+  )
+  return(returnValue_sc)
+}
