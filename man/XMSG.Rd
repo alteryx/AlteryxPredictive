@@ -2,29 +2,34 @@
 % Please edit documentation in R/localization.R
 \name{XMSG}
 \alias{XMSG}
-\title{localization.R}
+\title{localization.R
+translates input string and embeds any bind-variable values in result}
 \usage{
-XMSG(in.translString_sc, in.firstBindVar_sc = NULL,
-  in.secondBindVar_sc = NULL, in.thirdBindVar_sc = NULL,
-  in.fourthBindVar_sc = NULL, in.fifthBindVar_sc = NULL,
-  in.sixthBindVar_sc = NULL)
+XMSG(in.targetString_sc, in.firstBindVariable_sc = NULL,
+  in.secondBindVariable_sc = NULL, in.thirdBindVariable_sc = NULL,
+  in.fourthBindVariable_sc = NULL, in.fifthBindVariable_sc = NULL,
+  in.sixthBindVariable_sc = NULL)
 }
 \arguments{
-\item{in.translString_sc}{the input string to translate}
+\item{in.targetString_sc}{the input string to translate}
 
-\item{in.firstBindVar_sc}{the first bind variable}
+\item{in.firstBindVariable_sc}{the first bind variable}
 
-\item{in.secondBindVar_sc}{the second bind variable}
+\item{in.secondBindVariable_sc}{the second bind variable}
 
-\item{in.thirdBindVar_sc}{the third bind variable}
+\item{in.thirdBindVariable_sc}{the third bind variable}
 
-\item{in.fourthBindVar_sc}{the fourth bind variable}
+\item{in.fourthBindVariable_sc}{the fourth bind variable}
 
-\item{in.fifthBindVar_sc}{the fifth bind variable}
+\item{in.fifthBindVariable_sc}{the fifth bind variable}
 
-\item{in.sixthBindVar_sc}{the sixth bind variable}
+\item{in.sixthBindVariable_sc}{the sixth bind variable}
+}
+\value{
+translated string with embedded bind-variable values (if any)
 }
 \description{
 localization.R
+translates input string and embeds any bind-variable values in result
 }
 

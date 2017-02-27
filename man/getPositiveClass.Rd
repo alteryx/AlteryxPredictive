@@ -3,7 +3,9 @@
 \name{getPositiveClass}
 \alias{getPositiveClass}
 \title{Get the postive class for two-class classification, choosing the
-positive class to the less-common class when all else fails.}
+positive class to the less-common class when all else fails.
+This function is localized: it tries to match target_levels to an
+appropriate string based on the user's language.}
 \usage{
 getPositiveClass(target_levels)
 }
@@ -16,5 +18,7 @@ string - name of positive class
 \description{
 Get the postive class for two-class classification, choosing the
 positive class to the less-common class when all else fails.
+This function is localized: it tries to match target_levels to an
+appropriate string based on the user's language.
 }
 
