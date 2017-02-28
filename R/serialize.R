@@ -40,7 +40,11 @@ checkModelObjects <- function(name, default){
   if(identical(names.field, c("Name", "Object"))) {
     invisible()
   } else {
-    stop.Alteryx2("The input stream does not appear to be an R model object.")
+    stop.Alteryx2(
+      XMSG(
+        in.targetString_sc = "The input stream does not appear to be an R model object."
+      )
+    )
   }
 }
 

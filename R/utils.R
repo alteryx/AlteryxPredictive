@@ -40,17 +40,15 @@ rSquared <- function(
     !inherits(x = numeric_vector_2, what = 'numeric')
   ){
     stop.Alteryx2(
-      msg = paste(
-        "An object other than a numeric vector was passed to",
-        "AlteryxPredictive::rSquared().  Please contact Alteryx Support. "
+      msg = XMSG(
+        in.targetString_sc = "An object other than a numeric vector was passed to AlteryxPredictive::rSquared(). Please contact Alteryx Support."
       )
     )
   }
   if(length(numeric_vector_1) != length(numeric_vector_2)){
     stop.Alteryx2(
-      msg = paste(
-        "The vectors passed to AlteryxPredictive::rSquared() were of",
-        "unequal length.  Please contact Alteryx Support. "
+      msg = XMSG(
+        in.targetString_sc = "The vectors passed to AlteryxPredictive::rSquared() were of unequal length. Please contact Alteryx Support."
       )
     )
   }
