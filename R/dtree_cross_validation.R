@@ -57,7 +57,11 @@ getResultsCrossValidationDTree <- function(inputs, config){
         # Generate an empty plot
         empty_df <- data.frame()
         emptyPlot <- ggplot2::ggplot(empty_df) + ggplot2::geom_point() + ggplot2::xlim(0, 1) + ggplot2::ylim(0, 1) +
-          ggplot2::ggtitle("No plots available for >2 class classification")
+          ggplot2::ggtitle(
+            XMSG(
+              in.targetString_sc = "No plots available for >2 class classification"
+            )
+          )
         AlteryxGraph2(emptyPlot, nOutput = 4)
       }
     } else {

@@ -95,7 +95,13 @@ createReportLinearOSR <- function(the.model, config){
 #' @export
 #' @rdname createReportLinear
 createReportLinearXDF <- function(the.model, config){
-  AlteryxMessage2("Creation of the Analysis of Variance table was surpressed due to the use of an XDF file", iType = 2, iPriority = 3)
+  AlteryxMessage2(
+    XMSG(
+      in.targetString_sc = "Creation of the Analysis of Variance table was surpressed due to the use of an XDF file."
+    ),
+    iType = 2,
+    iPriority = 3
+  )
   lm.out <- AlteryxReportRx(the.model)
   lm.out <- rbind(c("Model_Name", config$`Model Name`), lm.out)
   lm.out
@@ -118,7 +124,11 @@ createPlotOutputsLinearOSR <- function(the.model){
 #'
 #' @export
 createPlotOutputsLinearXDF <- function(){
-  noDiagnosticPlot("The diagnostic plot is not available for XDF based models")
+  noDiagnosticPlot(
+    XMSG(
+      in.targetString_sc = "The diagnostic plot is not available for XDF based models."
+    )
+  )
 }
 
 

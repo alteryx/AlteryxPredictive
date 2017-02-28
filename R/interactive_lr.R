@@ -53,21 +53,22 @@ interactive_lr <- function(
   cv_b <- FALSE
   if('glm' %in% class(model)){
     glm_b <- TRUE
-    title <- 'Classical Logistic Regression'
+    title <- XMSG(in.targetString_sc = 'Classical Logistic Regression')
   } else if(any(c('reg_glm', 'glmnet') %in% class(model))){
     regularized_b <- TRUE
-    title <- 'Regularized Logistic Regression'
+    title <- XMSG(in.targetString_sc = 'Regularized Logistic Regression')
   } else if(any(c('cv.glmt', 'cv.glmnet') %in% class(model))){
     cv_b <- TRUE
-    title <- 'Cross-Validated Logistic Regression'
+    title <- XMSG(in.targetString_sc = 'Cross-Validated Logistic Regression')
   } else{
-    return(badDash(
-      paste0(
-        'Interactive visualization not available for models of class ',
-        class(model),
-        '.'
+    return(
+      badDash(
+        XMSG(
+          in.targetString_sc = 'Interactive visualization not available for models of class @1.',
+          in.firstBindVariable_sc = class(model)
+        )
       )
-    ))
+    )
   }
   logistic_b <- FALSE
   probit_b <- FALSE
@@ -87,16 +88,14 @@ interactive_lr <- function(
         link_function <- 'complementary log log'
       } else{
         return(badDash(
-          paste(
-            'An invalid link function was passed to interactive_lr. ',
-            'Please contact Alteryx support!')
+          XMSG(
+            in.targetString_sc = 'An invalid link function was passed to interactive_lr. Please contact Alteryx support!')
         ))
       }
     } else{
       return(badDash(
-        paste(
-          'An invalid model family was passed to interactive_lr. ',
-          'Please contact Alteryx support!'
+        XMSG(
+          in.targetString_sc = 'An invalid model family was passed to interactive_lr. Please contact Alteryx support!'
         )
       ))
     }
@@ -115,7 +114,9 @@ interactive_lr <- function(
   } else{
     independent_variable_m <- df2NumericMatrix(
       x = data[ , -1, drop = FALSE],
-      filtering_message = "Non-numeric variables are among the predictors. They are now being removed.",
+      filtering_message = XMSG(
+        in.targetString_sc = "Non-numeric variables are among the predictors. They are now being removed."
+      ),
       convertVectorToDataFrame = TRUE
     )
     if(regularized_b){
@@ -128,12 +129,16 @@ interactive_lr <- function(
       }
     }
     if(all(unlist(model$coefficients[-1] == 0))){
-      msg1 <- "All model coefficients were zero. Cannot generate dashboard. "
+      msg1 <- XMSG(
+        in.targetString_sc = "All model coefficients were zero. Cannot generate dashboard."
+      )
       if(regularized_b) {
-        msg2 <- "Consider using a smaller value of lambda."
+        msg2 <- XMSG(in.targetString_sc = "Consider using a smaller value of lambda.")
       } else { # cv_b is true
         if (config$lambda_1se) {
-          msg2 <- "Consider using lambda.min instead of lambda for simple model."
+          msg2 <- XMSG(
+            in.targetString_sc = "Consider using lambda.min instead of lambda for simple model."
+          )
         } else {
           msg2 <- ""
         }
@@ -180,14 +185,14 @@ interactive_lr <- function(
   )
   fitted_values <- as.integer(probability_v >= optimal_cutoff_nv[3])
   if(length(unique(fitted_values)) == 1) {
-    msg1 <- "All values are being fitted to the same class. "
+    msg1 <- XMSG(in.targetString_sc = "All values are being fitted to the same class. ")
     if(regularized_b) {
-      msg2 <- "Consider using a smaller value of lambda. "
+      msg2 <- XMSG(in.targetString_sc = "Consider using a smaller value of lambda. ")
     }
     else if(cv_b) {
-      msg2 <- "Consider using a different value of lambda. "
+      msg2 <- XMSG(in.targetString_sc = "Consider using a different value of lambda. ")
     }
-    msg3 <- "Interactive dashboard could not be generated."
+    msg3 <- XMSG(in.targetString_sc = "Interactive dashboard could not be generated.")
     return(badDash(paste0(msg1,msg2,msg3)))
   }
   if(is.null(x = cv_metrics)){
@@ -230,15 +235,21 @@ interactive_lr <- function(
     nrow = 2,
     ncol = 2
   )
-  rownames(confusion_matrix_m) <- c('Predicted Positive', 'Predicted Negative')
-  colnames(confusion_matrix_m) <- c('Actual Positive', 'Actual Negative')
+  rownames(confusion_matrix_m) <- c(
+    XMSG(in.targetString_sc = 'Predicted Positive'),
+    XMSG(in.targetString_sc = 'Predicted Negative')
+  )
+  colnames(confusion_matrix_m) <- c(
+    XMSG(in.targetString_sc = 'Actual Positive'),
+    XMSG(in.targetString_sc = 'Actual Negative')
+  )
 
   # Prepare UI elements.
   # page 1:  model summary
 
   row_1_1 <- fdRow(
     fdInfoBox(
-      title = 'Accuracy',
+      title = XMSG('Accuracy'),
       value = round(
         x = accuracy,
         digits = digits
@@ -251,7 +262,7 @@ interactive_lr <- function(
       width = halfWidth
     ),
     fdInfoBox(
-      title = 'Precision',
+      title = XMSG(in.targetString_sc = 'Precision'),
       value = round(
         x = precision,
         digits = digits
@@ -266,7 +277,7 @@ interactive_lr <- function(
   )
   row_1_2 <- fdRow(
     fdInfoBox(
-      title = 'Recall',
+      title = XMSG(in.targetString_sc = 'Recall'),
       value = round(
         x = recall,
         digits = digits
@@ -279,7 +290,7 @@ interactive_lr <- function(
       width = halfWidth
     ),
     fdInfoBox(
-      title = 'F1',
+      title = XMSG(in.targetString_sc = 'F1'),
       value = round(
         x = f1,
         digits = digits
@@ -294,7 +305,7 @@ interactive_lr <- function(
   )
   row_1_3 <- fdRow(
     fdInfoBox(
-      title = 'Optimal Probability Cutoff',
+      title = XMSG(in.targetString_sc = 'Optimal Probability Cutoff'),
       value = round(
         x = optimal_cutoff_nv[3],
         digits = digits
@@ -340,12 +351,11 @@ interactive_lr <- function(
         )
       } else {
         print(
-          paste0(
-            "Conditional-density plot not generated for variable '",
-            x,
-            "' because it was categorical."
-            )
+          XMSG(
+            in.targetString_sc = "Conditional-density plot not generated for variable @1' because it was categorical.",
+            in.firstBindVariable_sc = x
           )
+        )
       }
     }
   )
@@ -384,11 +394,11 @@ interactive_lr <- function(
       fdTabsetPanel(
         selected = makeHtmlId('ROC Chart'),
         fdTabPanel(
-          'ROC Chart',
+          XMSG(in.targetString_sc = 'ROC Chart'),
           roc_chart
         ),
         fdTabPanel(
-          'Precision vs. Recall',
+          XMSG(in.targetString_sc = 'Precision vs. Recall'),
           precision_recall_chart
         )
       ),
@@ -406,7 +416,7 @@ interactive_lr <- function(
   the_header <- fdHeader(title = title)
   sidebar <- fdSidebarMenu(
     fdMenuItem(
-      text = 'Summary',
+      text = XMSG(in.targetString_sc = 'Summary'),
       icon = fdIcon(
         name = 'caret-right',
         lib = "font-awesome"
@@ -414,7 +424,7 @@ interactive_lr <- function(
       pageName = 'page_1'
     ),
     fdMenuItem(
-      text = 'Conditional-Density Plots',
+      text = XMSG(in.targetString_sc = 'Conditional-Density Plots'),
       icon = fdIcon(
         name = 'caret-right',
         lib = "font-awesome"
@@ -422,7 +432,7 @@ interactive_lr <- function(
       pageName = 'page_2'
     ),
     fdMenuItem(
-      text = 'Performance',
+      text = XMSG(in.targetString_sc = 'Performance'),
       icon = fdIcon(
         name = 'caret-right',
         lib = "font-awesome"

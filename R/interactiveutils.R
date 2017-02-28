@@ -8,7 +8,7 @@
 #' @author Todd Morley
 badDash <- function(
   messageIn,
-  titleIn = "Error",
+  titleIn = XMSG(in.targetString_sc = "Error"),
   colorIn = 'aqua',
   widthIn = 12
 ){
@@ -85,8 +85,14 @@ getBinaryConfusionMatrix <- function(
     nrow = 2,
     ncol = 2
   )
-  rownames(confusion_matrix_m) <- c('Predicted Positive', 'Predicted Negative')
-  colnames(confusion_matrix_m) <- c('Actual Positive', 'Actual Negative')
+  rownames(confusion_matrix_m) <- c(
+    XMSG(in.targetString_sc = 'Predicted Positive'),
+    XMSG(in.targetString_sc = 'Predicted Negative')
+  )
+  colnames(confusion_matrix_m) <- c(
+    XMSG(in.targetString_sc = 'Actual Positive'),
+    XMSG(in.targetString_sc = 'Actual Negative')
+  )
 
   confusion_matrix_m
 }

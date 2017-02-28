@@ -14,7 +14,11 @@ processLogisticOSR <- function(inputs, config){
   ylevels <- levels(inputs$the.data[[1]])
   num_levels <- length(unique(ylevels))
   if (num_levels != 2) {
-    stop.Alteryx2("The target variable must only have two unique values.")
+    stop.Alteryx2(
+      XMSG(
+        in.targetString_sc = "The target variable must only have two unique values."
+      )
+    )
   }
 
   the.formula <- makeFormula(var_names$x, var_names$y)
@@ -62,13 +66,23 @@ processLogisticXDF <- function(inputs, config){
   len.target <- length(
     RevoScaleR::rxGetVarInfo(xdf_path)[[var_names$y]]$levels)
   if(len.target != 2){
-    stop.Alteryx2("The target variable must only have two unique values.")
+    stop.Alteryx2(
+      XMSG(
+        in.targetString_sc = "The target variable must only have two unique values."
+      )
+    )
   }
 
   the.formula <- makeFormula(var_names$x, var_names$y)
 
   if (config$Link != "logit"){
-    AlteryxMessage2("Only the logit link function is available for XDF files, and will be used.", iType = 2, iPriority = 3)
+    AlteryxMessage2(
+      XMSG(
+        in.targetString_sc = "Only the logit link function is available for XDF files, and will be used."
+      ),
+      iType = 2,
+      iPriority = 3
+    )
   }
 
   # CHECK:
@@ -112,7 +126,13 @@ createReportLogisticOSR <- function(the.model, config, model_type) {
   if (!singular) {
     glm.out <- rbind(glm.out, Alteryx.ReportAnova(the.model))
   } else {
-    AlteryxMessage2("Creation of the Analysis of Deviance table was surpressed due to singularities", iType = 2, iPriority = 3)
+    AlteryxMessage2(
+      XMSG(
+        in.targetString_sc = "Creation of the Analysis of Deviance table was surpressed due to singularities."
+      ),
+      iType = 2,
+      iPriority = 3
+    )
   }
   glm.out
 }
@@ -128,8 +148,15 @@ createReportLogisticXDF <- function(the.model, config, null.model) {
   glm.out <- AlteryxReportRx(the.model, null.model$deviance)
   glm.out <- rbind(c("Model_Name", config[['Model Name']]), glm.out)
   glm.out <- rbind(glm.out, c("Model_Type", "binomial"))
-  AlteryxMessage2("Creation of the Analysis of Deviance tables was surpressed due to the use of an XDF file", iType = 2, iPriority = 3)
-  glm.out
+  AlteryxMessage2(
+    XMSG(
+      in.targetString_sc = "Creation of the Analysis of Deviance tables was surpressed due to the use of an XDF file"
+      ),
+
+    iType = 2,
+    iPriority = 3
+  )
+  return(glm.out)
 }
 
 #' Create Plots
@@ -147,7 +174,11 @@ createPlotOutputsLogisticOSR <- function(the.model, singular, config){
     par(mfrow=c(2, 2), mar=c(5, 4, 2, 2) + 0.1)
     plot(the.model)
   } else {
-    noDiagnosticPlot("The diagnostic plot is not available due to singularities")
+    noDiagnosticPlot(
+      XMSG(
+        in.targetString_sc = "The diagnostic plot is not available due to singularities."
+      )
+    )
   }
 }
 
@@ -155,15 +186,26 @@ createPlotOutputsLogisticOSR <- function(the.model, singular, config){
 #'
 #' @export
 createPlotOutputsLogisticXDF <- function(){
-  noDiagnosticPlot("The diagnostic plot is not available for XDF based models")
+  noDiagnosticPlot(
+    XMSG(
+      in.targetString_sc = "The diagnostic plot is not available for XDF based models."
+    )
+  )
 }
 
 #' Function to create empty plot with a message
 #'
 #' @param msg message to accompany plot.
 noDiagnosticPlot <- function(msg){
-  plot(x = c(0,1), y = c(0,1), type = "n", main = "Plot not available",
-    xlab = "", ylab = "", xaxt = "n", yaxt = "n"
+  plot(
+    x = c(0,1),
+    y = c(0,1),
+    type = "n",
+    main = XMSG(in.targetString_sc = "Plot not available"),
+    xlab = "",
+    ylab = "",
+    xaxt = "n",
+    yaxt = "n"
   )
   AlteryxMessage2(msg, iType = 2, iPriority = 3)
 }
