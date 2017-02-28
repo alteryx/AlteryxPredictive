@@ -6,9 +6,10 @@
 \usage{
 plotMeans(response, factor1, factor2, error.bars = c("se", "sd", "conf.int",
   "none"), level = 0.95, xlab = deparse(substitute(factor1)),
-  ylab = XMSG("mean of @1", deparse(substitute(response))),
-  legend.lab = deparse(substitute(factor2)), main = XMSG("Plot of Means"),
-  pch = 1:n.levs.2, lty = 1:n.levs.2, col = palette(), ...)
+  ylab = XMSG(in.targetString_sc = "mean of @1", in.firstBindVariable_sc =
+  deparse(substitute(response))), legend.lab = deparse(substitute(factor2)),
+  main = XMSG(in.targetString_sc = "Plot of Means"), pch = 1:n.levs.2,
+  lty = 1:n.levs.2, col = palette(), ...)
 }
 \arguments{
 \item{response}{the response variable}

@@ -29,11 +29,11 @@ plotMeans <- function(
   level = 0.95,
   xlab = deparse(substitute(factor1)),
   ylab = XMSG(
-    "mean of @1",
-    deparse(substitute(response))
+    in.targetString_sc = "mean of @1",
+    in.firstBindVariable_sc = deparse(substitute(response))
   ),
   legend.lab = deparse(substitute(factor2)),
-  main = XMSG("Plot of Means"),
+  main = XMSG(in.targetString_sc = "Plot of Means"),
   pch = 1:n.levs.2,
   lty = 1:n.levs.2,
   col = palette(), ...)
@@ -41,7 +41,7 @@ plotMeans <- function(
     if (!is.numeric(response)) {
       stop.Alteryx2(
         XMSG(
-          "Argument response must be numeric."
+          in.targetString_sc = "Argument response must be numeric."
           )
         )
     }
@@ -53,7 +53,7 @@ plotMeans <- function(
         if (!is.factor(factor1)) {
           stop.Alteryx2(
             XMSG(
-              "Argument factor1 must be a factor."
+              in.targetString_sc = "Argument factor1 must be a factor."
             )
           )
         }
@@ -89,7 +89,7 @@ plotMeans <- function(
         if (!(is.factor(factor1) | is.factor(factor2))) {
           stop.Alteryx2(
             XMSG(
-              "Arguments factor1 and factor2 must be factors."
+              in.targetString_sc = "Arguments factor1 and factor2 must be factors."
               )
             )
         }
@@ -123,9 +123,9 @@ plotMeans <- function(
         if (n.levs.2 > length(col)) {
           stop.Alteryx2(
             XMSG(
-              "Number of groups for factor2, @1, exceeds number of distinct colours, @2.",
-              n.levs.2,
-              length(col)
+              in.targetString_sc = "Number of groups for factor2, @1, exceeds number of distinct colours, @2.",
+              in.firstBindVariable_sc = n.levs.2,
+              in.secondBindVariable_sc = length(col)
             )
           )
         }
@@ -314,7 +314,7 @@ unitScale <- function(x) {
   if (!(class(x) %in% c("matrix", "data.frame", "numeric", "integer"))) {
     stop.Alteryx2(
       XMSG(
-        "The function argument cannot be coerced to be a matrix."
+        in.targetString_sc = "The function argument cannot be coerced to be a matrix."
         )
       )
   }
@@ -326,7 +326,7 @@ unitScale <- function(x) {
   }
   if (class(as.vector(x[,1])) == "character") {
     stop.Alteryx2(
-      XMSG("The function argument must consist of numeric and/or integer data."
+      XMSG(in.targetString_sc = "The function argument must consist of numeric and/or integer data."
       )
     )
   }
@@ -335,7 +335,7 @@ unitScale <- function(x) {
   max.min <- max.x - min.x
   if (any(max.min == 0)) {
     stop.Alteryx2(
-      XMSG("One or more of the provided data columns has a single data value."
+      XMSG(in.targetString_sc = "One or more of the provided data columns has a single data value."
       )
     )
   }
@@ -400,21 +400,22 @@ bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
     if(length(choices) != 2) {
       stop.Alteryx2(
         XMSG(
-          "Length of choices must be 2."
+          in.targetString_sc = "Length of choices must be 2."
         )
       )
     }
     if(!length(scores <- pc$x)) {
       stop.Alteryx2(
-        XMSG("object @1 has no scores",
-             deparse(substitute(x))
+        XMSG(
+          in.targetString_sc = "object @1 has no scores",
+          in.firstBindVariable_sc = deparse(substitute(x))
         )
       )
     }
     if(is.complex(scores)) {
       stop.Alteryx2(
         XMSG(
-          "biplots are not defined for complex PCA"
+          in.targetString_sc = "biplots are not defined for complex PCA"
         )
       )
     }
@@ -424,7 +425,7 @@ bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
     if(scale < 0 || scale > 1) {
       warning(
         XMSG(
-          "'scale' is outside [0, 1]"
+          in.targetString_sc = "'scale' is outside [0, 1]"
         )
       )
     }
@@ -447,7 +448,7 @@ bpCent <- function(pc, clsAsgn, data.pts = TRUE, centroids = TRUE,
     if (missing(ylabs)) {
 	    ylabs <- dimnames(y)[[1]]
 	    if (is.null(ylabs)) {
-	      ylabs <- paste(XMSG("Variable"), 1:p)
+	      ylabs <- paste(XMSG(in.targetString_sc = "Variable"), 1:p)
 	    }
     }
     ylabs <- as.character(ylabs)
@@ -523,7 +524,7 @@ standardize <- function(x, std.vec1, std.vec2) {
   if (!all(names(std.vec1) == names(std.vec2))) {
     stop.Alteryx2(
       XMSG(
-        "The two standarization vectors must have the same names."
+        in.targetString_sc = "The two standarization vectors must have the same names."
       )
     )
   }
@@ -531,7 +532,7 @@ standardize <- function(x, std.vec1, std.vec2) {
   if (!all(dimnames(x)[[2]] == names(std.vec1))) {
     stop.Alteryx2(
       XMSG(
-        "The data matrix and the standaridization vectors must have the same names."
+        in.targetString_sc = "The data matrix and the standaridization vectors must have the same names."
       )
     )
   }
@@ -627,13 +628,13 @@ varImpPlot.Alteryx <- function(
   type = NULL,
   class = NULL,
   scale = TRUE,
-  main = XMSG("Variable Importance Plot"),
+  main = XMSG(in.targetString_sc = "Variable Importance Plot"),
   ...
 ) {
   if (!inherits(x, "randomForest")) {
     stop.Alteryx2(
       XMSG(
-        "This function only works for objects of class `randomForest'."
+        in.targetString_sc = "This function only works for objects of class `randomForest'."
       )
     )
   }
@@ -834,7 +835,7 @@ validName <- function(name) {
   if (!is.character(name) || length(name) > 1) {
     stop.Alteryx2(
       XMSG(
-        "The name provided needs to be a character string."
+        in.targetString_sc = "The name provided needs to be a character string."
       )
     )
   }
@@ -843,9 +844,9 @@ validName <- function(name) {
     name <- gsub("\\.", "\\_", make.names(name))
     AlteryxMessage2(
       XMSG(
-        "The invalid name @1 has been replaced by @2.",
-        old.name,
-        name
+        in.targetString_sc = "The invalid name @1 has been replaced by @2.",
+        in.firstBindVariable_sc = old.name,
+        in.secondBindVariable_sc = name
       ),
       2,
       2,

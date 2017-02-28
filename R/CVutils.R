@@ -57,21 +57,21 @@ checkFactorVars <- function(data, folds, config) {
             currentColumnName <- colnames(factorVars)[k]
             if (length(missingTestClasses) > 1) {
               warningMessage1 <- XMSG(
-                "Classes @1 were not present in variable @2 of the test set.",
-                missingTestClasses,
-                currentColumnName
+                in.targetString_sc = "Classes @1 were not present in variable @2 of the test set.",
+                in.firstBindVariable_sc = missingTestClasses,
+                in.secondBindVariable_sc = currentColumnName
               )
               warningMessage2 <- XMSG(
-                "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on these classes."
+                in.targetString_sc = "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on these classes."
               )
               } else {
               warningMessage1 <- XMSG(
-                "Class @1 was not present in variable @2 of the test set.",
-                missingTestClasses,
-                currentColumnName
+                in.targetString_sc = "Class @1 was not present in variable @2 of the test set.",
+                in.firstBindVariable_sc = missingTestClasses,
+                in.secondBindVariable_sc = currentColumnName
               )
               warningMessage2 <- XMSG(
-                "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on this class."
+                in.targetString_sc = "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on this class."
               )
               }
             AlteryxMessage2(
@@ -91,27 +91,27 @@ checkFactorVars <- function(data, folds, config) {
             currentColumnName <- colnames(factorVars)[k]
             if (length(missingTrainingClasses) > 1) {
               warningMessage1 <- XMSG(
-                "Classes @1 were not present in variable @2 of the training set.",
-                missingTrainingClasses,
-                currentColumnName
+                in.targetString_sc = "Classes @1 were not present in variable @2 of the training set.",
+                in.firstBindVariable_sc = missingTrainingClasses,
+                in.secondBindVariable_sc = currentColumnName
               )
               warningMessage2 <- XMSG(
-                "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on these classes."
+                in.targetString_sc = "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on these classes."
               )
               errorMessage <- XMSG(
-                "It is very difficult to create an accurate model when the training set is missing classes."
+                in.targetString_sc = "It is very difficult to create an accurate model when the training set is missing classes."
               )
               } else {
               warningMessage1 <- XMSG(
-                "Class @1 was not present in variable @2 of the training set.",
-                missingTrainingClasses,
-                currentColumnName
+                in.targetString_sc = "Class @1 was not present in variable @2 of the training set.",
+                in.firstBindVariable_sc = missingTrainingClasses,
+                in.secondBindVariable_sc = currentColumnName
               )
               warningMessage2 <- XMSG(
-                "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on this class."
+                in.targetString_sc = "It is recommended that you either check your data to ensure no records were mis-labeled or collect more data on this class."
               )
               errorMessage <- XMSG(
-                "It is very difficult to create an accurate model when the training set is missing a class."
+                in.targetString_sc = "It is very difficult to create an accurate model when the training set is missing a class."
               )
             }
             AlteryxMessage2(warningMessage1, iType = 1, iPriority = 3)
@@ -166,13 +166,13 @@ getYvars <- function(data, models) {
   if (!all(y_names == y_names[1])) {
     stop.Alteryx2(
       XMSG(
-        "More than one target variable are present in the provided models."
+        in.targetString_sc = "More than one target variable are present in the provided models."
       )
     )
   } else if (!(y_names[1] %in% colnames(data))) {
     stop.Alteryx2(
       XMSG(
-        "The target variable from the models is different than the target chosen in the configuration. Please check your configuration settings and try again."
+        in.targetString_sc = "The target variable from the models is different than the target chosen in the configuration. Please check your configuration settings and try again."
         )
       )
   }
@@ -192,7 +192,7 @@ getYvars <- function(data, models) {
 getPositiveClass <- function(target_levels) {
   # no/yes
   yes_id <- match(
-    XMSG("yes"),
+    XMSG(in.targetString_sc = "yes"),
     tolower(target_levels)
   )
   if (!is.na(yes_id)) {
@@ -200,7 +200,7 @@ getPositiveClass <- function(target_levels) {
   }
   # false/true
   true_id <- match(
-    XMSG("true"),
+    XMSG(in.targetString_sc = "true"),
     tolower(target_levels)
   )
   if(!is.na(true_id)) {
@@ -292,7 +292,7 @@ getActualandResponse <- function(model, data, testIndices, extras, mid, config){
       trainingData_noyvar <- df2NumericMatrix(
         x = trainingData_noyvar,
         filtering_message = XMSG(
-          "Non-numeric variables are among the predictors. They are now being removed."
+          in.targetString_sc = "Non-numeric variables are among the predictors. They are now being removed."
         ),
         convertVectorToDataFrame = TRUE
       )
@@ -363,10 +363,10 @@ getCrossValidatedResults <- function(inputs, allFolds, extras, config){
     if (is.null(out)) {
       AlteryxMessage2(
         XMSG(
-          "For model @1 trial @2 fold @3 the data could not be scored.",
-          mid,
-          trial,
-          fold
+          in.targetString_sc = "For model @1 trial @2 fold @3 the data could not be scored.",
+          in.firstBindVariable_sc = mid,
+          in.secondBindVariable_sc = trial,
+          in.thirdBindVariable_sc = fold
         ),
         iType = 2,
         iPriority = 3
@@ -395,14 +395,14 @@ getMeasuresRegression <- function(outData, extras) {
   if (any(abs(actual) < 0.001)) {
     AlteryxMessage2(
       XMSG(
-        "The target variable contains values very close to 0 (-0.001, 0.001)."
+        in.targetString_sc = "The target variable contains values very close to 0 (-0.001, 0.001)."
       ),
       iType = 2,
       iPriority = 3
     )
     AlteryxMessage2(
       XMSG(
-        "Weighted Percent Error (WPE) and Weighted Absolute Percent Error (WAPE) are being used instead of Mean Percent Error (MPE) and Mean Percent Error (MAPE)."
+        in.targetString_sc = "Weighted Percent Error (WPE) and Weighted Absolute Percent Error (WAPE) are being used instead of Mean Percent Error (MPE) and Mean Percent Error (MAPE)."
       ),
       iType = 2,
       iPriority = 3
@@ -658,16 +658,16 @@ plotBinaryData <- function(plotData, config, modelNames) {
 
   liftPlotObj <- ggplot2::ggplot(data = liftdf, aes_string(x = "Rate_positive_predictions", y = "lift")) +
     ggplot2::geom_smooth(aes_string(colour="models")) +
-    ggplot2::ggtitle(XMSG("Lift curves"))
+    ggplot2::ggtitle(XMSG(in.targetString_sc = "Lift curves"))
   gainPlotObj <- ggplot2::ggplot(data = gaindf, aes_string(x = "Rate_positive_predictions", y = "True_Pos_Rate")) +
     ggplot2::geom_smooth(aes_string(colour="models")) +
-    ggplot2::ggtitle(XMSG('Gain Charts'))
+    ggplot2::ggtitle(XMSG(in.targetString_sc = 'Gain Charts'))
   PrecRecallPlotObj <- ggplot2::ggplot(data = prec_recalldf, aes_string(x = "recall", y = "precision")) +
     ggplot2::geom_smooth(aes_string(colour="models")) +
-    ggplot2::ggtitle(XMSG('Precision and Recall Curves'))
+    ggplot2::ggtitle(XMSG(in.targetString_sc = 'Precision and Recall Curves'))
   ROCPlotObj <- ggplot2::ggplot(data = rocdf, aes_string(x = "False_Pos_Rate", y = "True_Pos_Rate")) +
     ggplot2::geom_smooth(aes_string(colour="models")) +
-    ggplot2::ggtitle(XMSG('ROC Curves'))
+    ggplot2::ggtitle(XMSG(in.targetString_sc = 'ROC Curves'))
   AlteryxGraph2(liftPlotObj, nOutput = 4)
   AlteryxGraph2(gainPlotObj, nOutput = 4)
   AlteryxGraph2(PrecRecallPlotObj, nOutput = 4)
@@ -682,7 +682,7 @@ plotRegressionData <- function(plotData, config, modelNames) {
                        models = plotData$modelVec, trial = plotData$trialVec)
   plotObj <- ggplot2::ggplot(data = plotdf, aes_string(x = "Actual", y = "Predicted")) +
     ggplot2::geom_smooth(aes_string(colour="models")) +
-    ggplot2::ggtitle(XMSG("Predicted value vs actual values"))
+    ggplot2::ggtitle(XMSG(in.targetString_sc = "Predicted value vs actual values"))
   AlteryxGraph2(plotObj, nOutput = 4)
 }
 
@@ -701,21 +701,21 @@ checkXVars <- function(inputs){
       mvars2 <- modelXVars[[i + 1]]
       if (!areIdentical(mvars1, mvars2)){
         errorMsg <- XMSG(
-          "Models @1 and @2 were created using different predictor variables.",
-          modelNames[i],
-          modelNames[i + 1]
+          in.targetString_sc = "Models @1 and @2 were created using different predictor variables.",
+          in.firstBindVariable_sc = modelNames[i],
+          in.secondBindVariable_sc = modelNames[i + 1]
         )
         stopMsg <- XMSG(
-          "Please ensure all models were created using the same predictors."
+          in.targetString_sc = "Please ensure all models were created using the same predictors."
         )
       }
       else if (!all(mvars1 %in% dataXVars)){
         errorMsg <- XMSG(
-          "Model @1 used predictor variables which were not contained in the input data.",
-          modelNames[i]
+          in.targetString_sc = "Model @1 used predictor variables which were not contained in the input data.",
+          in.firstBindVariable_sc = modelNames[i]
         )
         stopMsg <- XMSG(
-          "Please ensure input data contains all the data used to create the models and try again."
+          in.targetString_sc = "Please ensure input data contains all the data used to create the models and try again."
         )
       }
       if (!is.null(errorMsg)){
@@ -727,11 +727,11 @@ checkXVars <- function(inputs){
     mvars1 <- modelXVars[[1]]
     if (!all(mvars1 %in% dataXVars)){
       errorMsg <- XMSG(
-        "Model @1 used predictor variables which were not contained in the input data.",
-        modelNames[1]
+        in.targetString_sc = "Model @1 used predictor variables which were not contained in the input data.",
+        in.firstBindVariable_sc = modelNames[1]
       )
       stopMsg <- XMSG(
-        "Please ensure input data contains all the data used to create the models and try again."
+        in.targetString_sc = "Please ensure input data contains all the data used to create the models and try again."
       )
     }
     if (!is.null(errorMsg)){
@@ -746,7 +746,7 @@ glmnetUpdate <- function(model, trainingData_noyvar, y_vec, config, weight_vec =
   if (ncol(predictors) < 2) {
     stop.Alteryx2(
       XMSG(
-        "Regularization requires at least two numeric predictors. Please  switch to a non-regularized model, or use more predictors. "
+        in.targetString_sc = "Regularization requires at least two numeric predictors. Please  switch to a non-regularized model, or use more predictors. "
       )
     )
   }

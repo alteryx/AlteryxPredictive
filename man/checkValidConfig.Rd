@@ -4,7 +4,7 @@
 \alias{checkValidConfig}
 \title{General Method for Validating config
 Error checking pre-model
-Does not return anything - just throws errror}
+Returns a vector of Booleans indicating warnings and errors}
 \usage{
 checkValidConfig(config, the.data, names)
 }
@@ -15,9 +15,12 @@ checkValidConfig(config, the.data, names)
 
 \item{names}{list of x, y, w names for data}
 }
+\value{
+messages_vb vector of booleans
+}
 \description{
 General Method for Validating config
 Error checking pre-model
-Does not return anything - just throws errror
+Returns a vector of Booleans indicating warnings and errors
 }
 
