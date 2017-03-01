@@ -21,18 +21,16 @@ df2NumericMatrix <- function(
   }
   if(!inherits(x, "data.frame")){
     stop.Alteryx2(
-      paste0(
-        "An object not inheriting from class data.frame was passed to df2NumericMatrix.",
-        "Please contact Alteryx Support. "
+      XMSG(
+        in.targetString_sc = "An object not inheriting from class data.frame was passed to df2NumericMatrix. Please contact Alteryx Support. "
       )
     )
   }
   numNonNumericCols <- NCOL(Filter(Negate(is.numeric), x))
   if (numNonNumericCols == NCOL(x)){
     AlteryxMessage2(
-      paste0(
-        "All of the provided variables were non-numeric. ",
-        "Please provide at least one numeric variable and try again."
+      XMSG(
+        in.targetString_sc = "All of the provided variables were non-numeric. Please provide at least one numeric variable and try again."
       ),
       iType = 2,
       iPriority = 3
@@ -59,7 +57,11 @@ getFamily <- function(inputs, config){
   num_levels <- nlevels(inputs$the.data[,1])
 
   if (num_levels == 1)
-    stop.Alteryx2("Target variable is a factor with only 1 level.")
+    stop.Alteryx2(
+      XMSG(
+        in.targetString_sc = "Target variable is a factor with only 1 level."
+      )
+    )
 
   family_levels <- c("gaussian", "", "binomial", "multinomial")
   family_levels[min(num_levels, 3) + 1]
@@ -79,14 +81,15 @@ processElasticNet <- function(inputs, config){
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weights`)
   x <- df2NumericMatrix(
     x = inputs$the.data[,var_names$x, drop = FALSE],
-    filtering_message = "Non-numeric variables are among the predictors. They are now being removed.",
+    filtering_message = XMSG(
+      in.targetString_sc = "Non-numeric variables are among the predictors. They are now being removed."
+    ),
     convertVectorToDataFrame = TRUE
   )
   if (ncol(x) < 2) {
     stop.Alteryx2(
-      paste0(
-        "Regularization requires at least two numeric predictors. ",
-        "Please switch to a non-regularized model, or use more numeric predictors."
+      XMSG(
+        in.targetString_sc = "Regularization requires at least two numeric predictors. Please switch to a non-regularized model, or use more numeric predictors."
       )
     )
   }

@@ -25,7 +25,11 @@ scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
   new.data <- matchLevels(new.data, getXlevels(mod.obj))
   y.levels <- getYlevels(mod.obj, new.data)
   if (class(mod.obj) == "earth" && is.null(mod.obj$glm.list)) {
-    stop.Alteryx2("Spline Models that did not use a GLM family cannot be scored")
+    stop.Alteryx2(
+      XMSG(
+        in.targetString_sc = "Spline Models that did not use a GLM family cannot be scored."
+      )
+    )
   }
   if (is.null(y.levels)) {
     if(inherits(mod.obj, c("nnet.formula", "rpart", "svm"))){
@@ -41,7 +45,13 @@ scoreModel.default <- function(mod.obj, new.data, score.field = "Score",
   } else {
     if (!is.null(os.value)) {
       if (length(y.levels) != 2) {
-        AlteryxRDataX::AlteryxMessage("Adjusting for the oversampling of the target is only valid for a binary categorical variable, so the predicted probabilities will not be adjusted.", iType = 2, iPriority = 3)
+        AlteryxRDataX::AlteryxMessage(
+          XMSG(
+            in.targetString_sc = "Adjusting for the oversampling of the target is only valid for a binary categorical variable, so the predicted probabilities will not be adjusted."
+          ),
+          iType = 2,
+          iPriority = 3
+          )
         scores <- data.frame(predProb(mod.obj, newdata = new.data))
       } else {
         sample.pct <- samplePct(mod.obj, os.value, new.data)
@@ -94,7 +104,13 @@ scoreModel.lm <- function(mod.obj, new.data, score.field = "Score",
       # to make this code work nicely in non-Alteryx environments, the
       # AlteryxRDataX::AlteryxMessage call would need to be replaced with a message call
       if (max(score) > 709) {
-        AlteryxRDataX::AlteryxMessage("The target variable does not appear to have been natural log transformed, no correction was applied.", iType = 2, iPriority = 3)
+        AlteryxRDataX::AlteryxMessage(
+          XMSG(
+            in.targetString_sc = "The target variable does not appear to have been natural log transformed, no correction was applied."
+          ),
+          iType = 2,
+          iPriority = 3
+          )
       } else {
         score <- exp(score)*(sum(exp(mod.obj$residuals))/length(mod.obj$residuals))
       }
@@ -154,7 +170,13 @@ scoreModel.rxLinMod <- function(mod.obj, new.data, score.field = "Score", pred.i
     scores <- RevoScaleR::rxPredict(mod.obj, data = new.data, type = "response", predVarNames = "score")$score
     if (log.y) {
       if (is.null(mod.obj$smearing.adj)) {
-        AlteryxRDataX::AlteryxMessage("The target variable does not appear to have been natrual log transformed, no correction was applied.", iType = 2, iPriority = 3)
+        AlteryxRDataX::AlteryxMessage(
+          XMSG(
+            in.targetString_sc = "The target variable does not appear to have been natrual log transformed, no correction was applied."
+          ),
+          iType = 2,
+          iPriority = 3
+        )
       } else {
         scores <- exp(scores)*mod.obj$smearing.adj
       }
@@ -175,7 +197,13 @@ scoreModel.rxDTree <- function(mod.obj, new.data, score.field, os.value = NULL,
       scores <- scores[, -(ncol(scores))]
     if (!is.null(os.value)) {
       if (ncol(scores) != 2) {
-        AlteryxRDataX::AlteryxMessage("Adjusting for the oversampling of the target is only valid for a binary categorical variable, so the predicted probabilities will not be adjusted.", iType = 2, iPriority = 3)
+        AlteryxRDataX::AlteryxMessage(
+          XMSG(
+            in.targetString_sc = "Adjusting for the oversampling of the target is only valid for a binary categorical variable, so the predicted probabilities will not be adjusted."
+          ),
+          iType = 2,
+          iPriority = 3
+        )
       } else {
         target.value <- os.value
         target.loc <- 2
@@ -219,19 +247,26 @@ scoreModel.elnet <- function(mod.obj, new.data, score.field = "Score", ...) {
   used_x_vars <- getXVars(mod.obj)
   new.data <- df2NumericMatrix(
     x = new.data,
-    filtering_message = "Non-numeric variables are among the predictors. They are now being removed.",
+    filtering_message = XMSG(
+      in.targetString_sc = "Non-numeric variables are among the predictors. They are now being removed."
+    ),
     convertVectorToDataFrame = TRUE
   )
   if (!all(used_x_vars %in% colnames(new.data))) {
     missing_x_vars <- used_x_vars[!(used_x_vars %in% colnames(new.data))]
     if (length(missing_x_vars) == 1) {
-      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing
-                                              the variable ", missing_x_vars, ". Please make
-                                              sure you provide this variable and try again."))
+      AlteryxPredictive::stop.Alteryx2(
+        XMSG(
+          in.targetString_sc = "The incoming data stream is missing the variable @1. Please make sure you provide this variable and try again."
+        )
+      )
     } else {
-      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing
-                                              the variables ", missing_x_vars, ". Please make
-                                              sure you provide these variables and try again."))
+      AlteryxPredictive::stop.Alteryx2(
+        XMSG(
+          in.targetString_sc = "The incoming data stream is missing the variables @1. Please make sure you provide these variables and try again.",
+          in.firstBindVariable_sc = missing_x_vars
+        )
+      )
     }
   }
   used_data <- new.data[,used_x_vars]
@@ -249,7 +284,9 @@ scoreModel.lognet <- function(mod.obj, new.data, score.field = "Score",
   used_x_vars <- getXVars(mod.obj)
   new.data <- df2NumericMatrix(
     x = new.data,
-    filtering_message = "Non-numeric variables are among the predictors. They are now being removed.",
+    filtering_message = XMSG(
+      in.targetString_sc = "Non-numeric variables are among the predictors. They are now being removed."
+    ),
     convertVectorToDataFrame = TRUE
   )
   target.value <- os.value
@@ -257,21 +294,32 @@ scoreModel.lognet <- function(mod.obj, new.data, score.field = "Score",
   if (!all(used_x_vars %in% colnames(new.data))) {
     missing_x_vars <- used_x_vars[!(used_x_vars %in% colnames(new.data))]
     if (length(missing_x_vars) == 1) {
-      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing
-                                              the variable ", missing_x_vars, ". Please
-                                              make sure you provide this variable and try again."))
+      AlteryxPredictive::stop.Alteryx2(
+        XMSG(
+          in.targetString_sc = "The incoming data stream is missing the variable @1. Please make sure you provide this variable and try again.",
+          in.firstBindVariable_sc = missing_x_vars
+        )
+      )
     } else {
-      AlteryxPredictive::stop.Alteryx2(paste0("The incoming data stream is missing
-                                              the variables ", missing_x_vars, ". Please
-                                              make sure you provide these variables and try again."))
+      AlteryxPredictive::stop.Alteryx2(
+        XMSG(
+          in.targetString_sc = "The incoming data stream is missing the variables @1. Please make sure you provide these variables and try again.",
+          in.firstBindVariable_sc = missing_x_vars
+        )
+      )
     }
   }
   used_data <- new.data[,used_x_vars]
   requireNamespace('glmnet')
   if (!is.null(os.value)) {
     if (length(y.levels) != 2) {
-      AlteryxMessage2("Adjusting for the oversampling of the target is only valid for a binary
-                      categorical variable, so the predicted probabilities will not be adjusted.", iType = 2, iPriority = 3)
+      AlteryxMessage2(
+        XMSG(
+          in.targetString_sc = "Adjusting for the oversampling of the target is only valid for a binary categorical variable, so the predicted probabilities will not be adjusted."
+        ),
+        iType = 2,
+        iPriority = 3
+      )
       scores <- predict(object = mod.obj, newx = used_data, s = mod.obj$lambda_pred, type = 'response')
       #Note that the predict.glmnet documentation says that only the probability of the second class is produced
       #So we need to take 1 - that result and set the first column to that

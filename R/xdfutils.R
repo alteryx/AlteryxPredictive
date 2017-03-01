@@ -37,7 +37,11 @@ getXdfProperties <- function(input_name, default = NULL) {
         is_XDF <- TRUE
         xdf_path <- context_list$File.Loc
       } else {
-        stop.Alteryx2("At this time only XDF scaling is supported.")
+        stop.Alteryx2(
+          XMSG(
+            in.targetString_sc = "At this time only XDF scaling is supported."
+          )
+        )
       }
     } else {
       xdf_path = ""
