@@ -51,22 +51,3 @@ XMSG <- function(
   )
   return(returnValue_sc)
 }
-
-#' translates strings in input vector and separates them with pipes
-#' @param in.term_vc vector of terms to XMSG and pipe-delimit
-#' @return single translated, pipe-delimited string
-#' @export
-xmsg_and_pipe_delimit <- function(in.term_vc){
-  returnValue_sc <- paste0(
-    unlist(
-      sapply(
-        X = 1:length(in.term_vc),
-        FUN = function(X){
-          XMSG(in.term_vc[X])
-        }
-      )
-    ),
-    collapse = '|'
-  )
-  return(returnValue_sc)
-}
