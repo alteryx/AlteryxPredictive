@@ -290,6 +290,8 @@ predProb.gbm <- function(x, new.data) {
   if (class(pred) == "array") {
     pred1 <- pred[,,1]
     if (inherits(pred1, 'numeric')) pred1 <- t(as.matrix(pred1))
+  } else {
+    pred1 <- cbind(pred, 1 - pred)
   }
   as.data.frame(pred1)
 }
