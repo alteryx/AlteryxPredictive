@@ -20,6 +20,7 @@ AlteryxMessage2(class(the.data), iType = 1, iPriority = 3)
     weight_col <- var_names$w
 AlteryxMessage2(weight_col, iType = 1, iPriority = 3)
     the_wts <- eval(parse(text = paste0('the.data[["', weight_col, '"]]')))
+AlteryxMessage2(paste(the_wts[1:3], collapse = ", "))
     call_sc <-
       paste0('lm(formula = the.formula, data = the.data, weights = the.data[["',
              weight_col,
