@@ -16,17 +16,13 @@ processLinearOSR <- function(inputs, config){
     makeFormula(var_names$x, var_names$y)
   }
   if (config$`Use Weight`) {
-AlteryxMessage2(class(the.data), iType = 1, iPriority = 3)
     weight_col <- var_names$w
-AlteryxMessage2(weight_col, iType = 1, iPriority = 3)
     the_wts <- eval(parse(text = paste0('the.data[["', weight_col, '"]]')))
-AlteryxMessage2(paste(the_wts[1:3], collapse = ", "))
     call_sc <-
       paste0('lm(formula = the.formula, data = the.data, weights = ',
              weight_col,
              ')'
       )
-AlteryxMessage2(call_sc, iType = 1, iPriority = 3)
     the.model <- eval(parse(text = call_sc))
   } else {
     the.model <- lm(the.formula, data = the.data)
