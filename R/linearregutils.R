@@ -18,9 +18,9 @@ processLinearOSR <- function(inputs, config){
   if (config$`Use Weight`) {
     weight_col <- var_names$w
     call_sc <-
-      paste0("lm(formula = the.formula, data = the.data, weights = the.data[[",
+      paste0('lm(formula = the.formula, data = the.data, weights = the.data[["',
              weight_col,
-             "]])"
+             '"]])'
       )
     eval(parse(text = call_sc))
   } else {
