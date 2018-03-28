@@ -8,7 +8,9 @@
 #' @rdname processLinear
 #' @export
 processLinearOSR <- function(inputs, config){
+print(names(inputs))
   the.data = inputs$the.data
+print(head(the.data))
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
   the.formula <- if (config$`Omit Constant`){
     makeFormula(c("-1", var_names$x), var_names$y)
@@ -22,6 +24,7 @@ processLinearOSR <- function(inputs, config){
              weight_col,
              '"]])'
       )
+print(call_sc)
     eval(parse(text = call_sc))
   } else {
     lm(the.formula, data = the.data)
