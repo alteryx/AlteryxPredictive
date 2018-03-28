@@ -25,10 +25,11 @@ AlteryxMessage2(class(the.data), iType = 1, iPriority = 3)
              '"]])'
       )
 AlteryxMessage2(call_sc, iType = 1, iPriority = 3)
-    eval(parse(text = call_sc))
+    the.model <- eval(parse(text = call_sc))
   } else {
-    lm(the.formula, data = the.data)
+    the.model <- lm(the.formula, data = the.data)
   }
+  the.model
 }
 
 #' @inheritParams processLinearOSR
