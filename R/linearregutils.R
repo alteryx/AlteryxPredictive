@@ -22,9 +22,9 @@ AlteryxMessage2(weight_col, iType = 1, iPriority = 3)
     the_wts <- eval(parse(text = paste0('the.data[["', weight_col, '"]]')))
 AlteryxMessage2(paste(the_wts[1:3], collapse = ", "))
     call_sc <-
-      paste0('lm(formula = the.formula, data = the.data, weights = the.data[["',
+      paste0('lm(formula = the.formula, data = the.data, weights = ',
              weight_col,
-             '"]])'
+             ')'
       )
 AlteryxMessage2(call_sc, iType = 1, iPriority = 3)
     the.model <- eval(parse(text = call_sc))
