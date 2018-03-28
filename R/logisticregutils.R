@@ -7,9 +7,8 @@
 #' @param config configuration parameters passed to the tool.
 #' @rdname processLogistic
 #' @export
-processLogisticOSR <- function(inputs, config){
+processLogisticOSR <- function(inputs, config) {
   var_names <- getNamesFromOrdered(names(inputs$the.data), config[['Use Weights']])
-
   # Make sure the target is binary
   ylevels <- levels(inputs$the.data[[1]])
   num_levels <- length(unique(ylevels))
@@ -32,24 +31,39 @@ processLogisticOSR <- function(inputs, config){
     the.design <- survey::svydesign(
       ids = ~1, weights = makeFormula(var_names$w, ""), data = the.data
     )
-    ### this seemingly useless if statement is very necessary
-    ### best guess is there is some strange environment doings in svyglm
-    if (config$Link == "complementary log-log" || config$Link == "cloglog"){
+    if (config$Link == "complementary log-log" || config$Link == "cloglog") {
       the.model <- survey::svyglm(
         the.formula,
         family = quasibinomial("cloglog"),
         design = the.design
       )
     } else {
-      the.model <- survey::svyglm(
-        the.formula,
-        family = quasibinomial(config$Link),
-        design = the.design
-      )
+      if (config$Link == "probit") {
+        the.model <- survey::svyglm(
+          the.formula,
+          family = quasibinomial("probit"),
+          design = the.design
+        )
+      } else {
+        the.model <- survey::svyglm(
+          the.formula,
+          family = quasibinomial("logit"),
+          design = the.design
+        )
+      }
     }
   } else {
     model_type <- "binomial"
-    the.model <- glm(the.formula, family = binomial(config$Link), data = the.data)
+    the.model <-
+      if (config$Link == "complementary log-log" || config$Link == "cloglog") {
+        glm(the.formula, family = binomial("cloglog"), data = the.data)
+      } else {
+        if (config$Link == "probit") {
+          glm(the.formula, family = binomial("probit"), data = the.data)
+        } else {
+          glm(the.formula, family = binomial("logit"), data = the.data)
+        }
+      }
   }
   list(the.model = the.model, model_type = model_type)
 }
