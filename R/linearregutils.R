@@ -8,9 +8,7 @@
 #' @rdname processLinear
 #' @export
 processLinearOSR <- function(inputs, config){
-AlteryxMessage2(paste(names(inputs), collapse = ", "), iType = 1, iPriority = 3)
   the.data = inputs$the.data
-AlteryxMessage2(class(the.data), iType = 1, iPriority = 3)
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
   the.formula <- if (config$`Omit Constant`){
     makeFormula(c("-1", var_names$x), var_names$y)
@@ -18,7 +16,10 @@ AlteryxMessage2(class(the.data), iType = 1, iPriority = 3)
     makeFormula(var_names$x, var_names$y)
   }
   if (config$`Use Weight`) {
+AlteryxMessage2(class(the.data), iType = 1, iPriority = 3)
     weight_col <- var_names$w
+AlteryxMessage2(weight_col, iType = 1, iPriority = 3)
+    the_wts <- eval(parse(text = paste0('the.data[["', weight_col, '"]]')))
     call_sc <-
       paste0('lm(formula = the.formula, data = the.data, weights = the.data[["',
              weight_col,
