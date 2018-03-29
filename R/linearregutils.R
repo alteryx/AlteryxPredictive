@@ -15,18 +15,15 @@ processLinearOSR <- function(inputs, config){
   } else {
     makeFormula(var_names$x, var_names$y)
   }
+  # Create a call list
+  theCall_l <- list(as.name('lm'))
+  theCall_l$formula <- the.formula
+  theCall_l$data <- as.name("the.data")
   if (config$`Use Weight`) {
-    weight_col <- var_names$w
-    the_wts <- eval(parse(text = paste0('the.data[["', weight_col, '"]]')))
-    call_sc <-
-      paste0('lm(formula = the.formula, data = the.data, weights = ',
-             weight_col,
-             ')'
-      )
-    the.model <- eval(parse(text = call_sc))
-  } else {
-    the.model <- lm(the.formula, data = the.data)
+    theCall_l$weights <- as.name(var_names$w)
   }
+  theCall_c <- as.call(theCall_c)
+  the.model <- eval(theCall_c)
   the.model
 }
 
