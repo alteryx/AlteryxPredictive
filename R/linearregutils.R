@@ -22,7 +22,7 @@ processLinearOSR <- function(inputs, config){
   if (config$`Use Weight`) {
     theCall_l$weights <- as.name(var_names$w)
   }
-  theCall_c <- as.call(theCall_c)
+  theCall_c <- as.call(theCall_l)
   the.model <- eval(theCall_c)
   the.model
 }
