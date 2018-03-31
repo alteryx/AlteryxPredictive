@@ -20,51 +20,46 @@ processLogisticOSR <- function(inputs, config) {
     )
   }
 
-  the.formula <- makeFormula(var_names$x, var_names$y)
+  # Adjust the set of field names to remove the weight field
   the.data <- inputs$the.data
+  config$Link[config$Link == "complementary log-log"] <- "cloglog"
   # If sample weights are used
   if (config[['Use Weights']]) {
+    requireNamespace("survey")
+    theCall_l <- list(as.name("svyglm"))
+    model_type <- "quasibinomial"
+    theFamily_l <- list(model_type)
     # Adjust the set of field names to remove the weight field
     # if weights are used
-    requireNamespace("survey")
-    model_type <- "quasibinomial"
+    numX_si <- length(var_names$x)
+    var_names$x <- var_names$x[!(var_names$x %in% var_names$w)]
+    if (length(var_names$x) < numX_si) {
+      AlteryxMessage2(
+        XMSG(in.targetString_sc = "Removed the weight column from the predictors"),
+        iType = 1,
+        iPriority = 3
+      )
+    }
+    the.formula <- makeFormula(var_names$x, var_names$y)
     the.design <- survey::svydesign(
       ids = ~1, weights = makeFormula(var_names$w, ""), data = the.data
     )
-    if (config$Link == "complementary log-log" || config$Link == "cloglog") {
-      the.model <- survey::svyglm(
-        the.formula,
-        family = quasibinomial("cloglog"),
-        design = the.design
-      )
-    } else {
-      if (config$Link == "probit") {
-        the.model <- survey::svyglm(
-          the.formula,
-          family = quasibinomial("probit"),
-          design = the.design
-        )
-      } else {
-        the.model <- survey::svyglm(
-          the.formula,
-          family = quasibinomial("logit"),
-          design = the.design
-        )
-      }
-    }
+    theFamily_l[[2]] <- config$Link
+    theCall_l$formula <- the.formula
+    theCall_l$family <- as.call(theFamily_l)
+    theCall_l$data <- as.name("the.data")
+    theCall_l$design <- as.name("the.design")
   } else {
+    the.formula <- makeFormula(var_names$x, var_names$y)
+    theCall_l <- list(as.name("glm"))
     model_type <- "binomial"
-    the.model <-
-      if (config$Link == "complementary log-log" || config$Link == "cloglog") {
-        glm(the.formula, family = binomial("cloglog"), data = the.data)
-      } else {
-        if (config$Link == "probit") {
-          glm(the.formula, family = binomial("probit"), data = the.data)
-        } else {
-          glm(the.formula, family = binomial("logit"), data = the.data)
-        }
-      }
+    theFamily_l <- list(model_type)
+    theFamily_l[[2]] <- config$Link
+    theCall_l$formula <- the.formula
+    theCall_l$family <- as.call(theFamily_l)
+    theCall_l$data <- as.name("the.data")
   }
+  the.model <- eval(as.call(theCall_l))
   list(the.model = the.model, model_type = model_type)
 }
 
