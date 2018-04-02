@@ -58,11 +58,6 @@ processLogisticOSR <- function(inputs, config) {
     theCall_l$formula <- the.formula
     theCall_l$family <- as.call(theFamily_l)
     theCall_l$data <- as.name("the.data")
-AlteryxMessage2("Attempt at printl", iType = 2, iPriority =3)
-AlteryxMessage2(paste(as.character(theCall_l$formula), collapse = ", "), iType = 2, iPriority = 3)
-AlteryxMessage2(paste(as.character(theCall_l$family), collapse = ", "), iType = 2, iPriority = 3)
-AlteryxMessage2(paste(as.character(theCall_l), collapse = ", "), iType = 2, iPriority = 3)
-AlteryxMessage2(paste(sapply(theCall_l, class), collapse = ", "), iType = 2, iPriority = 3)
   }
   the.model <- eval(as.call(theCall_l))
   list(the.model = the.model, model_type = model_type)
