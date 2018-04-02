@@ -28,7 +28,7 @@ processLogisticOSR <- function(inputs, config) {
     requireNamespace("survey")
     theCall_l <- list(as.name("svyglm"))
     model_type <- "quasibinomial"
-    theFamily_l <- list(model_type)
+    theFamily_l <- list(as.name(model_type))
     # Adjust the set of field names to remove the weight field
     # if weights are used
     numX_si <- length(var_names$x)
@@ -53,7 +53,7 @@ processLogisticOSR <- function(inputs, config) {
     the.formula <- makeFormula(var_names$x, var_names$y)
     theCall_l <- list(as.name("glm"))
     model_type <- "binomial"
-    theFamily_l <- list(model_type)
+    theFamily_l <- list(as.name(model_type))
     theFamily_l[[2]] <- config$Link
     theCall_l$formula <- the.formula
     theCall_l$family <- as.call(theFamily_l)
