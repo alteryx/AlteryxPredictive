@@ -46,7 +46,9 @@ processLogisticOSR <- function(inputs, config) {
     )
     theFamily_l[[2]] <- config$Link
     theCall_l$formula <- the.formula
+AlteryxMessage2(theCall_l$formula)
     theCall_l$family <- as.call(theFamily_l)
+AlteryxMessage2(theCall$family)
     theCall_l$data <- as.name("the.data")
     theCall_l$design <- as.name("the.design")
   } else {
