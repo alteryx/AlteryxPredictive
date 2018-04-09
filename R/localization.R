@@ -21,8 +21,7 @@ XMSG2 <- function(
   in.secondBindVariable_sc = NULL,
   in.thirdBindVariable_sc = NULL,
   in.fourthBindVariable_sc = NULL,
-  in.fifthBindVariable_sc = NULL,
-  in.sixthBindVariable_sc = NULL
+  in.fifthBindVariable_sc = NULL, in.sixthBindVariable_sc = NULL
 ){
   bindVariable_vc <- c(
     in.firstBindVariable_sc,
@@ -55,17 +54,41 @@ XMSG2 <- function(
 
 XMSG3 <- function(...){
   if(inAlteryx()){
-	  AlteryxRDataX:::XMSG(...)
+    AlteryxRDataX:::XMSG(...)
   } else {
     XMSG2(...)
   }
 }
 
-XMSG <- {
+
+XMSG <- function(
+  in.targetString_sc,
+  in.firstBindVariable_sc = NULL,
+  in.secondBindVariable_sc = NULL,
+  in.thirdBindVariable_sc = NULL,
+  in.fourthBindVariable_sc = NULL,
+  in.fifthBindVariable_sc = NULL,
+  in.sixthBindVariable_sc = NULL
+){
   if(inAlteryx()){
-	  AlteryxRDataX:::XMSG
+    AlteryxRDataX:::XMSG(
+      in.targetString_sc,
+      in.firstBindVariable_sc ,
+      in.secondBindVariable_sc,
+      in.thirdBindVariable_sc ,
+      in.fourthBindVariable_sc,
+      in.fifthBindVariable_sc ,
+      in.sixthBindVariable_sc 
+    )
   } else {
-    XMSG2
+    XMSG2(
+      in.targetString_sc,
+      in.firstBindVariable_sc ,
+      in.secondBindVariable_sc,
+      in.thirdBindVariable_sc ,
+      in.fourthBindVariable_sc,
+      in.fifthBindVariable_sc ,
+      in.sixthBindVariable_sc 
+    )
   }
 }
-
