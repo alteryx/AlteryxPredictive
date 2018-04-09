@@ -52,10 +52,19 @@ XMSG2 <- function(
   return(returnValue_sc)
 }
 
-XMSG <- function(...) {
-  if(inAlteryx()) {
-    AlteryxRDataX:::XMSG(...)
+
+XMSG3 <- function(...){
+  if(inAlteryx()){
+	  AlteryxRDataX:::XMSG(...)
   } else {
     XMSG2(...)
+  }
+}
+
+XMSG <- function(){
+  if(inAlteryx()){
+	  AlteryxRDataX:::XMSG
+  } else {
+    XMSG2
   }
 }
