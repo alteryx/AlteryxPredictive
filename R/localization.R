@@ -58,7 +58,6 @@ XMSG <- function(...){
   saveRDS(args_as_chars, file="C:/Documents/XMSGargs.rds")
   if(inAlteryx()){
     do.call(AlteryxRDataX:::XMSG, args_as_chars)
-    AlteryxRDataX:::XMSG(...)
   } else {
     do.call(XMSG2, args_as_chars)
   }
