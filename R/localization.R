@@ -55,7 +55,7 @@ XMSG2 <- function(
 XMSG <- function(...){
   args <- list(...)
   args_as_chars <- lapply(args, FUN=as.character)
-  saveRDS(list(...), file="C:/Documents/XMSGargs.rds")
+  saveRDS(args_as_chars, file="C:/Documents/XMSGargs.rds")
   if(inAlteryx()){
     do.call(AlteryxRDataX:::XMSG, args_as_chars)
     AlteryxRDataX:::XMSG(...)
