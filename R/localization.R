@@ -52,7 +52,8 @@ XMSG2 <- function(
 }
 
 
-XMSG3 <- function(...){
+XMSG <- function(...){
+  saveRDS(list(...), file="C:/Documents/XMSGargs.rds")
   if(inAlteryx()){
     AlteryxRDataX:::XMSG(...)
   } else {
@@ -61,7 +62,7 @@ XMSG3 <- function(...){
 }
 
 
-XMSG <- function(
+XMSG3 <- function(
   in.targetString_sc,
   in.firstBindVariable_sc = NULL,
   in.secondBindVariable_sc = NULL,
