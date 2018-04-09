@@ -15,7 +15,7 @@
 #' @param in.sixthBindVariable_sc the sixth bind variable
 #' @return translated string with embedded bind-variable values (if any)
 #' @export
-XMSG <- function(
+XMSG2 <- function(
   in.targetString_sc,
   in.firstBindVariable_sc = NULL,
   in.secondBindVariable_sc = NULL,
@@ -50,4 +50,12 @@ XMSG <- function(
     ']]]'
   )
   return(returnValue_sc)
+}
+
+XMSG <- function(...) {
+  if(inAlteryx()) {
+    AlteryxRDataX:::XMSG(...)
+  } else {
+    XMSG2(...)
+  }
 }
