@@ -8,35 +8,23 @@
 #' @rdname processLinear
 #' @export
 processLinearOSR <- function(inputs, config){
+  the.data = inputs$the.data
   var_names <- getNamesFromOrdered(names(inputs$the.data), config$`Use Weight`)
   the.formula <- if (config$`Omit Constant`){
     makeFormula(c("-1", var_names$x), var_names$y)
   } else {
     makeFormula(var_names$x, var_names$y)
   }
-  # FIXME: Revisit what we pass to the weights argument.
-  if (config$`Use Weight`){
-    weight_col <- var_names$w
-    weights_v <- inputs$the.data[[weight_col]]
-    # WORKAROUND
-    # The code below ensures that weights_v gets saved to the execution environment
-    # of lm.
-    my_envir <- environment()
-    lapply(
-      X = 1:ncol(inputs$the.data),
-      FUN = function(i){
-        assign(
-          x = names(inputs$the.data)[i],
-          value = inputs$the.data[,i],
-          envir = my_envir
-        )
-      }
-    )
-
-    lm(formula = the.formula, data = environment(), weights = weights_v)
-  } else {
-    lm(the.formula, inputs$the.data)
+  # Create a call list
+  theCall_l <- list(as.name('lm'))
+  theCall_l$formula <- the.formula
+  theCall_l$data <- as.name("the.data")
+  if (config$`Use Weight`) {
+    theCall_l$weights <- as.name(var_names$w)
   }
+  theCall_c <- as.call(theCall_l)
+  the.model <- eval(theCall_c)
+  the.model
 }
 
 #' @inheritParams processLinearOSR
