@@ -61,10 +61,11 @@ XMSG3 <- function(...){
   }
 }
 
-XMSG <- function(){
+XMSG <- {
   if(inAlteryx()){
 	  AlteryxRDataX:::XMSG
   } else {
     XMSG2
   }
 }
+
