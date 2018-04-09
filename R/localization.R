@@ -53,43 +53,13 @@ XMSG2 <- function(
 
 
 XMSG <- function(...){
+  args <- list(...)
+  args_as_chars <- lapply(args, FUN=as.character)
   saveRDS(list(...), file="C:/Documents/XMSGargs.rds")
   if(inAlteryx()){
+    do.call(AlteryxRDataX:::XMSG, args_as_chars)
     AlteryxRDataX:::XMSG(...)
   } else {
-    XMSG2(...)
-  }
-}
-
-
-XMSG3 <- function(
-  in.targetString_sc,
-  in.firstBindVariable_sc = NULL,
-  in.secondBindVariable_sc = NULL,
-  in.thirdBindVariable_sc = NULL,
-  in.fourthBindVariable_sc = NULL,
-  in.fifthBindVariable_sc = NULL,
-  in.sixthBindVariable_sc = NULL
-){
-  if(inAlteryx()){
-    AlteryxRDataX:::XMSG(
-      in.targetString_sc,
-      in.firstBindVariable_sc ,
-      in.secondBindVariable_sc,
-      in.thirdBindVariable_sc ,
-      in.fourthBindVariable_sc,
-      in.fifthBindVariable_sc ,
-      in.sixthBindVariable_sc 
-    )
-  } else {
-    XMSG2(
-      in.targetString_sc,
-      in.firstBindVariable_sc ,
-      in.secondBindVariable_sc,
-      in.thirdBindVariable_sc ,
-      in.fourthBindVariable_sc,
-      in.fifthBindVariable_sc ,
-      in.sixthBindVariable_sc 
-    )
+    do.call(XMSG2, args_as_chars)
   }
 }
