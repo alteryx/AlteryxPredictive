@@ -53,6 +53,7 @@ XMSG2 <- function(
 
 
 #' @export
+#' @inheritDotParams XMSG2
 XMSG <- function(...){
   args <- list(...)
   args_as_chars <- lapply(args, FUN = as.character)
