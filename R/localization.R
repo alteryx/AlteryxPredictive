@@ -52,6 +52,7 @@ XMSG2 <- function(
 }
 
 
+#' @export
 XMSG <- function(...){
   args <- list(...)
   args_as_chars <- lapply(args, FUN = as.character)
