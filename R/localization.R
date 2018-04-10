@@ -51,9 +51,10 @@ XMSG2 <- function(
   return(returnValue_sc)
 }
 
-
-#' @export
+#' translates input string and embeds any bind-variable values in result
 #' @inheritDotParams XMSG2
+#' @return translated string with embedded bind-variable values (if any)
+#' @export
 XMSG <- function(...){
   args <- list(...)
   args_as_chars <- lapply(args, FUN = as.character)
