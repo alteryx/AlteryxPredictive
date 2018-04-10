@@ -14,4 +14,3 @@ createDashboardDT(model)
 Generic S3 Class
 Create Interactive Dashboard
 }
-

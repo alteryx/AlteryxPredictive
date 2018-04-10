@@ -19,4 +19,3 @@ y variable
 Check if response variable is the same in the pre-built model(s) and the input data.
 If so, output this variable.
 }
-

@@ -17,4 +17,3 @@ list of results for outputting
 \description{
 get results from running cross validation for logistic regression model
 }
-

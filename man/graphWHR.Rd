@@ -32,4 +32,3 @@ provide the AlteryxGraph device.
 \author{
 Dan Putler
 }
-

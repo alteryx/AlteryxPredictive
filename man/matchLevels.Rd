@@ -15,4 +15,3 @@ matchLevels(nd, ol)
 Coerce the levels in new data factors to exactly match the levels
 of factors in the original data, and is needed for Revo ScaleR models
 }
-

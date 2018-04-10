@@ -22,4 +22,3 @@ new data
 \author{
 Dan Putler
 }
-

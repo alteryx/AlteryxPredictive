@@ -19,4 +19,3 @@ a data.frame with results
 \description{
 Get the necessary measures in the binary classification case
 }
-

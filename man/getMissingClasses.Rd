@@ -19,4 +19,3 @@ vector of the classes that are missing from the current fold.
 Given a factor variable and a set of records in a fixed trial and fold,
 return the list of classes not present in that trial and fold.
 }
-

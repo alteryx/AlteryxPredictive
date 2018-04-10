@@ -14,4 +14,3 @@ checkXVars(inputs)
 Check predictor variables
 Check if predictor variables in the models and input data are identical.
 }
-

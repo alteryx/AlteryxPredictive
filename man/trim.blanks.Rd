@@ -12,4 +12,3 @@ trim.blanks(text)
 \description{
 This function trims blanks from text input
 }
-

@@ -17,4 +17,3 @@ formula of y_var ~ x_vars
 \description{
 Create formula string
 }
-

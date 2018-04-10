@@ -16,12 +16,11 @@ function returns a data frame that is a set of key-value pairs for the
 components of the summary report as well as the model's coefficients in a
 JSON formatted character string.
 }
-\author{
-Dan Putler
-}
 \seealso{
 Other Alteryx.Report: \code{\link{Alteryx.ReportAnova}},
   \code{\link{Alteryx.ReportGLM}},
   \code{\link{createReportGLMNET}}
 }
-
+\author{
+Dan Putler
+}

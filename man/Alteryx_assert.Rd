@@ -20,4 +20,3 @@ analog of assert_that for use with Alteryx
 Generic S3 class on message
 message can have class 'error' or 'warning'
 }
-

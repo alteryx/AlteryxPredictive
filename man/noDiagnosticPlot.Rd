@@ -12,4 +12,3 @@ noDiagnosticPlot(msg)
 \description{
 Function to create empty plot with a message
 }
-

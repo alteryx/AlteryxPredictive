@@ -9,4 +9,3 @@ createPlotOutputsLogisticXDF()
 \description{
 Plots in XDF
 }
-

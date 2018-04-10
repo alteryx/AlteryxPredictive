@@ -15,4 +15,3 @@ data with missing records excluded
 \description{
 Check if data contains missing values, omit those records
 }
-

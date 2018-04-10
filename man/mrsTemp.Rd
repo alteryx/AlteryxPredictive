@@ -14,4 +14,3 @@ path to the directory
 \author{
 Dan Putler
 }
-

@@ -18,4 +18,3 @@ is.boundedInt(val, min = -Inf, max = Inf, closed = TRUE)
 \description{
 checks whether real value is between min and max
 }
-

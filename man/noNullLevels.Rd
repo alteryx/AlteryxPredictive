@@ -12,4 +12,3 @@ noNullLevels(ll)
 \description{
 Remove factors with null levels from a list
 }
-

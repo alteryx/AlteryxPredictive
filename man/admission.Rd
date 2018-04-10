@@ -20,4 +20,3 @@ The data is obtained from: http://www.ats.ucla.edu/stat/data/binary.csv
 The variables are as follows:
 }
 \keyword{datasets}
-

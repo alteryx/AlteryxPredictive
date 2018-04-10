@@ -17,4 +17,3 @@ names of levels - vector
 \description{
 extract levels from xdf data
 }
-

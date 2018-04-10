@@ -23,4 +23,3 @@ General Method for Validating config
 Error checking pre-model
 Returns a vector of Booleans indicating warnings and errors
 }
-

@@ -17,4 +17,3 @@ list with named parameters  for function
 \description{
 Map parameter names to function argument names
 }
-

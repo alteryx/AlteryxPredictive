@@ -12,4 +12,3 @@ createPrunePlotDT(model)
 \description{
 Create Prune Plot
 }
-

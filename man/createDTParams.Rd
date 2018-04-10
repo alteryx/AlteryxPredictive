@@ -17,4 +17,3 @@ list with components needed to create model
 \description{
 Creation of components for model object evaluation
 }
-

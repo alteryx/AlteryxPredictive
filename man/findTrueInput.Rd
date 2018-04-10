@@ -14,4 +14,3 @@ findTrueInput(input, root)
 \description{
 Find inputs that start with a root and have the value TRUE
 }
-

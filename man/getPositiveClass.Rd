@@ -21,4 +21,3 @@ positive class to the less-common class when all else fails.
 This function is localized: it tries to match target_levels to an
 appropriate string based on the user's language.
 }
-

@@ -21,4 +21,3 @@ list of record ID's. Each element is the record ID's of the folds for a given tr
 \description{
 Create the list of cross-validation folds
 }
-

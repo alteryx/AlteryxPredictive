@@ -22,4 +22,3 @@ Convert data frame into a numeric matrix, filtering out non-numeric columns
 and warning the user (by displaying a message passed in as an argument) when
 such filtering occurs.
 }
-

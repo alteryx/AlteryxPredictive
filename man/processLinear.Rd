@@ -18,4 +18,3 @@ processLinearXDF(inputs, config)
 These two functions take `inputs` and `config` and return the model object
 along with other elements essential to create the reports and plots
 }
-

@@ -15,4 +15,3 @@ list with named parameters for C5.0
 \description{
 Map parameter names to function arg names for C5.0
 }
-

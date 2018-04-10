@@ -9,4 +9,3 @@ inAlteryx()
 \description{
 Returns TRUE if called inside an Alteryx R Tool.
 }
-

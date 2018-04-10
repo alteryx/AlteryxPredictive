@@ -15,4 +15,3 @@ Unserialize a list of inputs some of which might contain serialized model object
 \author{
 Dan Putler, Ramnath Vaidyanathan
 }
-

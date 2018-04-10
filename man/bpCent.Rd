@@ -76,4 +76,3 @@ of a cluster analysis solution.
 \author{
 Dan Putler
 }
-

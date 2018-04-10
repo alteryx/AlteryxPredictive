@@ -27,4 +27,3 @@ object with alpha sorted factor levels.
 \author{
 Dan Putler
 }
-

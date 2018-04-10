@@ -18,4 +18,3 @@ checkFactorVars(data, folds, config)
 For each factor variable, check to see if all levels are present in each fold.
 If not, warn the user.
 }
-

@@ -17,12 +17,11 @@ components of the summary report as well as the model's coefficients in a
 JSON formatted character string. The coefficient JSON string is really for
 future option value
 }
-\author{
-Dan Putler
-}
 \seealso{
 Other Alteryx.Report: \code{\link{Alteryx.ReportAnova}},
   \code{\link{Alteryx.ReportLM}},
   \code{\link{createReportGLMNET}}
 }
-
+\author{
+Dan Putler
+}

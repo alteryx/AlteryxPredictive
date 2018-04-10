@@ -21,4 +21,3 @@ else zero}
 Translates an R squared into an adjusted R squared, returning NaN
 if the input is Nan.
 }
-

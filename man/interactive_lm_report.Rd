@@ -24,4 +24,3 @@ This function generates the interactive report for the Linear Model tool.
 \author{
 Todd Morley, Dylan Blanchard
 }
-

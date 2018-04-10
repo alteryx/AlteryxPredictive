@@ -18,4 +18,3 @@ process for Linear Regression with Cross Validation
 returns named vector of six model-performance metrics
 r_squared, adj_r_squared, avg_mae, avg_mape, avg_mse, avg_rmse
 }
-

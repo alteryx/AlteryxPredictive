@@ -18,4 +18,3 @@ defaults to error messaging}
 analog of assert_that for use with Alteryx,
 defaults to error messaging
 }
-

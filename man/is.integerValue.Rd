@@ -14,4 +14,3 @@ is.integerValue(x, precision = .Machine$double.eps^0.5)
 \description{
 check whether some number is an integerValue
 }
-

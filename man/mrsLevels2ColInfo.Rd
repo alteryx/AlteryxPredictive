@@ -17,4 +17,3 @@ in-platform data object
 \author{
 Dan Putler
 }
-

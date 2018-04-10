@@ -14,4 +14,3 @@ findInputs(input, root)
 \description{
 Find inputs that start with a root
 }
-

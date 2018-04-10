@@ -17,4 +17,3 @@ outvec a vector of results
 \description{
 Get the necessary measures in the classification case
 }
-

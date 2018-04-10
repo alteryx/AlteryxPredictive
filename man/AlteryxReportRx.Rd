@@ -14,4 +14,3 @@ AlteryxReportRx(rx.obj, null.deviance = NULL)
 \description{
 Create report for rx model objects.
 }
-

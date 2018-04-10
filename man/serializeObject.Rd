@@ -16,4 +16,3 @@ string.  Spatial objects become Well Known Text
 \author{
 Rob Bryan
 }
-

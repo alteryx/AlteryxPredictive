@@ -19,4 +19,3 @@ the original matrix
 \author{
 Dan Putler
 }
-
