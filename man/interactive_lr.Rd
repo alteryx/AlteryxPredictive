@@ -27,4 +27,3 @@ Dashboard generation for logistic regression models
 \author{
 Todd Morley
 }
-

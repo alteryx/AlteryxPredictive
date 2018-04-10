@@ -17,4 +17,3 @@ confusion matrix
 \description{
 Helpful wrapper around fitted and actual values for generating confusion matrix
 }
-

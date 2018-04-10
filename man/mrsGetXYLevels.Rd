@@ -18,4 +18,3 @@ information in an object created by mrsDataObj
 \author{
 Dan Putler
 }
-

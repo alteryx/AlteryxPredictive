@@ -12,4 +12,3 @@ getXlevels(x)
 \description{
 Get X Levels from model object
 }
-

@@ -18,4 +18,3 @@ checkValidConfigrpart(config, the.data, names)
 Error checking pre-model
 Does not return anything - just throws errror
 }
-

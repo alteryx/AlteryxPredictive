@@ -25,4 +25,3 @@ Create a dashboard outputting a single message
 \author{
 Todd Morley
 }
-

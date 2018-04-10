@@ -16,12 +16,11 @@ type II ANOVA for a LM or GLM model object. The last key- value indicates
 whether the report is for a lm or glm model which is relevant for labeling
 columns in the output created by Alteryx.
 }
-\author{
-Dan Putler
-}
 \seealso{
 Other Alteryx.Report: \code{\link{Alteryx.ReportGLM}},
   \code{\link{Alteryx.ReportLM}},
   \code{\link{createReportGLMNET}}
 }
-
+\author{
+Dan Putler
+}

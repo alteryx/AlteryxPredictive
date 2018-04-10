@@ -18,4 +18,3 @@ list with boolean is_XDF and string xdf_path representing
 \description{
 extract xdf properties from incoming xdf data
 }
-

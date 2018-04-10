@@ -16,4 +16,3 @@
 \description{
 analog of assert_that for use with Alteryx warnings
 }
-

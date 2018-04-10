@@ -14,4 +14,3 @@
 \description{
 Adjusts config based on results if config was initially "Auto"
 }
-

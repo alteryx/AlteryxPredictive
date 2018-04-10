@@ -15,14 +15,13 @@
 #' @param in.sixthBindVariable_sc the sixth bind variable
 #' @return translated string with embedded bind-variable values (if any)
 #' @export
-XMSG <- function(
+XMSG2 <- function(
   in.targetString_sc,
   in.firstBindVariable_sc = NULL,
   in.secondBindVariable_sc = NULL,
   in.thirdBindVariable_sc = NULL,
   in.fourthBindVariable_sc = NULL,
-  in.fifthBindVariable_sc = NULL,
-  in.sixthBindVariable_sc = NULL
+  in.fifthBindVariable_sc = NULL, in.sixthBindVariable_sc = NULL
 ){
   bindVariable_vc <- c(
     in.firstBindVariable_sc,
@@ -50,4 +49,15 @@ XMSG <- function(
     ']]]'
   )
   return(returnValue_sc)
+}
+
+
+XMSG <- function(...){
+  args <- list(...)
+  args_as_chars <- lapply(args, FUN = as.character)
+  if (inAlteryx()) {
+    do.call(AlteryxRDataX:::XMSG, args_as_chars)
+  } else {
+    do.call(XMSG2, args_as_chars)
+  }
 }

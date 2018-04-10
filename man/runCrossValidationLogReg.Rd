@@ -17,4 +17,3 @@ list of results for outputting
 \description{
 Run CV and output results for logistic CV model
 }
-

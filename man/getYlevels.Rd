@@ -14,4 +14,3 @@ getYlevels(x, ...)
 \description{
 Get Y levels from model object
 }
-

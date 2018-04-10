@@ -19,4 +19,3 @@ interval.
 \author{
 Dan Putler
 }
-

@@ -14,4 +14,3 @@ AlteryxMessage2(msg, ...)
 \description{
 Message
 }
-

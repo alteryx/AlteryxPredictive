@@ -18,4 +18,3 @@ write.Alteryx2(data, nOutput = 1, bIncludeRowNames = FALSE, source = "")
 \description{
 Alteryx Write Function
 }
-

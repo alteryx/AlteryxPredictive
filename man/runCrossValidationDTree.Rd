@@ -17,4 +17,3 @@ list with components measuring model fit obtained via CV
 \description{
 Wrapper function for performing cross-validation on DTree models.
 }
-

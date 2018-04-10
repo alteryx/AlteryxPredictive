@@ -15,4 +15,3 @@ processElasticNet(inputs, config)
 This function takes `inputs` and `config` and returns the model object
 along with other elements essential to create the reports and plots
 }
-

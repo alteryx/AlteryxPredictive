@@ -18,4 +18,3 @@ Prepare the basic regression diagnostic plots if it is requested
 and their isn't the combination of singularities and the use of
 sampling weights.
 }
-

@@ -21,4 +21,3 @@ dataframe of piped results
 \description{
 Get data for static report for C5.0 model
 }
-

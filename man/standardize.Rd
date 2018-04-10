@@ -21,4 +21,3 @@ appropriate columns and then dividing by the second standarization parameter.
 \author{
 Dan Putler
 }
-

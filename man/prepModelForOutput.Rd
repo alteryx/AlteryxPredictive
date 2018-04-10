@@ -17,4 +17,3 @@ key value pair list with name and model
 \description{
 Prepare model for output
 }
-

@@ -15,4 +15,3 @@ getYVar function
 \author{
 Ramnath Vaidyanathan, Bridget Toomey
 }
-

@@ -21,4 +21,3 @@ macro/workflow runs this function, the input data gets saved as an rds file
 with the prefix ".input", to the macro/workflow directory. This allows the R
 code to be run outside of Alteryx.
 }
-

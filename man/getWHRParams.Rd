@@ -14,4 +14,3 @@ getWHRParams(config, plotPrefix = NULL)
 \description{
 Get list of arguments to pass to whrParams
 }
-

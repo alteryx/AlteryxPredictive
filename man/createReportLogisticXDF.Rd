@@ -16,4 +16,3 @@ createReportLogisticXDF(the.model, config, null.model)
 \description{
 Create report for logistic regression run on XDF
 }
-

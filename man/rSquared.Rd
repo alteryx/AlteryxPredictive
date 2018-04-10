@@ -14,4 +14,3 @@ rSquared(numeric_vector_1, numeric_vector_2)
 \description{
 Tries very hard to compute a sensible R squared, else returns NaN.
 }
-

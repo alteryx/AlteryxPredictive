@@ -27,4 +27,3 @@ concatenated warning and/or error string. All three arguments must be
 vectors of the same length.
 Does not return anything. It only writes out concatenated errors/warnings.
 }
-

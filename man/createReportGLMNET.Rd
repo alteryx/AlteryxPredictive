@@ -15,12 +15,11 @@ The function createReportGLMNET creates a data frame of an elnet/cv.glmnet model
 output that can more easily be handled by Alteryx's reporting tools. The
 function returns a data frame containing the model's coeffcients.
 }
-\author{
-Bridget Toomey
-}
 \seealso{
 Other Alteryx.Report: \code{\link{Alteryx.ReportAnova}},
   \code{\link{Alteryx.ReportGLM}},
   \code{\link{Alteryx.ReportLM}}
 }
-
+\author{
+Bridget Toomey
+}

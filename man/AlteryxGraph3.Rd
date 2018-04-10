@@ -18,4 +18,3 @@ AlteryxGraph3(expr, nOutput, config = NULL, plotPrefix = NULL)
 \description{
 Plot output of an R expression
 }
-

@@ -14,4 +14,3 @@ stop.Alteryx2(msg, ...)
 \description{
 Stop
 }
-

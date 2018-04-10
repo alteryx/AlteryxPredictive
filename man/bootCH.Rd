@@ -39,4 +39,3 @@ implementing the sum of squares components
 \author{
 Dan Putler
 }
-

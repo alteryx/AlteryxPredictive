@@ -20,4 +20,3 @@ AlteryxGraph2(expr, nOutput = 1, width = 576, height = 576, ...)
 \description{
 Alteryx Graph Function
 }
-

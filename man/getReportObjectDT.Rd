@@ -17,4 +17,3 @@ list of piped results
 \description{
 Get common report objects
 }
-

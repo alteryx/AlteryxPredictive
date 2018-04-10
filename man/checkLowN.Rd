@@ -21,4 +21,3 @@ no return - only throws warning
 \description{
 Check if data has enough rows
 }
-

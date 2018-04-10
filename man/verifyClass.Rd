@@ -21,4 +21,3 @@ Check if positive class is present in vector
 Will return same value if in vector, value from data if level is in vector
 with different case / trim, and an empty string if no similar value is present
 }
-

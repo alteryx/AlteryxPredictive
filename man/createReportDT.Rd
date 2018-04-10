@@ -23,4 +23,3 @@ dataframe of piped results
 Generic S3 class
 Get data for static report (grp|out pipes)
 }
-

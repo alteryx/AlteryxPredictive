@@ -15,4 +15,3 @@ list with named parameters for rpart
 \description{
 Map parameter names to function arg names for rpart
 }
-

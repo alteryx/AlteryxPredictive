@@ -18,4 +18,3 @@ levels.
 \author{
 Dan Putler
 }
-

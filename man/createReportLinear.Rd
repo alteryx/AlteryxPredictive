@@ -19,4 +19,3 @@ If the ANOVA table is requested then create it and add its results to the
 key-value table. Its creation will be surpressed if the car package isn't
 present, or if the input is an XDF file.
 }
-

@@ -16,4 +16,3 @@ turns it into a pipe delimited string for processing in Alteryx.
 \author{
 Dan Putler
 }
-

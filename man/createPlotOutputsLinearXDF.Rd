@@ -9,4 +9,3 @@ createPlotOutputsLinearXDF()
 \description{
 Plots in XDF
 }
-

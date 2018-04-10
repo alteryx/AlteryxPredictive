@@ -2,16 +2,16 @@
 % Please edit documentation in R/scoreModel.R
 \name{scoreModel}
 \alias{scoreModel}
-\alias{scoreModel.cv.glmnet}
 \alias{scoreModel.default}
-\alias{scoreModel.elnet}
 \alias{scoreModel.lm}
-\alias{scoreModel.lognet}
-\alias{scoreModel.rxDForest}
-\alias{scoreModel.rxDTree}
+\alias{scoreModel.rxLogit}
 \alias{scoreModel.rxGlm}
 \alias{scoreModel.rxLinMod}
-\alias{scoreModel.rxLogit}
+\alias{scoreModel.rxDTree}
+\alias{scoreModel.rxDForest}
+\alias{scoreModel.elnet}
+\alias{scoreModel.lognet}
+\alias{scoreModel.cv.glmnet}
 \title{Score function}
 \usage{
 scoreModel(mod.obj, new.data, score.field = "Score", ...)
@@ -69,4 +69,3 @@ Score function
 \author{
 Ramnath Vaidyanathan, Dan Putler, Bridget Toomey
 }
-

@@ -35,4 +35,3 @@ is returned as a character vector.
 \author{
 Dan Putler
 }
-

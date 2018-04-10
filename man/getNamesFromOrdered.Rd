@@ -17,4 +17,3 @@ list of x, y, and weights with respective names
 \description{
 Get names list for x, y, and weights
 }
-

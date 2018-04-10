@@ -41,4 +41,3 @@ plotMeans(response, factor1, factor2, error.bars = c("se", "sd", "conf.int",
 \description{
 This function is taken from John Fox's plotMeans function from the Rcmdr package
 }
-

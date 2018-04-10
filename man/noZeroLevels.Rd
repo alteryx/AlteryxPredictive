@@ -12,4 +12,3 @@ noZeroLevels(ll)
 \description{
 Remove non numeric elements from a list
 }
-

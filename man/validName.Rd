@@ -16,4 +16,3 @@ determines if it is a valid R object name and (2) if not, make it one.
 \author{
 Dan Putler
 }
-

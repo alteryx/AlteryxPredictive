@@ -12,4 +12,3 @@ getXVars(x)
 \description{
 Extract predictor variables from an R model call object
 }
-

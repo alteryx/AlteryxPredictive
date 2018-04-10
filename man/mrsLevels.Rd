@@ -26,4 +26,3 @@ mrs_levels[names(mrs_levels) %in% desired_factor_names]
 \author{
 Dan Putler
 }
-

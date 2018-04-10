@@ -17,4 +17,3 @@ installed and install them if they're not.
 \author{
 Bridget Toomey, Dan Putler
 }
-

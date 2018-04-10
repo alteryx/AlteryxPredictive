@@ -19,4 +19,3 @@ key-value table. Its creation will be surpressed if the car package isn't
 present, if their were singularities in estimation, or if the input is an
 XDF file.
 }
-

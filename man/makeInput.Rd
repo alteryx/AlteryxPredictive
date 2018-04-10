@@ -14,4 +14,3 @@ makeInput(template, input)
 \description{
 Make an input string to be inserted at the top of R code
 }
-

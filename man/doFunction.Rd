@@ -19,4 +19,3 @@ model object
 Execute function on parameters
 To-Do: re-specify call to be appropriate
 }
-

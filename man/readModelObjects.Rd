@@ -14,4 +14,3 @@ readModelObjects(name, default)
 \description{
 Read an Alteryx stream consisting of a table of model objects
 }
-

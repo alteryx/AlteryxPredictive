@@ -16,4 +16,3 @@ using an alpha sort on the level labels.
 \author{
 Dan Putler
 }
-
