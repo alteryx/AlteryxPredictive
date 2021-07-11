@@ -4,7 +4,8 @@
 \alias{read.Alteryx2}
 \title{Alteryx Read Function}
 \usage{
-read.Alteryx2(name, mode = "data.frame", bIncludeRowNames = FALSE, default)
+read.Alteryx2(name, mode = "data.frame", bIncludeRowNames = FALSE, default,
+  allowEmpty = FALSE)
 }
 \arguments{
 \item{name}{name}
@@ -14,6 +15,8 @@ read.Alteryx2(name, mode = "data.frame", bIncludeRowNames = FALSE, default)
 \item{bIncludeRowNames}{include row names}
 
 \item{default}{default}
+
+\item{allowEmpty}{boolean indicating if empty inputs should be allowed}
 }
 \description{
 This function reads data from an Alteryx input stream. Every time a

@@ -10,13 +10,27 @@
 #' @param mode mode
 #' @param bIncludeRowNames include row names
 #' @param default default
+#' @param allowEmpty boolean indicating if empty inputs should be allowed
 read.Alteryx2 = function(name, mode = "data.frame",
-    bIncludeRowNames = FALSE, default){
+    bIncludeRowNames = FALSE, default, allowEmpty = FALSE){
   inAlteryx = function(){'package:AlteryxRDataX' %in% search()}
   if (inAlteryx()){
     wdir = getOption('alteryx.wd', '%Engine.WorkflowDirectory%')
     requireNamespace('AlteryxRDataX')
-    d <- AlteryxRDataX::read.Alteryx(name = name, mode = mode, bIncludeRowNames = FALSE)
+    d <- AlteryxRDataX::read.Alteryx(
+      name = name, mode = mode, bIncludeRowNames = bIncludeRowNames
+    )
+    # The logic here is that if we are (a) reading in input as a data frame
+    # and we (b) dont want to allow for empty inputs, and (c) the input
+    # read as a data frame has zero rows, then invoke stop.Alteryx2
+    # TODO
+    # Extend the logic to lists with empty objects and other modes.
+    if ((mode == 'data.frame') && !allowEmpty && (NROW(d) == 0)){
+      stop.Alteryx2(paste(
+        "The input to this tool is empty. Please check for any",
+        "errors reported upstream."
+      ))
+    }
     # i need to figure out a way to make things work during debug as well
     # as production. it would be ideal to expose this flag in the macro ui
     # so that an end user can flip the debug mode to inspect further
